@@ -259,3 +259,11 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/Northwind
+/ENV
+/Firefly.Box.xml
+/Firefly.Box.Dll
+/buildRelease.bat
+/buildDebug.bat
+/BuildAnalyzer.exe
+/lib

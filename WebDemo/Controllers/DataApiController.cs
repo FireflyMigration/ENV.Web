@@ -12,6 +12,7 @@ namespace WebDemo.Controllers
         static DataApiController()
         {
             ViewModelHelper.RegisterEntity("Products",typeof(Northwind.Models.Products));
+            ViewModelHelper.RegisterEntity("Categories", typeof(Northwind.Models.Categories),true);
         }
         // GET: DataApi
         public void Index(string name, string id = null)

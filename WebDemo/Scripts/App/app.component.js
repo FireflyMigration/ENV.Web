@@ -16,9 +16,14 @@ require("rxjs/add/operator/toPromise");
 let AppComponent = class AppComponent {
     constructor(server) {
         this.server = server;
-        this.title = 'The title';
+        this.title = 'Categories';
+        this.status = 'ok';
     }
     ngOnInit() {
+        this.server.getData('categories').then(r => this.categories = r);
+    }
+    save(c) {
+        this.server.put('categories/' + c.id, c).then(() => this.status = 'updated');
     }
 };
 AppComponent = __decorate([

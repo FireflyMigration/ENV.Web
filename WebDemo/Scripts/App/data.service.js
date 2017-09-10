@@ -29,6 +29,9 @@ let dataService = class dataService {
             return Promise.reject(error.message || error);
         });
     }
+    put(url, data) {
+        return this.http.put(this.urlFor('dataApi/' + url), JSON.stringify(data), { headers: this.headers }).toPromise();
+    }
     do(url) {
         return this.get(url);
     }

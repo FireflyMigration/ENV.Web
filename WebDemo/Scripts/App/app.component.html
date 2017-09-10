@@ -1,1 +1,22 @@
 ﻿<h3>{{title}}</h3>
+<h5>{{status}}</h5>
+<table class="table table-bordered table-responsive table-condensed">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let c of categories">
+            <th><button class="btn" (click)="save(c)">Save</button></th>
+            <td class="col-md-1"><input class="form-control" [(ngModel)]="c.id" /></td>
+            <td class="col-md-3"><input class="form-control" [(ngModel)]="c.categoryName" /></td>
+            <td class="col-md-3"><input class="form-control" [(ngModel)]="c.description" /></td>
+        </tr>
+    </tbody>
+</table>
+

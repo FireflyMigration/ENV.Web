@@ -12,6 +12,20 @@ const RestList_1 = require("./utils/RestList");
 let AppComponent = class AppComponent {
     constructor() {
         this.categories = new RestList_1.RestList('http://localhost/web.demo/dataApi/categories');
+        this.columnSettings = [
+            {
+                primaryKey: 'id',
+                header: 'id'
+            },
+            {
+                primaryKey: 'categoryName',
+                header: 'Name'
+            },
+            {
+                primaryKey: 'description',
+                header: 'Description'
+            }
+        ];
     }
     ngOnInit() {
         this.categories.get({

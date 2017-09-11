@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { Category } from './models';
 import { RestList } from './utils/RestList';
+import { ColumnSetting } from "./utils/table-layout.component";
 
 
 @Component({
@@ -13,7 +14,21 @@ import { RestList } from './utils/RestList';
 export class AppComponent implements OnInit {
 
     categories = new RestList<Category>('http://localhost/web.demo/dataApi/categories');
-
+    columnSettings: ColumnSetting[] =
+    [
+        {
+            primaryKey: 'id',
+            header: 'id'
+        },
+        {
+            primaryKey: 'categoryName',
+            header: 'Name'
+        },
+        {
+            primaryKey: 'description',
+            header: 'Description'
+        }
+    ];
     ngOnInit(): void {
     
         this.categories.get({

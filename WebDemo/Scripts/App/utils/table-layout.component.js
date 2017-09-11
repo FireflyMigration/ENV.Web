@@ -16,8 +16,23 @@ let TableLayoutComponent = class TableLayoutComponent {
         this.keys = [];
     }
     ngOnChanges() {
-        if (this.records.length > 0)
-            this.keys = Object.keys(this.records[0]);
+        if (this.settings) {
+            this.columnMaps = this.settings;
+        }
+        else {
+            {
+                // no settings, create column maps with defaults
+                if (this.records.length > 0)
+                    this.columnMaps = Object.keys(this.records[0])
+                        .map(key => {
+                        return {
+                            primaryKey: key,
+                            header: key.slice(0, 1).toUpperCase() +
+                                key.replace(/_/g, ' ').slice(1)
+                        };
+                    });
+            }
+        }
     }
 };
 __decorate([
@@ -28,6 +43,10 @@ __decorate([
     core_1.Input(),
     __metadata("design:type", String)
 ], TableLayoutComponent.prototype, "caption", void 0);
+__decorate([
+    core_1.Input(),
+    __metadata("design:type", Array)
+], TableLayoutComponent.prototype, "settings", void 0);
 TableLayoutComponent = __decorate([
     core_1.Component({
         selector: 'ct-table',
@@ -35,4 +54,7 @@ TableLayoutComponent = __decorate([
     })
 ], TableLayoutComponent);
 exports.TableLayoutComponent = TableLayoutComponent;
+class ColumnSetting {
+}
+exports.ColumnSetting = ColumnSetting;
 //# sourceMappingURL=table-layout.component.js.map

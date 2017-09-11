@@ -10,9 +10,33 @@ export class TableLayoutComponent implements OnChanges {
 
     @Input() records: any[];
     @Input() caption: string;
-    keys: string[]=[];
+    @Input() settings: ColumnSetting[];
+    columnMaps: ColumnSetting[];
+    keys: string[] = [];
     ngOnChanges(): void {
-        if (this.records.length > 0)
-            this.keys = Object.keys(this.records[0]);
+        if (this.settings) { // when settings provided
+            this.columnMaps = this.settings;
+        } else {
+            {
+                // no settings, create column maps with defaults
+                if (this.records.length > 0)
+                    this.columnMaps = Object.keys(this.records[0])
+                        .map(key => {
+                            return {
+                                primaryKey: key,
+                                header: key.slice(0, 1).toUpperCase() +
+                                key.replace(/_/g, ' ').slice(1)
+                            }
+                        });
+            }
+        }
+
     }
+}
+
+export class ColumnSetting {
+    primaryKey: string;
+    header?: string;
+    format?: string;
+    alternativeKeys?: string[];
 }

@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const core_2 = require("@angular/core");
+const models_1 = require("./models");
 const data_service_1 = require("./data.service");
 require("rxjs/add/operator/toPromise");
 let AppComponent = class AppComponent {
@@ -23,7 +24,23 @@ let AppComponent = class AppComponent {
         this.server.getData('categories').then(r => this.categories = r);
     }
     save(c) {
-        this.server.put('categories/' + c.id, c).then(() => this.status = 'updated');
+        if (c instanceof newCategory)
+            this.server.post('categories', c).then(response => {
+                this.categories[this.categories.indexOf(c)] = response;
+            }).then(() => this.status = 'created');
+        else
+            this.server.put('categories/' + c.id, c).then(response => {
+                this.categories[this.categories.indexOf(c)] = response;
+            }).then(() => this.status = 'updated');
+    }
+    add() {
+        this.categories.push(new newCategory());
+    }
+    delete(c) {
+        this.server.delete('categories/' + c.id).then(() => {
+            this.categories.splice(this.categories.indexOf(c), 1);
+            this.status = 'deleted';
+        });
     }
 };
 AppComponent = __decorate([
@@ -36,4 +53,10 @@ AppComponent = __decorate([
     __metadata("design:paramtypes", [data_service_1.dataService])
 ], AppComponent);
 exports.AppComponent = AppComponent;
+class newCategory extends models_1.Category {
+    constructor() {
+        super();
+        this.newRow = true;
+    }
+}
 //# sourceMappingURL=app.component.js.map

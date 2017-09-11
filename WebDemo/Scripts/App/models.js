@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class Categorie {
+class Category {
 }
-exports.Categorie = Categorie;
+exports.Category = Category;
 //# sourceMappingURL=models.js.map

@@ -15,7 +15,7 @@ let dataService = class dataService {
     constructor(http) {
         this.http = http;
         this.headers = new http_1.Headers({ 'Content-Type': 'application/json' });
-        this.url = "http://localhost/webDemo";
+        this.url = "http://localhost/web.Demo";
     }
     getData(url) {
         return this.get('dataApi/' + url).then(response => {
@@ -30,7 +30,14 @@ let dataService = class dataService {
         });
     }
     put(url, data) {
-        return this.http.put(this.urlFor('dataApi/' + url), JSON.stringify(data), { headers: this.headers }).toPromise();
+        return this.http.put(this.urlFor('dataApi/' + url), JSON.stringify(data), { headers: this.headers }).toPromise().then(response => response.json());
+        ;
+    }
+    delete(url) {
+        return this.http.delete(this.urlFor('dataApi/' + url)).toPromise();
+    }
+    post(url, data) {
+        return this.http.post(this.urlFor('dataApi/' + url), JSON.stringify(data), { headers: this.headers }).toPromise().then(response => response.json());
     }
     do(url) {
         return this.get(url);

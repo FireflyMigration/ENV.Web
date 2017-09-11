@@ -161,7 +161,8 @@ namespace ENV.Web
         internal Text Text
         {
             get
-            {
+            {if (_o == null)
+                    return null;
                 return _o.ToString();
             }
         }

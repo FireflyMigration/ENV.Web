@@ -240,9 +240,9 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\app.component.ts" />
     <TypeScriptCompile Include="Scripts\App\app.module.ts" />
-    <TypeScriptCompile Include="Scripts\App\data.service.ts" />
     <TypeScriptCompile Include="Scripts\App\main.ts" />
     <TypeScriptCompile Include="Scripts\App\models.ts" />
+    <TypeScriptCompile Include="Scripts\App\utils\RestList.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

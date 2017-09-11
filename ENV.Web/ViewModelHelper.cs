@@ -173,7 +173,7 @@ namespace ENV.Web
         }
         public void CreateTypeScriptClass(TextWriter tw, string name)
         {
-            tw.WriteLine("export class " + name + " {");
+            tw.WriteLine("export interface " + name + " {");
             init();
             foreach (var item in _columns)
             {
@@ -317,7 +317,7 @@ namespace ENV.Web
 
             internal void CreateMemberInTypeScriptClass(TextWriter tw)
             {
-                tw.WriteLine("    " + _key + ":string;");
+                tw.WriteLine("    " + _key + "?:string;");
             }
 
             internal void Describe(TextWriter tw)

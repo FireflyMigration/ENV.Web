@@ -17,16 +17,16 @@ export class AppComponent implements OnInit {
     columnSettings: ColumnSetting[] =
     [
         {
-            primaryKey: 'id',
-            header: 'id'
+            key: 'id',
+            caption: 'id'
         },
         {
-            primaryKey: 'categoryName',
-            header: 'Name'
+            key: 'categoryName',
+            caption: 'Name'
         },
         {
-            primaryKey: 'description',
-            header: 'Description'
+            key: 'description',
+            caption: 'Description'
         }
     ];
     ngOnInit(): void {

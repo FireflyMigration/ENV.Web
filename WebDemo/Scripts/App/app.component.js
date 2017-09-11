@@ -14,16 +14,16 @@ let AppComponent = class AppComponent {
         this.categories = new RestList_1.RestList('http://localhost/web.demo/dataApi/categories');
         this.columnSettings = [
             {
-                primaryKey: 'id',
-                header: 'id'
+                key: 'id',
+                caption: 'id'
             },
             {
-                primaryKey: 'categoryName',
-                header: 'Name'
+                key: 'categoryName',
+                caption: 'Name'
             },
             {
-                primaryKey: 'description',
-                header: 'Description'
+                key: 'description',
+                caption: 'Description'
             }
         ];
     }

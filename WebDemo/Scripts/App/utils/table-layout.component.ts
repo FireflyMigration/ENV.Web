@@ -23,8 +23,8 @@ export class TableLayoutComponent implements OnChanges {
                     this.columnMaps = Object.keys(this.records[0])
                         .map(key => {
                             return {
-                                primaryKey: key,
-                                header: key.slice(0, 1).toUpperCase() +
+                                key: key,
+                                caption: key.slice(0, 1).toUpperCase() +
                                 key.replace(/_/g, ' ').slice(1)
                             }
                         });
@@ -35,8 +35,8 @@ export class TableLayoutComponent implements OnChanges {
 }
 
 export class ColumnSetting {
-    primaryKey: string;
-    header?: string;
-    format?: string;
-    alternativeKeys?: string[];
+    key: string;
+    caption?: string;
+    
+    
 }

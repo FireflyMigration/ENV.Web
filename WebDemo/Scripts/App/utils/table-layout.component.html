@@ -2,12 +2,12 @@
     <caption *ngIf="caption">{{caption}}</caption>
     <thead>
         <tr>
-            <th *ngFor="let map of columnMaps">{{map.header}}</th>
+            <th *ngFor="let map of columnMaps">{{map.caption}}</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let record of records">
-            <td *ngFor="let map of columnMaps">{{record[map.primaryKey]}}</td>
+            <td *ngFor="let map of columnMaps">{{record[map.key]}}</td>
         </tr>
     </tbody>
 </table>

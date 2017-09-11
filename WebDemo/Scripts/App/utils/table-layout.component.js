@@ -26,8 +26,8 @@ let TableLayoutComponent = class TableLayoutComponent {
                     this.columnMaps = Object.keys(this.records[0])
                         .map(key => {
                         return {
-                            primaryKey: key,
-                            header: key.slice(0, 1).toUpperCase() +
+                            key: key,
+                            caption: key.slice(0, 1).toUpperCase() +
                                 key.replace(/_/g, ' ').slice(1)
                         };
                     });

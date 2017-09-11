@@ -6,20 +6,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
 const core_1 = require("@angular/core");
-const platform_browser_1 = require("@angular/platform-browser");
-const app_component_1 = require("./app.component");
-const forms_1 = require("@angular/forms");
-const http_1 = require("@angular/http");
-const table_layout_component_1 = require("./utils/table-layout.component");
-let AppModule = class AppModule {
+let TableLayoutComponent = class TableLayoutComponent {
 };
-AppModule = __decorate([
-    core_1.NgModule({
-        imports: [platform_browser_1.BrowserModule, forms_1.FormsModule, http_1.HttpModule],
-        declarations: [app_component_1.AppComponent, table_layout_component_1.TableLayoutComponent],
-        bootstrap: [app_component_1.AppComponent]
+TableLayoutComponent = __decorate([
+    core_1.Component({
+        selector: 'ct-table',
+        templateUrl: './scripts/app/utils/table-layout.component.html'
     })
-], AppModule);
-exports.AppModule = AppModule;
-//# sourceMappingURL=app.module.js.map
+], TableLayoutComponent);
+exports.TableLayoutComponent = TableLayoutComponent;
+//# sourceMappingURL=table-layout.component.js.map

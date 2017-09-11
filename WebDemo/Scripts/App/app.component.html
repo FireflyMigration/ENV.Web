@@ -1,5 +1,5 @@
 ﻿<h3>{{title}}</h3>
-<h5>{{status}}</h5>
+<h5>{{status}}  {{categories.items.length}} </h5>
 <table class="table table-bordered table-responsive table-condensed">
     <thead>
         <tr>
@@ -11,8 +11,8 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let c of categories">
-            <th><button class="btn" (click)="save(c)">Save</button><button class="btn" *ngIf="!c.newRow" (click)="delete(c)">Delete</button></th>
+        <tr *ngFor="let c of categories.items">
+            <th><button class="btn" (click)="categories.save(c)">Save</button><button class="btn" *ngIf="!c.newRow" (click)="categories.delete(c)">Delete</button></th>
             <td class="col-md-1"><input class="form-control" [(ngModel)]="c.id" /></td>
             <td class="col-md-3"><input class="form-control" [(ngModel)]="c.categoryName" /></td>
             <td class="col-md-3"><input class="form-control" [(ngModel)]="c.description" /></td>
@@ -20,5 +20,5 @@
     </tbody>
     
 </table>
-<button class="btn" (click)="add()">Add</button>
+<button class="btn" (click)="categories.add()">Add</button>
 

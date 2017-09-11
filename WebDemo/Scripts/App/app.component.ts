@@ -15,36 +15,59 @@ import 'rxjs/add/operator/toPromise';
 @Injectable()
 export class AppComponent implements OnInit {
     title = 'Categories';
-    categories: Category[];
+    categories = new RestList<Category>();
     status = 'ok';
     constructor(private server: dataService) {
 
     }
     ngOnInit(): void {
-        this.server.getData<Category[]>('categories').then(r => this.categories = r);
+        this.categories.get(this.server, 'categories');
     }
-    save(c: Category) {
-        if (c instanceof newCategory)
-            this.server.post('categories', c).then(response => {
-                this.categories[this.categories.indexOf(c)] = response as Category;
-            }).then(() => this.status = 'created');
-        else
-            this.server.put('categories/' + c.id, c).then(response => {
-                this.categories[this.categories.indexOf(c)] = response as Category;
-            }).then(() => this.status = 'updated');
+
+
+
+
+}
+
+
+class RestList<T extends hasId>{
+
+    items: T[] = [];
+    private server: dataService;
+    private url: string;
+    get(server: dataService, name: string) {
+        this.server = server;
+        this.url = name;
+        this.server.getData<T[]>(name).then(r => {
+            this.items = r;
+        });
     }
     add() {
-        this.categories.push(new newCategory());
+        let x: newItemInList = { newRow: true };
+        this.items.push(x as any as T);
     }
-    delete(c: Category) {
-        this.server.delete('categories/' + c.id).then(() => {
-            this.categories.splice(this.categories.indexOf(c),1);
-            this.status = 'deleted';
+    save(c: T) {
+        if ('newRow' in c )
+            return this.server.post(this.url, c).then(response => {
+                this.items[this.items.indexOf(c)] = response as T;
+            });
+        else {
+            return this.server.put(this.url + '/' + c.id, c).then(response => {
+                this.items[this.items.indexOf(c)] = response as T;
+            });
+        }
+    }
+    delete(c: T) {
+        return this.server.delete(this.url+'/' + c.id).then(() => {
+            this.items.splice(this.items.indexOf(c), 1);
+            
         });
     }
 
 }
-class newCategory extends Category {
-    newRow = true;
-    constructor() { super();}
+interface newItemInList {
+    newRow: boolean;
+}
+interface hasId {
+    id: any;
 }

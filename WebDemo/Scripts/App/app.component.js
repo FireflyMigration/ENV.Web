@@ -11,36 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const core_2 = require("@angular/core");
-const models_1 = require("./models");
 const data_service_1 = require("./data.service");
 require("rxjs/add/operator/toPromise");
 let AppComponent = class AppComponent {
     constructor(server) {
         this.server = server;
         this.title = 'Categories';
+        this.categories = new RestList();
         this.status = 'ok';
     }
     ngOnInit() {
-        this.server.getData('categories').then(r => this.categories = r);
-    }
-    save(c) {
-        if (c instanceof newCategory)
-            this.server.post('categories', c).then(response => {
-                this.categories[this.categories.indexOf(c)] = response;
-            }).then(() => this.status = 'created');
-        else
-            this.server.put('categories/' + c.id, c).then(response => {
-                this.categories[this.categories.indexOf(c)] = response;
-            }).then(() => this.status = 'updated');
-    }
-    add() {
-        this.categories.push(new newCategory());
-    }
-    delete(c) {
-        this.server.delete('categories/' + c.id).then(() => {
-            this.categories.splice(this.categories.indexOf(c), 1);
-            this.status = 'deleted';
-        });
+        this.categories.get(this.server, 'categories');
     }
 };
 AppComponent = __decorate([
@@ -53,10 +34,36 @@ AppComponent = __decorate([
     __metadata("design:paramtypes", [data_service_1.dataService])
 ], AppComponent);
 exports.AppComponent = AppComponent;
-class newCategory extends models_1.Category {
+class RestList {
     constructor() {
-        super();
-        this.newRow = true;
+        this.items = [];
+    }
+    get(server, name) {
+        this.server = server;
+        this.url = name;
+        this.server.getData(name).then(r => {
+            this.items = r;
+        });
+    }
+    add() {
+        let x = { newRow: true };
+        this.items.push(x);
+    }
+    save(c) {
+        if ('newRow' in c)
+            return this.server.post(this.url, c).then(response => {
+                this.items[this.items.indexOf(c)] = response;
+            });
+        else {
+            return this.server.put(this.url + '/' + c.id, c).then(response => {
+                this.items[this.items.indexOf(c)] = response;
+            });
+        }
+    }
+    delete(c) {
+        return this.server.delete(this.url + '/' + c.id).then(() => {
+            this.items.splice(this.items.indexOf(c), 1);
+        });
     }
 }
 //# sourceMappingURL=app.component.js.map

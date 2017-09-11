@@ -267,3 +267,11 @@ __pycache__/
 /buildDebug.bat
 /BuildAnalyzer.exe
 /lib
+/Northwind.Customers
+/Northwind.Orders
+/Northwind.Products
+/NorthwindBase
+/Northwind.sln
+/Northwind Full.sln
+/msbuild.xml
+/buildDebug.log.NoErrors.txt

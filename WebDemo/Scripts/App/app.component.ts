@@ -15,8 +15,14 @@ export class AppComponent implements OnInit {
     categories = new RestList<Category>('http://localhost/web.demo/dataApi/categories');
 
     ngOnInit(): void {
-        this.categories.get();
-}
+    
+        this.categories.get({
+            sort: 'categoryName',
+            order: "desc",
+            isGreaterOrEqualTo: { id: 4 },
+            isLessOrEqualTo: {id:7}
+        });
+    }
 }
 
 

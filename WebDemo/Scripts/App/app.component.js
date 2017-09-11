@@ -14,7 +14,12 @@ let AppComponent = class AppComponent {
         this.categories = new RestList_1.RestList('http://localhost/web.demo/dataApi/categories');
     }
     ngOnInit() {
-        this.categories.get();
+        this.categories.get({
+            sort: 'categoryName',
+            order: "desc",
+            isGreaterOrEqualTo: { id: 4 },
+            isLessOrEqualTo: { id: 7 }
+        });
     }
 };
 AppComponent = __decorate([

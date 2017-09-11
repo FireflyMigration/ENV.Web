@@ -20,7 +20,22 @@ class RestList {
         return x;
     }
     get(options) {
-        return myFetch(this.url).then(r => {
+        let url = new urlBuilder(this.url);
+        if (options) {
+            url.addObject({
+                _limit: options.limit,
+                _page: options.page,
+                _sort: options.sort,
+                _order: options.order
+            });
+            url.addObject(options.isEqualTo);
+            url.addObject(options.isGreaterOrEqualTo, "_gte");
+            url.addObject(options.isLessOrEqualTo, "_lte");
+            url.addObject(options.isGreaterThan, "_gt");
+            url.addObject(options.isLessThan, "_lt");
+            url.addObject(options.isDifferentFrom, "_ne");
+        }
+        return myFetch(url.url).then(r => {
             let x = r;
             this.items = r.map(x => this.map(x));
         });
@@ -56,6 +71,26 @@ class RestList {
     }
 }
 exports.RestList = RestList;
+class urlBuilder {
+    constructor(url) {
+        this.url = url;
+    }
+    add(key, value) {
+        if (value == undefined)
+            return;
+        if (this.url.indexOf('?') >= 0)
+            this.url += '&';
+        else
+            this.url += '?';
+        this.url += encodeURIComponent(key) + '=' + encodeURIComponent(value);
+    }
+    addObject(object, suffix = '') {
+        if (object != undefined)
+            for (var key in object) {
+                this.add(key + suffix, object[key]);
+            }
+    }
+}
 function myFetch(url, init) {
     return fetch(url, init).then(onSuccess, error => {
     });

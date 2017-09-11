@@ -1,15 +1,13 @@
 ﻿<table class="table">
-    <caption>Table</caption>
+    <caption *ngIf="caption">{{caption}}</caption>
     <thead>
         <tr>
-            <th>Column 1</th>
-            <th>Column 2</th>
+            <th *ngFor="let key of keys">{{key}}</th>
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>Some value</td>
-            <td>Some value</td>
+        <tr *ngFor="let record of records">
+            <td *ngFor="let key of keys">{{record[key]}}</td>
         </tr>
     </tbody>
 </table>

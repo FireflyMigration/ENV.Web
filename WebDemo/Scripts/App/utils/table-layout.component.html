@@ -6,7 +6,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let record of records">
+        <tr *ngFor="let record of records.items">
             <td *ngFor="let map of columnMaps">{{record[map.key]}}</td>
         </tr>
     </tbody>

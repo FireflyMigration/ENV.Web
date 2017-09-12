@@ -22,20 +22,20 @@ export class TableLayoutComponent implements OnChanges {
             });
         } else {
             {
-                let x = this.records as any[];
-                if (x)
-                    // no settings, create column maps with defaults
-                    if (x.length > 0) {
-                        this.columnMaps = [];
-                        Object.keys(x[0]).forEach(key => {
-                            if (typeof (x[0][key]) != 'function')
+                for (let r of this.records)
+                {
+                    this.columnMaps = [];
+                    Object.keys(r).forEach(key => {
+                        if (typeof (r[key]) != 'function')
 
-                                this.columnMaps.push({
-                                    key: key,
-                                    caption: makeTitle(key)
-                                });
-                        });
-                    }
+                            this.columnMaps.push({
+                                key: key,
+                                caption: makeTitle(key)
+                            });
+                    });
+                    break;
+                }
+               
             }
         }
     }

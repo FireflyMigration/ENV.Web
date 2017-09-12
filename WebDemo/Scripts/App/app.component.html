@@ -25,8 +25,8 @@
 </table>
 <button class="btn" (click)="categories.add()">Add</button>
 
-<ct-table [records]="categories.items"
+<ct-table [records]="categories"
           [caption]="'Categories'"
-        
+          [settings]="columnSettings"
           ></ct-table>
 

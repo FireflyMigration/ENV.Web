@@ -25,24 +25,26 @@ let TableLayoutComponent = class TableLayoutComponent {
         }
         else {
             {
-                // no settings, create column maps with defaults
-                if (this.records.length > 0) {
-                    this.columnMaps = [];
-                    Object.keys(this.records[0]).forEach(key => {
-                        if (typeof (this.records[0][key]) != 'function')
-                            this.columnMaps.push({
-                                key: key,
-                                caption: makeTitle(key)
-                            });
-                    });
-                }
+                let x = this.records;
+                if (x)
+                    // no settings, create column maps with defaults
+                    if (x.length > 0) {
+                        this.columnMaps = [];
+                        Object.keys(x[0]).forEach(key => {
+                            if (typeof (x[0][key]) != 'function')
+                                this.columnMaps.push({
+                                    key: key,
+                                    caption: makeTitle(key)
+                                });
+                        });
+                    }
             }
         }
     }
 };
 __decorate([
     core_1.Input(),
-    __metadata("design:type", Array)
+    __metadata("design:type", Object)
 ], TableLayoutComponent.prototype, "records", void 0);
 __decorate([
     core_1.Input(),

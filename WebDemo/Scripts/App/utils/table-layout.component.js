@@ -13,11 +13,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 let TableLayoutComponent = class TableLayoutComponent {
     constructor() {
+        this.settings = new ColumnSettings();
+        this.rowButtons = [];
         this.keys = [];
     }
     ngOnChanges() {
-        if (this.settings) {
-            this.columnMaps = this.settings;
+        this.rowButtons = [];
+        let s = new rowButton('Save');
+        s.click = r => r.save();
+        this.rowButtons.push(s);
+        let d = new rowButton('Delete');
+        d.visible = (r) => {
+            return r.newRow == undefined;
+        };
+        d.click = r => r.delete();
+        this.rowButtons.push(d);
+        if (this.settings.settings.length > 0) {
+            this.columnMaps = this.settings.settings;
             this.columnMaps.forEach(s => {
                 if (!s.caption)
                     s.caption = makeTitle(s.key);
@@ -46,11 +58,7 @@ __decorate([
 ], TableLayoutComponent.prototype, "records", void 0);
 __decorate([
     core_1.Input(),
-    __metadata("design:type", String)
-], TableLayoutComponent.prototype, "caption", void 0);
-__decorate([
-    core_1.Input(),
-    __metadata("design:type", Array)
+    __metadata("design:type", Object)
 ], TableLayoutComponent.prototype, "settings", void 0);
 TableLayoutComponent = __decorate([
     core_1.Component({
@@ -62,7 +70,27 @@ exports.TableLayoutComponent = TableLayoutComponent;
 function makeTitle(key) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
-class ColumnSetting {
+class ColumnSettings {
+    constructor(...columns) {
+        this.settings = [];
+        this.add(...columns);
+    }
+    add(...columns) {
+        for (let c of columns) {
+            let x = c;
+            if (x.key)
+                this.settings.push(x);
+            else
+                this.settings.push({ key: c });
+        }
+    }
 }
-exports.ColumnSetting = ColumnSetting;
+exports.ColumnSettings = ColumnSettings;
+class rowButton {
+    constructor(name) {
+        this.name = name;
+        this.visible = (r) => true;
+        this.click = r => { };
+    }
+}
 //# sourceMappingURL=table-layout.component.js.map

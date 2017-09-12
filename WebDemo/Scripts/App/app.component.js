@@ -9,31 +9,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const core_2 = require("@angular/core");
 const RestList_1 = require("./utils/RestList");
+const table_layout_component_1 = require("./utils/table-layout.component");
 let AppComponent = class AppComponent {
     constructor() {
         this.categories = new RestList_1.RestList('http://localhost/web.demo/dataApi/categories');
-        this.columnSettings = [
-            {
-                key: 'id',
-                caption: 'id'
-            },
-            {
-                key: 'categoryName',
-                caption: 'Name'
-            },
-            {
-                key: 'description',
-                caption: 'Description'
-            }
-        ];
+        this.columnSettings = new table_layout_component_1.ColumnSettings('id', 'categoryName', 'description');
     }
     ngOnInit() {
-        this.categories.get({
-            sort: 'categoryName',
-            order: "desc",
-            isGreaterOrEqualTo: { id: 4 },
-            isLessOrEqualTo: { id: 7 }
-        });
+        this.categories.get();
     }
 };
 AppComponent = __decorate([

@@ -1,32 +1,7 @@
 ﻿<h3>Categories ({{categories.items.length}})</h3>
 
-<table class="table table-bordered table-responsive table-condensed">
-    <thead>
-        <tr>
-            <th></th>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Description</th>
-
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let c of categories">
-            <th>
-                <button class="btn" (click)="c.save()">Save</button>
-                <button class="btn" *ngIf="!c.newRow" (click)="c.delete()">Delete</button>
-            </th>
-            <td><input class="form-control" [(ngModel)]="c.id" /></td>
-            <td><input class="form-control" [(ngModel)]="c.categoryName" /></td>
-            <td><input class="form-control" [(ngModel)]="c.description" /></td>
-        </tr>
-    </tbody>
-
-</table>
-<button class="btn" (click)="categories.add()">Add</button>
 
 <ct-table [records]="categories"
-          [caption]="'Categories'"
           [settings]="columnSettings"
           ></ct-table>
 

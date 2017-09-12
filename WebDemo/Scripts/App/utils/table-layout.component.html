@@ -1,13 +1,22 @@
 ﻿<table class="table table-bordered table-responsive table-condensed">
-    <caption *ngIf="caption">{{caption}}</caption>
+    
     <thead>
         <tr>
+            <th></th>
             <th *ngFor="let map of columnMaps">{{map.caption}}</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let record of records.items">
-            <td *ngFor="let map of columnMaps">{{record[map.key]}}</td>
+            <td>
+                <span *ngFor="let b of rowButtons">
+                    <button class="btn" *ngIf="b.visible(record)" (click)="b.click(record)">{{b.name}}</button>
+                </span>
+            </td>
+            <td *ngFor="let map of columnMaps">
+                <input class="form-control" [(ngModel)]="record[map.key]" />
+            </td>
         </tr>
     </tbody>
 </table>
+<button class="btn" (click)="records.add()">Add</button>

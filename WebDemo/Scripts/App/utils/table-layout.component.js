@@ -22,15 +22,17 @@ let TableLayoutComponent = class TableLayoutComponent {
         else {
             {
                 // no settings, create column maps with defaults
-                if (this.records.length > 0)
-                    this.columnMaps = Object.keys(this.records[0])
-                        .map(key => {
-                        return {
-                            key: key,
-                            caption: key.slice(0, 1).toUpperCase() +
-                                key.replace(/_/g, ' ').slice(1)
-                        };
+                if (this.records.length > 0) {
+                    this.columnMaps = [];
+                    Object.keys(this.records[0]).forEach(key => {
+                        if (typeof (this.records[0][key]) != 'function')
+                            this.columnMaps.push({
+                                key: key,
+                                caption: key.slice(0, 1).toUpperCase() +
+                                    key.replace(/_/g, ' ').slice(1)
+                            });
                     });
+                }
             }
         }
     }

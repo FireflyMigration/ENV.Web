@@ -18,6 +18,10 @@ let TableLayoutComponent = class TableLayoutComponent {
     ngOnChanges() {
         if (this.settings) {
             this.columnMaps = this.settings;
+            this.columnMaps.forEach(s => {
+                if (!s.caption)
+                    s.caption = makeTitle(s.key);
+            });
         }
         else {
             {
@@ -28,8 +32,7 @@ let TableLayoutComponent = class TableLayoutComponent {
                         if (typeof (this.records[0][key]) != 'function')
                             this.columnMaps.push({
                                 key: key,
-                                caption: key.slice(0, 1).toUpperCase() +
-                                    key.replace(/_/g, ' ').slice(1)
+                                caption: makeTitle(key)
                             });
                     });
                 }
@@ -56,6 +59,9 @@ TableLayoutComponent = __decorate([
     })
 ], TableLayoutComponent);
 exports.TableLayoutComponent = TableLayoutComponent;
+function makeTitle(key) {
+    return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
+}
 class ColumnSetting {
 }
 exports.ColumnSetting = ColumnSetting;

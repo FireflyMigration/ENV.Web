@@ -16,6 +16,10 @@ export class TableLayoutComponent implements OnChanges {
     ngOnChanges(): void {
         if (this.settings) { // when settings provided
             this.columnMaps = this.settings;
+            this.columnMaps.forEach(s => {
+                if (!s.caption)
+                    s.caption = makeTitle(s.key);
+            });
         } else {
             {
                 // no settings, create column maps with defaults
@@ -26,14 +30,17 @@ export class TableLayoutComponent implements OnChanges {
 
                             this.columnMaps.push({
                                 key: key,
-                                caption: key.slice(0, 1).toUpperCase() +
-                                key.replace(/_/g, ' ').slice(1)
+                                caption: makeTitle(key)
                             });
                         });
                 }
             }
         }
     }
+}
+function makeTitle(key: string)
+{
+    return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
 
 export class ColumnSetting {

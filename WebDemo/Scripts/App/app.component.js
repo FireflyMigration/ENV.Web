@@ -13,7 +13,7 @@ const table_layout_component_1 = require("./utils/table-layout.component");
 let AppComponent = class AppComponent {
     constructor() {
         this.categories = new RestList_1.RestList('http://localhost/web.demo/dataApi/categories');
-        this.columnSettings = new table_layout_component_1.ColumnSettings('id', 'categoryName', 'description');
+        this.tableSettings = new table_layout_component_1.TableSettings('id', 'categoryName', 'description');
     }
     ngOnInit() {
         this.categories.get();

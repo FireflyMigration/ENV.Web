@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 let TableLayoutComponent = class TableLayoutComponent {
     constructor() {
-        this.settings = new ColumnSettings();
+        this.settings = new TableSettings();
         this.rowButtons = [];
         this.keys = [];
     }
@@ -70,7 +70,7 @@ exports.TableLayoutComponent = TableLayoutComponent;
 function makeTitle(key) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
-class ColumnSettings {
+class TableSettings {
     constructor(...columns) {
         this.settings = [];
         this.add(...columns);
@@ -85,7 +85,7 @@ class ColumnSettings {
         }
     }
 }
-exports.ColumnSettings = ColumnSettings;
+exports.TableSettings = TableSettings;
 class rowButton {
     constructor(name) {
         this.name = name;

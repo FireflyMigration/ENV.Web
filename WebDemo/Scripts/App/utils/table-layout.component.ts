@@ -10,7 +10,7 @@ export class TableLayoutComponent implements OnChanges {
 
     @Input() records: Iterable<any>;
     
-    @Input() settings =new ColumnSettings();
+    @Input() settings =new TableSettings();
     columnMaps: ColumnSetting[];
     rowButtons: rowButton[] = [];
     keys: string[] = [];
@@ -56,12 +56,12 @@ function makeTitle(key: string) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
 
-export class ColumnSettings {
+export class TableSettings {
     settings: ColumnSetting[] = [];
     constructor(...columns: ColumnSetting[]);
     constructor(...columns: string[]);
     constructor(...columns: any[]){
-        this.add(...columns);
+        this.add(...columns);   
     }
     add(...columns: ColumnSetting[]);
     add(...columns: string[]);

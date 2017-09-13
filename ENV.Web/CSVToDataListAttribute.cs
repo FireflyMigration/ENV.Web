@@ -2,6 +2,9 @@
 using System.Web.Mvc;
 using Firefly.Box;
 using ENV.IO;
+using System.Text;
+using System.Collections.Generic;
+
 namespace ENV.Web
 {
     public class CSVToDataListAttribute : ActionFilterAttribute
@@ -30,7 +33,7 @@ namespace ENV.Web
         public class CaptureCSVToDataList : ITextWriter
         {
             static ContextStatic<Func<string, System.Text.Encoding, FileWriter, Func<ITextWriter>>> _threadFileWriterFactory = new ContextStatic<Func<string, System.Text.Encoding, FileWriter, Func<ITextWriter>>>();
-            public static void Init()
+            static CaptureCSVToDataList()
             {
                 var originalFileWriterFactory = ENV.IO.FileWriter._fileWriterFactory;
 
@@ -58,21 +61,26 @@ namespace ENV.Web
                 using (var sr = new System.IO.StringReader(_sw.ToString()))
                 {
                     var dl = new DataList();
-                    string[] headers = null;
+                    SeperatedReader headers = null;
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
+                        var spr = new SeperatedReader(line, _seperator);
                         if (headers == null)
                         {
-                            headers = line.Split('.');
+                            headers = spr;
+
                         }
                         else
                         {
-                            var data = line.Split(',');
+
                             var item = dl.AddItem();
-                            for (int i = 0; i < data.Length; i++)
+                            for (int i = 0; i < spr.Count; i++)
                             {
-                                item.Set(headers[i], data[i]);
+                                var x = headers[i];
+                                if (string.IsNullOrWhiteSpace(x))
+                                    x = "empty" + i;
+                                item.Set(x, spr[i]);
                             }
                         }
 
@@ -92,5 +100,92 @@ namespace ENV.Web
             }
         }
 
+    }
+
+    /// <summary>
+    /// based on http://doc.fireflymigration.com/export-import-table-data-to-csv-file.html
+    /// </summary>
+    public class SeperatedReader : IEnumerable<string>
+    {
+        List<string> _values = new List<string>();
+        string _line;
+        public SeperatedReader(string line, char seperator = ',')
+        {
+            _line = line;
+
+            var sr = new System.IO.StringReader(line);
+            var sb = new StringBuilder();
+            int i = 0;
+            bool inQuotes = false;
+            while ((i = sr.Read()) != -1)
+            {
+                if (inQuotes)
+                {
+                    switch (i)
+                    {
+                        case '"':
+                            if (sr.Peek() == '"')
+                            {
+                                sb.Append('"');
+                                sr.Read();
+                            }
+                            else
+                                inQuotes = false;
+                            break;
+                        default:
+                            sb.Append((char)i);
+                            break;
+                    }
+                }
+
+                else
+                    switch (i)
+                    {
+
+                        case ',':
+                            _values.Add(sb.ToString());
+                            sb = new StringBuilder();
+                            break;
+                        case '"':
+                            inQuotes = true;
+                            break;
+                        default:
+                            sb.Append((char)i);
+                            break;
+                    }
+            }
+            _values.Add(sb.ToString());
+            sb = new StringBuilder();
+        }
+        public string Line { get { return _line; } }
+        public string this[int index]
+        {
+            get { return _values[index]; }
+
+        }
+        public int Count { get { return _values.Count; } }
+        public string this[string index]
+        {
+            get { return _values[ConvertLetter(index)]; }
+        }
+        static int ConvertLetter(string index)
+        {
+            int result = 0;
+            foreach (var item in index)
+            {
+                result = result * 26 + (int)item - 'A';
+            }
+            return result;
+        }
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            return _values.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return _values.GetEnumerator();
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace ENV.Web
         {
             _bp.AddAllColumns();
         }
-        private void AllowInsertUpdateDelete()
+        protected void AllowInsertUpdateDelete()
         {
             AllowUpdate = true;
             AllowDelete = true;
@@ -57,9 +57,9 @@ namespace ENV.Web
         protected FilterCollection Where { get { return _bp.Where; } }
         protected Sort OrderBy { get { return _bp.OrderBy; } }
         protected internal  ColumnCollection Columns => _bp.Columns;
-        bool AllowUpdate { get; set; }
-        bool AllowDelete { get; set; }
-        bool AllowInsert { get; set; }
+        protected bool AllowUpdate { get; set; }
+        protected bool AllowDelete { get; set; }
+        protected bool AllowInsert { get; set; }
         protected internal  Firefly.Box.Data.Entity From { get { return _bp.From; } set { _bp.From = value; } }
 
         protected virtual void OnInsert() { }
@@ -387,7 +387,7 @@ namespace ENV.Web
             return name;
         }
    
-        public static void RegisterController(string key, Func<ViewModelHelper> controller)
+        public static void RegisterViewModel(string key, Func<ViewModelHelper> controller)
         {
             _controllers.Add(key.ToLower(), controller);
         }
@@ -399,7 +399,7 @@ namespace ENV.Web
         public static void RegisterEntity(string name,System.Type t,bool allowInsertUpdateDelete = false)
         {
             
-            RegisterController(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t),allowInsertUpdateDelete));
+            RegisterViewModel(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t),allowInsertUpdateDelete));
         }
         public static void RegisterEntityByClassName(System.Type t)
         {

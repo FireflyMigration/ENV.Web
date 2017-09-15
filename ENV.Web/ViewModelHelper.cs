@@ -15,7 +15,7 @@ using Firefly.Box.Testing;
 
 namespace ENV.Web
 {
-    public class ViewModelHelper 
+    public class ViewModelHelper
     {
         protected readonly ENV.UserMethods u;
         public ViewModelHelper()
@@ -24,14 +24,14 @@ namespace ENV.Web
             _bp.Load += OnLoad;
         }
         protected virtual void OnLoad() { }
-        public ViewModelHelper(Firefly.Box.Data.Entity e,bool allowInsertUpdateDelete =false) : this()
+        public ViewModelHelper(Firefly.Box.Data.Entity e, bool allowInsertUpdateDelete = false) : this()
         {
             From = e;
             if (allowInsertUpdateDelete)
             {
                 AllowInsertUpdateDelete();
             }
-           
+
         }
         internal void AssertColumnKey(ColumnBase c, string key)
         {
@@ -39,8 +39,8 @@ namespace ENV.Web
         }
         protected void MapExperssion(string name, Func<Text> exp)
         {
-            MapColumn( Columns.Add(new TextColumn(name)).BindValue(exp));
-            
+            MapColumn(Columns.Add(new TextColumn(name)).BindValue(exp));
+
         }
         protected void AddAllColumns()
         {
@@ -60,11 +60,11 @@ namespace ENV.Web
         protected RelationCollection Relations { get { return _bp.Relations; } }
         protected FilterCollection Where { get { return _bp.Where; } }
         protected Sort OrderBy { get { return _bp.OrderBy; } }
-        protected internal  ColumnCollection Columns => _bp.Columns;
+        protected internal ColumnCollection Columns => _bp.Columns;
         protected bool AllowUpdate { get; set; }
         protected bool AllowDelete { get; set; }
         protected bool AllowInsert { get; set; }
-        protected internal  Firefly.Box.Data.Entity From { get { return _bp.From; } set { _bp.From = value; } }
+        protected internal Firefly.Box.Data.Entity From { get { return _bp.From; } set { _bp.From = value; } }
 
         protected virtual void OnInsert() { }
         protected virtual void OnUpdate() { }
@@ -91,7 +91,7 @@ namespace ENV.Web
         {
             init();
             var dl = new DataList();
-            
+
             foreach (var item in _colsPerKey)
             {
                 item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key), _tempFilter, new equalToFilter());
@@ -167,7 +167,7 @@ namespace ENV.Web
             init();
             foreach (var item in _columns)
             {
-                item.Describe(tw);
+                tw.WriteLine("    " + item.Key + " = new stringColumn('" + item.Caption + "');");
             }
             tw.WriteLine(@"    constructor(ds?: dataSource) {
         super(ds ? ds : shared.server, '" + name + @"');
@@ -177,13 +177,44 @@ namespace ENV.Web
         }
         public void CreateTypeScriptClass(TextWriter tw, string name)
         {
-            tw.WriteLine("export interface " + name + " {");
+            tw.WriteLine("export interface " + MakeSingular( name )+ " {");
             init();
             foreach (var item in _columns)
             {
-                item.CreateMemberInTypeScriptClass(tw);
+                tw.WriteLine("    " + item.Key + "?:string;");
             }
             tw.WriteLine("}");
+        }
+        public void ColumnList(TextWriter tw)
+        {
+            init();
+            tw.WriteLine("columnKeys:[");
+            bool first = true;
+            foreach (var item in _columns)
+            {
+                if (first)
+                    first = false;
+                else
+                    tw.Write(",");
+                tw.Write("\""+item.Key+"\"");
+            }
+            tw.WriteLine("]");
+        }
+        public void FullColumnList(TextWriter tw)
+        {
+            init();
+            tw.WriteLine("columnSettings:[");
+            bool first = true;
+            foreach (var item in _columns)
+            {
+                if (first)
+                    first = false;
+                else
+                    tw.WriteLine(",");
+                tw.Write("{key:\"" + item.Key + "\",caption:\""+item.Caption+"\"}");
+            }
+            tw.WriteLine();
+            tw.WriteLine("]");
         }
         DataItem GetItem()
         {
@@ -323,16 +354,10 @@ namespace ENV.Web
             {
                 _key.ShouldBe(key);
             }
+            public string Key => _key;
+            public string Caption => _col.Caption;
 
-            internal void CreateMemberInTypeScriptClass(TextWriter tw)
-            {
-                tw.WriteLine("    " + _key + "?:string;");
-            }
 
-            internal void Describe(TextWriter tw)
-            {
-                tw.WriteLine("    " + _key + " = new stringColumn('" + _col.Caption + "');");
-            }
             internal void SaveTo(DataItem x)
             {
                 x.Set(_key, _getValueFromRow());
@@ -398,7 +423,7 @@ namespace ENV.Web
         public static string HebrewTranslateCsStyle(string source)
         {
             string splitedSource = source;
-           
+
             StringBuilder output = new StringBuilder();
             foreach (string s in splitedSource.Split(' '))
             {
@@ -487,20 +512,20 @@ namespace ENV.Web
         {
             _controllers.Add(key.ToLower(), controller);
         }
-        public static void RegisterEntityByDbName(System.Type t,bool allowInsertUpdateDelete=false)
+        public static void RegisterEntityByDbName(System.Type t, bool allowInsertUpdateDelete = false)
         {
             var e = ((ENV.Data.Entity)System.Activator.CreateInstance(t));
-            RegisterEntity(e.EntityName,t, allowInsertUpdateDelete);
+            RegisterEntity(e.EntityName, t, allowInsertUpdateDelete);
         }
-        public static void RegisterEntity(string name,System.Type t,bool allowInsertUpdateDelete = false)
+        public static void RegisterEntity(string name, System.Type t, bool allowInsertUpdateDelete = false)
         {
-            
-            RegisterViewModel(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t),allowInsertUpdateDelete));
+
+            RegisterViewModel(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t), allowInsertUpdateDelete));
         }
         public static void RegisterEntityByClassName(System.Type t)
         {
 
-            RegisterEntity(t.Name,t);
+            RegisterEntity(t.Name, t);
         }
         static Dictionary<string, Func<ViewModelHelper>> _controllers = new Dictionary<string, Func<ViewModelHelper>>();
         public static void ProcessRequest(string name, string id = null)
@@ -543,8 +568,8 @@ namespace ENV.Web
                                         w = new CSVISerializedObjectWriter(sw);
                                     else if (responseType.StartsWith("H"))
                                     {
-                                        
-                                        w = new HTMLISerializedObjectWriter(sw,name)
+
+                                        w = new HTMLISerializedObjectWriter(sw, name)
                                         {
                                             BodyAddition = @"
 <strong>url options</strong>
@@ -556,12 +581,18 @@ namespace ENV.Web
     <li><strong>_gt, _gte, _lt, _lte, _ne</strong> - Filter Data Options</li>
 </ul>"
                                         };
-                                       
+
                                     }
                                     if (responseType.StartsWith("D"))
                                     {
+                                        sw.WriteLine("// /"+name+"?_responseType=" + responseType);
+                                        sw.WriteLine();
                                         if (responseType.StartsWith("DE"))
                                             vmc.Describe(sw, name);
+                                        else if (responseType.StartsWith("DCF"))
+                                            vmc.FullColumnList(sw);
+                                        else if (responseType.StartsWith("DC"))
+                                            vmc.ColumnList(sw);
                                         else
                                             vmc.CreateTypeScriptClass(sw, name);
                                     }
@@ -620,7 +651,7 @@ namespace ENV.Web
                             }
                             else if (responseType.StartsWith("H"))
                                 Response.ContentType = "text/html";
-                            else if (responseType == "D")
+                            else if (responseType.StartsWith("D"))
                                 Response.ContentType = "text/plain";
                             Response.Write(jsonResult);
                         }
@@ -629,8 +660,20 @@ namespace ENV.Web
             }
             finally
             {
-                
+
             }
+        }
+        internal static string MakeSingular(string name)
+        {
+            if (name.EndsWith("IES"))
+                return name.Remove(name.Length - 3) + "Y";
+            if (name.EndsWith("ies"))
+                return name.Remove(name.Length - 3) + "y";
+            if (name.EndsWith("S"))
+                return name.Remove(name.Length - 1) ;
+            if (name.EndsWith("s"))
+                return name.Remove(name.Length - 1);
+            return name;
         }
     }
     class setValueForColumn : DoSomething
@@ -906,15 +949,16 @@ namespace ENV.Web
         public void StartBlockElse()
         {
         }
+        
     }
     interface IMyHttpContext
     {
         string GetRequestParam(string key);
     }
-    class HttpContextBridgeToIHttpContext:IMyHttpContext
+    class HttpContextBridgeToIHttpContext : IMyHttpContext
     {
         System.Web.HttpContext _current;
-        
+
 
         public HttpContextBridgeToIHttpContext(System.Web.HttpContext current)
         {

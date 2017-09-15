@@ -21,7 +21,7 @@ namespace ENV.Web.Tests
                 mt.a.Value = mt.Max(mt.a) + 1;
             }
 
-          
+
         }
         [TestMethod]
         public void TestViewModelHelper_0()
@@ -97,7 +97,20 @@ namespace ENV.Web.Tests
             vmh.From = t;
             vmh.MapColumn(t.c);
             vmh.AssertColumnKey(t.c, "mzaa");
-            
+
+        }
+        [TestMethod]
+        public void TestSingularNames()
+        {
+            using (var t = new BulkTester((x, r) => ViewModelHelper.MakeSingular(x).ShouldBe(r, x)))
+            {
+                t.Test("categories", "category");
+                t.Test("products", "product");
+                t.Test("CATEGORIES", "CATEGORY");
+                t.Test("PRODUCTS", "PRODUCT");
+                t.Test("NOAM", "NOAM");
+
+            }
         }
         [TestInitialize]
         public void TestInitialize()

@@ -18,16 +18,18 @@ let TableLayoutComponent = class TableLayoutComponent {
         this.keys = [];
     }
     ngOnChanges() {
-        this.rowButtons = [];
-        let s = new rowButton('Save');
-        s.click = r => r.save();
-        this.rowButtons.push(s);
-        let d = new rowButton('Delete');
-        d.visible = (r) => {
-            return r.newRow == undefined;
-        };
-        d.click = r => r.delete();
-        this.rowButtons.push(d);
+        if (this.settings.editable) {
+            this.rowButtons = [];
+            let s = new rowButton('Save');
+            s.click = r => r.save();
+            this.rowButtons.push(s);
+            let d = new rowButton('Delete');
+            d.visible = (r) => {
+                return r.newRow == undefined;
+            };
+            d.click = r => r.delete();
+            this.rowButtons.push(d);
+        }
         if (this.settings.settings.length > 0) {
             this.columnMaps = this.settings.settings;
             this.columnMaps.forEach(s => {
@@ -71,9 +73,17 @@ function makeTitle(key) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
 class TableSettings {
-    constructor(...columns) {
+    constructor(settings) {
         this.settings = [];
-        this.add(...columns);
+        this.editable = false;
+        if (settings) {
+            if (settings.columnSettings)
+                this.add(...settings.columnSettings);
+            else if (settings.columnKeys)
+                this.add(...settings.columnKeys);
+            if (settings.editable)
+                this.editable = true;
+        }
     }
     add(...columns) {
         for (let c of columns) {

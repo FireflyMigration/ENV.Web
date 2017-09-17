@@ -104,4 +104,30 @@ function myFetch(url, init) {
         throw error;
     }
 }
+class Lookup {
+    constructor(url, options) {
+        this.options = options;
+        this.categories = new RestList(url);
+    }
+    get(r) {
+        let find = {};
+        this.options(r, find);
+        let key = JSON.stringify(find);
+        if (this.cache == undefined)
+            this.cache = {};
+        if (this.cache[key]) {
+            return this.cache[key];
+        }
+        else {
+            let res = {};
+            this.cache[key] = res;
+            this.categories.get(find).then(() => {
+                if (this.categories.items.length > 0)
+                    this.cache[key] = this.categories.items[0];
+            });
+            return res;
+        }
+    }
+}
+exports.Lookup = Lookup;
 //# sourceMappingURL=RestList.js.map

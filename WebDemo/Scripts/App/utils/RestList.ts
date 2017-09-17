@@ -4,7 +4,7 @@
     }
 
 
-    private items: (restListItem & T)[] = [];
+    items: (restListItem & T)[] = [];
     constructor(private url: string) {
 
     }
@@ -126,7 +126,7 @@ interface restListItem {
     save: () => void;
     delete: () => void;
 }
-interface getOptions<T> {
+export  interface getOptions<T> {
     isEqualTo?: T;
     isGreaterOrEqualTo?: T;
     isLessOrEqualTo?: T;
@@ -138,4 +138,37 @@ interface getOptions<T> {
     isLessThan?: T;
     isDifferentFrom?: T;
 
+}
+export class Lookup<lookupType, mainType> {
+
+    constructor(url: string, private options: (mt: mainType, o: getOptions<lookupType>) => lookupType) {
+        this.categories = new RestList<lookupType>(url);
+    }
+
+    categories: RestList<lookupType>;
+    private cache: {};
+
+
+
+    get(r: any): lookupType {
+
+        let find: getOptions<lookupType> = {};
+        this.options(<mainType>r, find);
+        let key = JSON.stringify(find);
+        if (this.cache == undefined)
+            this.cache = {};
+        if (this.cache[key]) {
+            return this.cache[key];
+        } else {
+            let res = {} as lookupType;
+            this.cache[key] = res;
+            this.categories.get(find).then(() => {
+                if (this.categories.items.length > 0)
+                    this.cache[key] = this.categories.items[0];
+
+            });
+            return res;
+        }
+
+    }
 }

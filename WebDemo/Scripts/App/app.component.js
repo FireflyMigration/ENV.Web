@@ -7,32 +7,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
-const core_2 = require("@angular/core");
 const RestList_1 = require("./utils/RestList");
 const table_layout_component_1 = require("./utils/table-layout.component");
+const apiUrl = 'http://localhost/web.demo/dataApi/';
 let AppComponent = class AppComponent {
     constructor() {
-        this.categories = new RestList_1.RestList('http://localhost/web.demo/dataApi/categories');
+        this.products = new RestList_1.RestList(apiUrl + 'products');
+        this.category = new RestList_1.Lookup(apiUrl + 'categories', (product, o) => o.isEqualTo = { id: +product.categoryID });
         this.tableSettings = new table_layout_component_1.TableSettings({
             // /categories?_responseType=DCF
             editable: true,
             columnSettings: [
-                { key: "id", caption: "CategoryID", readonly: true },
-                { key: "categoryName", caption: "CategoryName" },
-                { key: "description", caption: "Description" }
+                { key: "id", caption: "ProductID", readonly: true },
+                { key: "productName", caption: "ProductName" },
+                { key: "supplierID", caption: "SupplierID" },
+                { key: "categoryID", caption: "CategoryID" },
+                { caption: "categoryName", getValue: (r) => this.category.get(r).categoryName }
             ]
         });
     }
     ngOnInit() {
-        this.categories.get();
+        this.products.get();
     }
 };
 AppComponent = __decorate([
-    core_1.Component({
-        selector: 'my-app',
-        templateUrl: `./scripts/app/app.component.html`,
-    }),
-    core_2.Injectable()
+    core_1.Injectable()
 ], AppComponent);
 exports.AppComponent = AppComponent;
 //# sourceMappingURL=app.component.js.map

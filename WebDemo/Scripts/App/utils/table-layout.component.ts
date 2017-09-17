@@ -9,7 +9,7 @@ export class TableLayoutComponent implements OnChanges {
 
 
     @Input() records: Iterable<any>;
-    @Input() settings =new TableSettings();
+    @Input() settings = new TableSettings();
     columnMaps: ColumnSetting[];
     rowButtons: rowButton[] = [];
     keys: string[] = [];
@@ -28,7 +28,7 @@ export class TableLayoutComponent implements OnChanges {
         }
 
 
-        if (this.settings.settings.length>0) { // when settings provided
+        if (this.settings.settings.length > 0) { // when settings provided
             this.columnMaps = this.settings.settings;
             this.columnMaps.forEach(s => {
                 if (!s.caption)
@@ -52,6 +52,20 @@ export class TableLayoutComponent implements OnChanges {
             }
         }
     }
+    _getColValue(col: ColumnSetting, row: any) {
+        if (col.getValue)
+            return col.getValue(row);
+        return row[col.key];
+    }
+    _getEditable(col: ColumnSetting) {
+        if (!this.settings.editable)
+            return false;
+        if (!col.key)
+            return false
+        return !col.readonly;
+        
+
+    }
 }
 function makeTitle(key: string) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
@@ -70,18 +84,18 @@ export class TableSettings {
         }
     }
     editable = false;
-   
+
     add(...columns: ColumnSetting[]);
     add(...columns: string[]);
-    add(...columns: any[]){
+    add(...columns: any[]) {
         for (let c of columns) {
             let x = c as ColumnSetting;
-            if (x.key)
+            if (x.key || x.getValue)
                 this.settings.push(x);
-            else this.settings.push({key:c});
+            else this.settings.push({ key: c });
         }
-
     }
+   
 }
 interface TableSettingsInterface {
     editable?: boolean,
@@ -90,9 +104,10 @@ interface TableSettingsInterface {
 }
 
 interface ColumnSetting {
-    key: string;
+    key?: string;
     caption?: string;
     readonly?: boolean;
+    getValue?: (row: any) => any;
 }
 class rowButton {
     constructor(public name: string) { }

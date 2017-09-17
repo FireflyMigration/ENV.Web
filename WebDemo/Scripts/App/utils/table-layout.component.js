@@ -53,6 +53,18 @@ let TableLayoutComponent = class TableLayoutComponent {
             }
         }
     }
+    _getColValue(col, row) {
+        if (col.getValue)
+            return col.getValue(row);
+        return row[col.key];
+    }
+    _getEditable(col) {
+        if (!this.settings.editable)
+            return false;
+        if (!col.key)
+            return false;
+        return !col.readonly;
+    }
 };
 __decorate([
     core_1.Input(),
@@ -88,7 +100,7 @@ class TableSettings {
     add(...columns) {
         for (let c of columns) {
             let x = c;
-            if (x.key)
+            if (x.key || x.getValue)
                 this.settings.push(x);
             else
                 this.settings.push({ key: c });

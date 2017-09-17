@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { Injectable } from '@angular/core';
-import { Category } from './models';
-import { RestList } from './utils/RestList';
+import { Product, Category } from './models';
+import { RestList, getOptions, Lookup } from './utils/RestList';
 import { TableSettings } from "./utils/table-layout.component";
 
 
@@ -10,24 +10,36 @@ import { TableSettings } from "./utils/table-layout.component";
     templateUrl: `./scripts/app/app.component.html`,
 
 })
+const apiUrl = 'http://localhost/web.demo/dataApi/';
 @Injectable()
 export class AppComponent implements OnInit {
+    
 
-    categories = new RestList<Category>('http://localhost/web.demo/dataApi/categories');
+    products = new RestList<Product>(apiUrl +'products');
+
+    category = new Lookup<Category, Product>(apiUrl+'categories', (product, o) => o.isEqualTo = { id: +product.categoryID } );
+
     tableSettings = new TableSettings({
         // /categories?_responseType=DCF
-        editable:true,
+        editable: true,
         columnSettings: [
-            { key: "id", caption: "CategoryID", readonly:true },
-            { key: "categoryName", caption: "CategoryName" },
-            { key: "description", caption: "Description" }
+            { key: "id", caption: "ProductID", readonly: true },
+            { key: "productName", caption: "ProductName" },
+            { key: "supplierID", caption: "SupplierID" },
+            { key: "categoryID", caption: "CategoryID" },
+            { caption: "categoryName", getValue: (r: any) => this.category.get(r).categoryName }
+
         ]
     });
 
 
     ngOnInit(): void {
-        this.categories.get();
+        this.products.get();
     }
+
+
 }
+
+
 
 

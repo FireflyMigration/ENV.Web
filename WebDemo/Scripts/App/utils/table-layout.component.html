@@ -14,8 +14,8 @@
                 </span>
             </td>
             <td *ngFor="let map of columnMaps">
-                <span *ngIf="map.readonly||!settings.editable">{{record[map.key]}}</span>
-                <input *ngIf="!map.readonly&&settings.editable" class="form-control" [(ngModel)]="record[map.key]" />
+                <span *ngIf="!_getEditable(map)">{{_getColValue(map,record)}}</span>
+                <input *ngIf="_getEditable(map)" class="form-control" [(ngModel)]="record[map.key]" />
             </td>
         </tr>
     </tbody>

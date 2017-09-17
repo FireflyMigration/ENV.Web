@@ -9,22 +9,23 @@ export class TableLayoutComponent implements OnChanges {
 
 
     @Input() records: Iterable<any>;
-    
     @Input() settings =new TableSettings();
     columnMaps: ColumnSetting[];
     rowButtons: rowButton[] = [];
     keys: string[] = [];
     ngOnChanges(): void {
-        this.rowButtons = [];
-        let s = new rowButton('Save');
-        s.click = r => r.save();
-        this.rowButtons.push(s);
-        let d = new rowButton('Delete');
-        d.visible = (r) => {
-            return r.newRow == undefined;
-        };
-        d.click = r => r.delete();
-        this.rowButtons.push(d);
+        if (this.settings.editable) {
+            this.rowButtons = [];
+            let s = new rowButton('Save');
+            s.click = r => r.save();
+            this.rowButtons.push(s);
+            let d = new rowButton('Delete');
+            d.visible = (r) => {
+                return r.newRow == undefined;
+            };
+            d.click = r => r.delete();
+            this.rowButtons.push(d);
+        }
 
 
         if (this.settings.settings.length>0) { // when settings provided
@@ -58,11 +59,18 @@ function makeTitle(key: string) {
 
 export class TableSettings {
     settings: ColumnSetting[] = [];
-    constructor(...columns: ColumnSetting[]);
-    constructor(...columns: string[]);
-    constructor(...columns: any[]){
-        this.add(...columns);   
+    constructor(settings?: TableSettingsInterface) {
+        if (settings) {
+            if (settings.columnSettings)
+                this.add(...settings.columnSettings);
+            else if (settings.columnKeys)
+                this.add(...settings.columnKeys);
+            if (settings.editable)
+                this.editable = true;
+        }
     }
+    editable = false;
+   
     add(...columns: ColumnSetting[]);
     add(...columns: string[]);
     add(...columns: any[]){
@@ -75,10 +83,16 @@ export class TableSettings {
 
     }
 }
+interface TableSettingsInterface {
+    editable?: boolean,
+    columnSettings?: ColumnSetting[],
+    columnKeys?: string[]
+}
 
 interface ColumnSetting {
     key: string;
     caption?: string;
+    readonly?: boolean;
 }
 class rowButton {
     constructor(public name: string) { }

@@ -13,7 +13,15 @@ const table_layout_component_1 = require("./utils/table-layout.component");
 let AppComponent = class AppComponent {
     constructor() {
         this.categories = new RestList_1.RestList('http://localhost/web.demo/dataApi/categories');
-        this.tableSettings = new table_layout_component_1.TableSettings('id', 'categoryName', 'description');
+        this.tableSettings = new table_layout_component_1.TableSettings({
+            // /categories?_responseType=DCF
+            editable: true,
+            columnSettings: [
+                { key: "id", caption: "CategoryID", readonly: true },
+                { key: "categoryName", caption: "CategoryName" },
+                { key: "description", caption: "Description" }
+            ]
+        });
     }
     ngOnInit() {
         this.categories.get();

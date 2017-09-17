@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Firefly.Box.Testing;
 using Firefly.Box;
+using ENV.Data;
 
 namespace ENV.Web.Tests
 {
@@ -19,6 +20,8 @@ namespace ENV.Web.Tests
             {
                 mt.a.Value = mt.Max(mt.a) + 1;
             }
+
+
         }
         [TestMethod]
         public void TestViewModelHelper_0()
@@ -84,6 +87,30 @@ namespace ENV.Web.Tests
 
 
 
+        }
+        [TestMethod]
+        public void Test_Issue_5()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            t.c.Caption = "מזהה";
+            vmh.From = t;
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "mzaa");
+
+        }
+        [TestMethod]
+        public void TestSingularNames()
+        {
+            using (var t = new BulkTester((x, r) => ViewModelHelper.MakeSingular(x).ShouldBe(r, x)))
+            {
+                t.Test("categories", "category");
+                t.Test("products", "product");
+                t.Test("CATEGORIES", "CATEGORY");
+                t.Test("PRODUCTS", "PRODUCT");
+                t.Test("NOAM", "NOAM");
+
+            }
         }
         [TestInitialize]
         public void TestInitialize()

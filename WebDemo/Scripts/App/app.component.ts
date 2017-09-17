@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
 
     category = new Lookup<Category, Product>(apiUrl+'categories', (product, o) => o.isEqualTo = { id: +product.categoryID } );
 
-    tableSettings = new TableSettings({
+    tableSettings = new TableSettings<Product>({
         // /categories?_responseType=DCF
         editable: true,
         columnSettings: [
@@ -29,8 +29,11 @@ export class AppComponent implements OnInit {
             { key: "categoryID", caption: "CategoryID" },
             {
                 caption: "categoryName",
-                getValue: (r: any) => this.category.get(r).categoryName,
+                getValue: (r) => this.category.get(r).categoryName,
                 columnClass: r => this.category.found(r) ? '' : 'danger'
+            },
+            {
+                caption: 'test', getValue: r => r.categoryID
             }
         ]
     });

@@ -26,6 +26,9 @@ let AppComponent = class AppComponent {
                     caption: "categoryName",
                     getValue: (r) => this.category.get(r).categoryName,
                     columnClass: r => this.category.found(r) ? '' : 'danger'
+                },
+                {
+                    caption: 'test', getValue: r => r.categoryID
                 }
             ]
         });

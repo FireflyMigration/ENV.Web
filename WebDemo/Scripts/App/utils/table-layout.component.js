@@ -92,10 +92,15 @@ exports.TableLayoutComponent = TableLayoutComponent;
 function makeTitle(key) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
-class TableSettings {
-    constructor(settings) {
-        this.settings = [];
+class TableSettingsBase {
+    constructor() {
         this.editable = false;
+        this.settings = [];
+    }
+}
+class TableSettings extends TableSettingsBase {
+    constructor(settings) {
+        super();
         if (settings) {
             if (settings.columnSettings)
                 this.add(...settings.columnSettings);

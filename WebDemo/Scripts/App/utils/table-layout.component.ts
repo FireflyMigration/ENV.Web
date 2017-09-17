@@ -10,7 +10,7 @@ export class TableLayoutComponent implements OnChanges {
 
     @Input() records: Iterable<any>;
     @Input() settings = new TableSettings();
-    columnMaps: ColumnSetting[];
+    columnMaps: ColumnSettingBase[];
     rowButtons: rowButton[] = [];
     keys: string[] = [];
     ngOnChanges(): void {
@@ -55,18 +55,18 @@ export class TableLayoutComponent implements OnChanges {
     _getRowClass(row: any) {
         return "";
     }
-    _getColValue(col: ColumnSetting, row: any) {
+    _getColValue(col: ColumnSettingBase, row: any) {
         if (col.getValue)
             return col.getValue(row);
         return row[col.key];
     }
-    _getColumnClass(col: ColumnSetting, row: any) {
+    _getColumnClass(col: ColumnSettingBase, row: any) {
         if (col.columnClass)
             return col.columnClass(row);
         return '';
 
     }
-    _getEditable(col: ColumnSetting) {
+    _getEditable(col: ColumnSettingBase) {
         if (!this.settings.editable)
             return false;
         if (!col.key)
@@ -79,10 +79,15 @@ export class TableLayoutComponent implements OnChanges {
 function makeTitle(key: string) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
-
-export class TableSettings {
-    settings: ColumnSetting[] = [];
-    constructor(settings?: TableSettingsInterface) {
+class TableSettingsBase
+{
+    editable = false;
+    settings: ColumnSettingBase[] = [];
+}
+export class TableSettings<rowType> extends TableSettingsBase{
+    
+    constructor(settings?: TableSettingsInterface<rowType>) {
+        super();
         if (settings) {
             if (settings.columnSettings)
                 this.add(...settings.columnSettings);
@@ -91,14 +96,15 @@ export class TableSettings {
             if (settings.editable)
                 this.editable = true;
         }
+        
     }
-    editable = false;
+    
 
-    add(...columns: ColumnSetting[]);
+    add(...columns: ColumnSetting<rowType>[]);
     add(...columns: string[]);
     add(...columns: any[]) {
         for (let c of columns) {
-            let x = c as ColumnSetting;
+            let x = c as ColumnSetting<rowType>;
             if (x.key || x.getValue)
                 this.settings.push(x);
             else this.settings.push({ key: c });
@@ -106,19 +112,23 @@ export class TableSettings {
     }
    
 }
-interface TableSettingsInterface {
+interface TableSettingsInterface<rowType> {
     editable?: boolean,
-    columnSettings?: ColumnSetting[],
+    columnSettings?: ColumnSetting<rowType>[],
     columnKeys?: string[],
     rowClass?: (row: any) => string;
 }
 
-interface ColumnSetting {
+interface ColumnSettingBase {
     key?: string;
     caption?: string;
     readonly?: boolean;
     getValue?: (row: any) => any;
     columnClass?: (row: any) => string;
+}
+interface ColumnSetting<rowType> extends ColumnSettingBase{
+    getValue?: (row: rowType) => any;
+    columnClass?: (row: rowType) => string;
 }
 class rowButton {
     constructor(public name: string) { }

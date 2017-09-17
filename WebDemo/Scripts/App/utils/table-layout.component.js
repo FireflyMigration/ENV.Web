@@ -53,10 +53,18 @@ let TableLayoutComponent = class TableLayoutComponent {
             }
         }
     }
+    _getRowClass(row) {
+        return "";
+    }
     _getColValue(col, row) {
         if (col.getValue)
             return col.getValue(row);
         return row[col.key];
+    }
+    _getColumnClass(col, row) {
+        if (col.columnClass)
+            return col.columnClass(row);
+        return '';
     }
     _getEditable(col) {
         if (!this.settings.editable)

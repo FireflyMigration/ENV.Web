@@ -43,7 +43,7 @@ export class TableLayoutComponent implements OnChanges {
 
                             this.columnMaps.push({
                                 key: key,
-                                caption: makeTitle(key)
+                                caption: makeTitle(key) 
                             });
                     });
                     break;
@@ -52,10 +52,19 @@ export class TableLayoutComponent implements OnChanges {
             }
         }
     }
+    _getRowClass(row: any) {
+        return "";
+    }
     _getColValue(col: ColumnSetting, row: any) {
         if (col.getValue)
             return col.getValue(row);
         return row[col.key];
+    }
+    _getColumnClass(col: ColumnSetting, row: any) {
+        if (col.columnClass)
+            return col.columnClass(row);
+        return '';
+
     }
     _getEditable(col: ColumnSetting) {
         if (!this.settings.editable)
@@ -100,7 +109,8 @@ export class TableSettings {
 interface TableSettingsInterface {
     editable?: boolean,
     columnSettings?: ColumnSetting[],
-    columnKeys?: string[]
+    columnKeys?: string[],
+    rowClass?: (row: any) => string;
 }
 
 interface ColumnSetting {
@@ -108,6 +118,7 @@ interface ColumnSetting {
     caption?: string;
     readonly?: boolean;
     getValue?: (row: any) => any;
+    columnClass?: (row: any) => string;
 }
 class rowButton {
     constructor(public name: string) { }

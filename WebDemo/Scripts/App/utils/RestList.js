@@ -110,6 +110,12 @@ class Lookup {
         this.categories = new RestList(url);
     }
     get(r) {
+        return this.getInternal(r).value;
+    }
+    found(r) {
+        return this.getInternal(r).found;
+    }
+    getInternal(r) {
         let find = {};
         this.options(r, find);
         let key = JSON.stringify(find);
@@ -119,15 +125,25 @@ class Lookup {
             return this.cache[key];
         }
         else {
-            let res = {};
+            let res = new lookupRowInfo();
             this.cache[key] = res;
             this.categories.get(find).then(() => {
-                if (this.categories.items.length > 0)
-                    this.cache[key] = this.categories.items[0];
+                res.loading = false;
+                if (this.categories.items.length > 0) {
+                    res.value = this.categories.items[0];
+                    res.found = true;
+                }
             });
             return res;
         }
     }
 }
 exports.Lookup = Lookup;
+class lookupRowInfo {
+    constructor() {
+        this.found = false;
+        this.loading = true;
+        this.value = {};
+    }
+}
 //# sourceMappingURL=RestList.js.map

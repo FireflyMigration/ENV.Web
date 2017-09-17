@@ -7,9 +7,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
+const core_2 = require("@angular/core");
 const RestList_1 = require("./utils/RestList");
 const table_layout_component_1 = require("./utils/table-layout.component");
-const apiUrl = 'http://localhost/web.demo/dataApi/';
 let AppComponent = class AppComponent {
     constructor() {
         this.products = new RestList_1.RestList(apiUrl + 'products');
@@ -22,7 +22,11 @@ let AppComponent = class AppComponent {
                 { key: "productName", caption: "ProductName" },
                 { key: "supplierID", caption: "SupplierID" },
                 { key: "categoryID", caption: "CategoryID" },
-                { caption: "categoryName", getValue: (r) => this.category.get(r).categoryName }
+                {
+                    caption: "categoryName",
+                    getValue: (r) => this.category.get(r).categoryName,
+                    columnClass: r => this.category.found(r) ? '' : 'danger'
+                }
             ]
         });
     }
@@ -31,7 +35,12 @@ let AppComponent = class AppComponent {
     }
 };
 AppComponent = __decorate([
-    core_1.Injectable()
+    core_1.Component({
+        selector: 'my-app',
+        templateUrl: `./scripts/app/app.component.html`,
+    }),
+    core_2.Injectable()
 ], AppComponent);
 exports.AppComponent = AppComponent;
+const apiUrl = 'http://localhost/web.demo/dataApi/';
 //# sourceMappingURL=app.component.js.map

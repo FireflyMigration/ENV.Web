@@ -33,11 +33,11 @@
                 _order: options.order
             });
             url.addObject(options.isEqualTo);
-            url.addObject(options.isGreaterOrEqualTo,"_gte");
-            url.addObject(options.isLessOrEqualTo,"_lte");
-            url.addObject(options.isGreaterThan,"_gt");
-            url.addObject(options.isLessThan,"_lt");
-            url.addObject(options.isDifferentFrom,"_ne");
+            url.addObject(options.isGreaterOrEqualTo, "_gte");
+            url.addObject(options.isLessOrEqualTo, "_lte");
+            url.addObject(options.isGreaterThan, "_gt");
+            url.addObject(options.isLessThan, "_lt");
+            url.addObject(options.isDifferentFrom, "_ne");
         }
 
 
@@ -126,7 +126,7 @@ interface restListItem {
     save: () => void;
     delete: () => void;
 }
-export  interface getOptions<T> {
+export interface getOptions<T> {
     isEqualTo?: T;
     isGreaterOrEqualTo?: T;
     isLessOrEqualTo?: T;
@@ -148,11 +148,16 @@ export class Lookup<lookupType, mainType> {
     categories: RestList<lookupType>;
     private cache: {};
 
-
-
     get(r: any): lookupType {
+        return this.getInternal(r).value;
+    }
+    found(r: any): boolean {
+        return this.getInternal(r).found;
+    }
 
-        let find: getOptions<lookupType> = {};
+    private getInternal(r: any): lookupRowInfo<lookupType> {
+
+        let find: getOptions<lookupType> = { };
         this.options(<mainType>r, find);
         let key = JSON.stringify(find);
         if (this.cache == undefined)
@@ -160,15 +165,23 @@ export class Lookup<lookupType, mainType> {
         if (this.cache[key]) {
             return this.cache[key];
         } else {
-            let res = {} as lookupType;
+            let res = new lookupRowInfo < lookupType>();
             this.cache[key] = res;
             this.categories.get(find).then(() => {
-                if (this.categories.items.length > 0)
-                    this.cache[key] = this.categories.items[0];
-
+                res.loading = false;
+                if (this.categories.items.length > 0) {
+                    res.value = this.categories.items[0];
+                    res.found = true;
+                }
             });
             return res;
         }
 
     }
+}
+class lookupRowInfo<type> {
+    found = false;
+    loading = true;
+    value: type = {} as type;
+
 }

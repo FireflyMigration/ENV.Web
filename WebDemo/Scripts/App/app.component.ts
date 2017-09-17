@@ -10,7 +10,7 @@ import { TableSettings } from "./utils/table-layout.component";
     templateUrl: `./scripts/app/app.component.html`,
 
 })
-const apiUrl = 'http://localhost/web.demo/dataApi/';
+
 @Injectable()
 export class AppComponent implements OnInit {
     
@@ -27,8 +27,11 @@ export class AppComponent implements OnInit {
             { key: "productName", caption: "ProductName" },
             { key: "supplierID", caption: "SupplierID" },
             { key: "categoryID", caption: "CategoryID" },
-            { caption: "categoryName", getValue: (r: any) => this.category.get(r).categoryName }
-
+            {
+                caption: "categoryName",
+                getValue: (r: any) => this.category.get(r).categoryName,
+                columnClass: r => this.category.found(r) ? '' : 'danger'
+            }
         ]
     });
 
@@ -39,6 +42,7 @@ export class AppComponent implements OnInit {
 
 
 }
+const apiUrl = 'http://localhost/web.demo/dataApi/';
 
 
 

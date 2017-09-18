@@ -40,12 +40,12 @@ export class AppComponent implements OnInit {
 
 
     ngOnInit(): void {
-        this.products.get();
+        this.products.get({ limit: 5 });
     }
 
 
 }
-const apiUrl = 'http://localhost/web.demo/dataApi/';
+const apiUrl = '/dataApi/';
 
 
 

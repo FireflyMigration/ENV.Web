@@ -17,18 +17,24 @@ let TableLayoutComponent = class TableLayoutComponent {
         this.rowButtons = [];
         this.keys = [];
     }
+    addButton(b) {
+        if (!b.click)
+            b.click = (r) => { };
+        if (!b.visible)
+            b.visible = r => true;
+        this.rowButtons.push(b);
+        return b;
+    }
     ngOnChanges() {
+        this.rowButtons = [];
         if (this.settings.editable) {
-            this.rowButtons = [];
-            let s = new rowButton('Save');
-            s.click = r => r.save();
-            this.rowButtons.push(s);
-            let d = new rowButton('Delete');
-            d.visible = (r) => {
-                return r.newRow == undefined;
-            };
-            d.click = r => r.delete();
-            this.rowButtons.push(d);
+            this.addButton({ name: "save", click: r => r.save() });
+            this.addButton({
+                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => r.delete()
+            });
+        }
+        for (let b of this.settings.buttons) {
+            this.addButton(b);
         }
         if (this.settings.settings.length > 0) {
             this.columnMaps = this.settings.settings;
@@ -96,6 +102,7 @@ class TableSettingsBase {
     constructor() {
         this.editable = false;
         this.settings = [];
+        this.buttons = [];
     }
 }
 class TableSettings extends TableSettingsBase {
@@ -108,6 +115,8 @@ class TableSettings extends TableSettingsBase {
                 this.add(...settings.columnKeys);
             if (settings.editable)
                 this.editable = true;
+            if (settings.rowButtons)
+                this.buttons = settings.rowButtons;
         }
     }
     add(...columns) {
@@ -121,11 +130,4 @@ class TableSettings extends TableSettingsBase {
     }
 }
 exports.TableSettings = TableSettings;
-class rowButton {
-    constructor(name) {
-        this.name = name;
-        this.visible = (r) => true;
-        this.click = r => { };
-    }
-}
 //# sourceMappingURL=table-layout.component.js.map

@@ -34,7 +34,7 @@ let AppComponent = class AppComponent {
         });
     }
     ngOnInit() {
-        this.products.get();
+        this.products.get({ limit: 5 });
     }
 };
 AppComponent = __decorate([
@@ -45,5 +45,5 @@ AppComponent = __decorate([
     core_2.Injectable()
 ], AppComponent);
 exports.AppComponent = AppComponent;
-const apiUrl = 'http://localhost/web.demo/dataApi/';
+const apiUrl = '/dataApi/';
 //# sourceMappingURL=app.component.js.map

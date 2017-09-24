@@ -677,7 +677,10 @@ namespace ENV.Web
                         {
                             var c = item.Value();
                             Response.Write(@"<table class=""table table-responsive table-striped table-hover table-condensed table-responsive""><thead><tr><th>API</th><th><th></tr></thead><tbody>");
-                            string url = Request.Path + "/" + item.Key;
+                            string url = Request.Path;
+                            if (!url.EndsWith("/"))
+                                url += "/";
+                            url+= item.Key;
                             void addLine(string action, Action<Action<string, string>> addLink = null, bool dontNeedId = false)
                             {
                                 var sw = new StringBuilder();

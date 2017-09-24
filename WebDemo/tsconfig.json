@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": false, 
+  //  "noStrictGenericChecks": true,
     "typeRoots": [
       "node_modules/@types"
     ],

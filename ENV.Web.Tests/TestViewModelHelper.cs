@@ -102,7 +102,7 @@ namespace ENV.Web.Tests
         [TestMethod]
         public void TestSingularNames()
         {
-            using (var t = new BulkTester((x, r) => ViewModelHelper.MakeSingular(x).ShouldBe(r, x)))
+            using (var t = new BulkTester((x, r) => NameFixer.MakeSingular(x).ShouldBe(r, x)))
             {
                 t.Test("categories", "category");
                 t.Test("products", "product");

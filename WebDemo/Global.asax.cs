@@ -15,7 +15,8 @@ namespace WebDemo
     {
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas();
+            //commented out for performance - it uses reflection to read everything - just expensive.
+            //   AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -24,9 +25,11 @@ namespace WebDemo
             ConnectionManager.UseConnectionPool = true;
             
             //sets the current directory to the bin directory in the parent directory
-            System.Environment.CurrentDirectory = 
+            Environment.CurrentDirectory = 
                Path.Combine(
                 Path.GetDirectoryName( HttpContext.Current.Server.MapPath("")),"bin");
+            //determines where the appliaction dlls are
+            ENV.AbstractFactory.AlternativeDllPath = Environment.CurrentDirectory;
             
             //calls a refactored version of the program main of Northwind
             Northwind.Program.Init(new string[0]);

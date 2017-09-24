@@ -31,6 +31,26 @@ namespace ENV.Web
         }
         public void Set(string name, object value)
         {
+            value = FixValueTypes(value);
+
+            Val result;
+            if (_vals.TryGetValue(name, out result))
+            {
+                result.Value = value;
+            }
+            else
+            {
+                result = new Val { Name = name, Value = value };
+                _value.Add(result);
+                _vals.Add(name, result);
+            }
+
+
+
+        }
+
+        internal static object FixValueTypes(object value)
+        {
             Text txt;
             Number n;
             Date d;
@@ -65,22 +85,9 @@ namespace ENV.Web
             }
             else if (Bool.TryCast(value, out b))
                 value = b.ToBoolean();
-
-            Val result;
-            if (_vals.TryGetValue(name, out result))
-            {
-                result.Value = value;
-            }
-            else
-            {
-                result = new Val { Name = name, Value = value };
-                _value.Add(result);
-                _vals.Add(name, result);
-            }
-
-
-
+            return value;
         }
+
         public string ToJson()
         {
             using (var sw = new StringWriter())

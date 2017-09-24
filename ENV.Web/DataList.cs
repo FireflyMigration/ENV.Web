@@ -433,14 +433,7 @@ namespace ENV.Web
     }
     public class HTMLISerializedObjectWriter : ISerializedObjectWriter
     {
-        TextWriter _writer;
-        public HTMLISerializedObjectWriter(TextWriter writer,string title=null, bool root = true)
-        {
-
-            _writer = writer;
-            if (root)
-            {
-                _writer.WriteLine(@"
+        internal static string HTMLPageHeader = @"
 <!DOCTYPE html>
 <html lang=""en"">
 <head>
@@ -448,7 +441,16 @@ namespace ENV.Web
      <link href=""../content/bootstrap.min.css"" rel=""stylesheet"">
 <link href=""./content/bootstrap.min.css"" rel=""stylesheet"">
 </head>
-<body>");
+<body>";
+
+        TextWriter _writer;
+        public HTMLISerializedObjectWriter(TextWriter writer,string title=null, bool root = true)
+        {
+
+            _writer = writer;
+            if (root)
+            {
+                _writer.WriteLine(HTMLPageHeader);
                 if (!string.IsNullOrEmpty(title))
                     _writer.WriteLine("<h1>" + title + "</h1>");
             }

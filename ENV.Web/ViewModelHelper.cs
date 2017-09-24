@@ -185,7 +185,7 @@ namespace ENV.Web
         }
         public void CreateTypeScriptClass(TextWriter tw, string name)
         {
-            tw.WriteLine("export interface " + MakeSingular(name) + " {");
+            tw.WriteLine("export interface " + NameFixer.MakeSingular(name) + " {");
             init();
             foreach (var item in _columns)
             {
@@ -404,7 +404,7 @@ namespace ENV.Web
                 string name = column.Caption;
                 if (column == _idColumn)
                     name = "id";
-                name = fixName(name);
+                name = NameFixer.fixName(name);
                 var orgName = name;
                 int i = 1;
                 while (_colsPerKey.ContainsKey(name))
@@ -420,101 +420,7 @@ namespace ENV.Web
                 _columns.Add(cv);
             }
         }
-        string fixName(string name)
-        {
-            name = EntityScriptGenerator.FixNameForDb(HebrewTranslateCsStyle(name));
-            if (name.Length > 2)
-                if (char.IsLower(name[1]))
-                    return name[0].ToString().ToLower() + name.Substring(1);
-            return name;
-        }
-        public static string HebrewTranslateCsStyle(string source)
-        {
-            string splitedSource = source;
-
-            StringBuilder output = new StringBuilder();
-            foreach (string s in splitedSource.Split(' '))
-            {
-                var y = s;
-                if (HasHebrewInIt(y))
-                {
-                    y = HebrewTranslateOracleStyle(y);
-                    if (y.Length > 0)
-                        y = y.Substring(0, 1).ToUpper() + y.Remove(0, 1).ToLower();
-                }
-                output.Append(y);
-
-
-            }
-            return output.ToString();
-        }
-        public static string HebrewTranslateOracleStyle(string source)
-        {
-            string hebrewEngish = "ABGDAOZCTIKKLMMNNSAFPTTKRST";
-            string deletedChars = "";//= @" )(*&^%$#@!}{[]+|\/?.>,<~`;:-''";
-            int asciiRangeFrom, asciiRangeTo, asciiRangeDelta;
-            asciiRangeFrom = 1488;
-            asciiRangeTo = 1488 - 224 + 250;
-            asciiRangeDelta = 96;
-            source = source.Replace("\"", "");
-
-            StringBuilder output = new StringBuilder();
-            for (int i = 0; i < source.Length; i++)
-            {
-                char currentChar = source[i];
-                int asciiValue = (int)currentChar;
-                if (asciiValue >= asciiRangeFrom - asciiRangeDelta && asciiValue <= asciiRangeTo - asciiRangeDelta)
-                    asciiValue += asciiRangeDelta;
-                if (asciiValue >= asciiRangeFrom && asciiValue <= asciiRangeTo)
-                    currentChar = hebrewEngish[asciiValue - asciiRangeFrom];
-                //if(currentChar==' ') currentChar = '_';
-                if (deletedChars.IndexOf(currentChar) == -1)
-                    output.Append(currentChar);
-                if (asciiValue >= asciiRangeFrom && asciiValue <= asciiRangeTo)
-                {
-                    if (asciiValue == asciiRangeFrom + 7 || asciiValue == asciiRangeFrom + 10 || asciiValue == asciiRangeFrom + 25)
-                        output.Append('H');
-                    if (asciiValue == asciiRangeFrom + 21 || asciiValue == asciiRangeFrom + 22)
-                        output.Append('S');
-                    if (output.ToString().EndsWith("CH "))
-                        output = output.Remove(output.Length - 3, 3).Append("ACH ");
-                    if (output.Length > 1)
-                    {
-                        switch (output.ToString().Substring(output.Length - 2, 2))
-                        {
-                            case "AI":
-                                output = output.Remove(output.Length - 2, 2).Append("I");
-                                break;
-                            case "AO":
-                                output = output.Remove(output.Length - 2, 2).Append("O");
-                                break;
-                            case "B ":
-                                output = output.Remove(output.Length - 2, 2).Append("V ");
-                                break;
-                            case "K ":
-                                output = output.Remove(output.Length - 2, 2).Append("CH ");
-                                break;
-                            case "P ":
-                                output = output.Remove(output.Length - 2, 2).Append("F ");
-                                break;
-                        }
-                    }
-                }
-            }
-            if (output.ToString().EndsWith("CH"))
-                output = output.Remove(output.Length - 2, 2).Append("ACH");
-            if (output.ToString().EndsWith("B"))
-                output = output.Remove(output.Length - 1, 1).Append("V");
-            return output.ToString();
-        }
-        public static bool HasHebrewInIt(string s)
-        {
-            foreach (char c in s)
-            {
-                if (c >= 'א' && c <= 'ת') return true;
-            }
-            return false;
-        }
+      
 
         public static void RegisterViewModel(string key, Func<ViewModelHelper> controller)
         {
@@ -569,6 +475,7 @@ namespace ENV.Web
                         var vmc = vmcFactory();
                         {
                             string jsonResult = null;
+                            Response.ContentType = "application/json";
                             switch (Request.HttpMethod.ToLower())
                             {
                                 case "get":
@@ -577,12 +484,19 @@ namespace ENV.Web
 
                                         ISerializedObjectWriter w = new JsonISerializedObjectWriter(sw);
                                         if (responseType.StartsWith("X"))
+                                        {
                                             w = new XmlISerializedObjectWriter(new XmlTextWriter(sw));
+                                            Response.ContentType = "text/xml";
+                                        }
                                         else if (responseType.StartsWith("C"))
+                                        {
                                             w = new CSVISerializedObjectWriter(sw);
+                                            Response.ContentType = "application/csv";
+                                            Response.AddHeader("Content-Disposition", "attachment;filename=" + name + ".csv");
+                                        }
                                         else if (responseType.StartsWith("H"))
                                         {
-
+                                            ResponseIsHtml(Response);
                                             w = new HTMLISerializedObjectWriter(sw, name)
                                             {
                                                 BodyAddition = optionalUrlParametersHtmlDoc
@@ -591,6 +505,7 @@ namespace ENV.Web
                                         }
                                         if (responseType.StartsWith("D"))
                                         {
+                                            Response.ContentType = "text/plain";
                                             sw.WriteLine("// /" + name + "?_responseType=" + responseType);
                                             sw.WriteLine();
                                             if (responseType.StartsWith("DE"))
@@ -607,7 +522,7 @@ namespace ENV.Web
                                         else
                                             vmc.GetRow(id).ToWriter(w);
                                         w.Dispose();
-                                        jsonResult = sw.ToString();
+                                        Response.Write(sw.ToString());
                                         break;
                                     }
                                 case "post":
@@ -616,7 +531,7 @@ namespace ENV.Web
                                     Request.InputStream.Position = 0;
                                     using (var sr = new System.IO.StreamReader(Request.InputStream))
                                     {
-                                        jsonResult = vmc.Insert(DataItem.FromJson(sr.ReadToEnd())).ToJson();
+                                        Response.Write(vmc.Insert(DataItem.FromJson(sr.ReadToEnd())).ToJson());
                                     }
                                     break;
                                 case "put":
@@ -625,7 +540,7 @@ namespace ENV.Web
                                     Request.InputStream.Position = 0;
                                     using (var sr = new System.IO.StreamReader(Request.InputStream))
                                     {
-                                        jsonResult = vmc.Update(id, DataItem.FromJson(sr.ReadToEnd())).ToJson();
+                                        Response.Write(vmc.Update(id, DataItem.FromJson(sr.ReadToEnd())).ToJson());
                                     }
                                     break;
                                 case "delete":
@@ -645,22 +560,7 @@ namespace ENV.Web
                                     Response.StatusCode = 204;
                                     return;
                             }
-                            if (!string.IsNullOrEmpty(jsonResult))
-                            {
-                                Response.ContentType = "application/json";
-                                if (responseType.StartsWith("X"))
-                                    Response.ContentType = "text/xml";
-                                else if (responseType.StartsWith("C"))
-                                {
-                                    Response.ContentType = "application/csv";
-                                    Response.AddHeader("Content-Disposition", "attachment;filename=" + name + ".csv");
-                                }
-                                else if (responseType.StartsWith("H"))
-                                    ResponseIsHtml(Response);
-                                else if (responseType.StartsWith("D"))
-                                    Response.ContentType = "text/plain";
-                                Response.Write(jsonResult);
-                            }
+                        
                         }
                     }
                 }
@@ -701,6 +601,7 @@ namespace ENV.Web
                             addLine("GET", x => {
                                 x("JSON", "");
                                 x("XML", "xml");
+                                x("CSV", "csv");
                                 x("HTML", "html");
                                 x("ts interface", "d");
                                 x("column list", "dc");
@@ -737,18 +638,7 @@ namespace ENV.Web
             Response.ContentType = "text/html";
         }
 
-        internal static string MakeSingular(string name)
-        {
-            if (name.EndsWith("IES"))
-                return name.Remove(name.Length - 3) + "Y";
-            if (name.EndsWith("ies"))
-                return name.Remove(name.Length - 3) + "y";
-            if (name.EndsWith("S"))
-                return name.Remove(name.Length - 1);
-            if (name.EndsWith("s"))
-                return name.Remove(name.Length - 1);
-            return name;
-        }
+      
     }
     class setValueForColumn : DoSomething
     {
@@ -865,23 +755,5 @@ namespace ENV.Web
             throw new NotImplementedException();
         }
     }
-    interface IMyHttpContext
-    {
-        string GetRequestParam(string key);
-    }
-    class HttpContextBridgeToIHttpContext : IMyHttpContext
-    {
-        System.Web.HttpContext _current;
-
-
-        public HttpContextBridgeToIHttpContext(System.Web.HttpContext current)
-        {
-            _current = current;
-        }
-
-        public string GetRequestParam(string key)
-        {
-            return _current.Request.Params[key];
-        }
-    }
+    
 }

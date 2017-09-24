@@ -18,7 +18,7 @@ let AppComponent = class AppComponent {
             // /categories?_responseType=DCF
             editable: true,
             columnSettings: [
-                { key: "id", caption: "ProductID", readonly: true },
+                { key: "id", caption: "ProductID" },
                 { key: "productName", caption: "ProductName" },
                 { key: "supplierID", caption: "SupplierID" },
                 { key: "categoryID", caption: "CategoryID" },
@@ -34,7 +34,7 @@ let AppComponent = class AppComponent {
         });
     }
     ngOnInit() {
-        this.products.get({ limit: 5 });
+        this.products.get({ limit: 9995 });
     }
 };
 AppComponent = __decorate([

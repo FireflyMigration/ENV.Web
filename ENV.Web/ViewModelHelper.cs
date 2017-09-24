@@ -8,7 +8,6 @@ using Firefly.Box.Data.Advanced;
 using ENV.Utilities;
 using Firefly.Box.Advanced;
 using Firefly.Box.Data;
-using Firefly.Box.Flow;
 using System.IO;
 using System.Xml;
 using Firefly.Box.Testing;
@@ -17,6 +16,15 @@ namespace ENV.Web
 {
     public class ViewModelHelper
     {
+        private const string optionalUrlParametersHtmlDoc = @"
+<strong>Optional Url Parameters</strong>
+<ul>
+    <li><strong>_limit</strong> - Num of rows per result</li>
+    <li><strong>_page</strong> - Page Number</li>
+    <li><strong>_sort</strong> - Sort Columns</li>
+    <li><strong>_order</strong> - Sort Direction</li>
+    <li><strong>_gt, _gte, _lt, _lte, _ne</strong> - Filter Data Options</li>
+</ul>";
         protected readonly ENV.UserMethods u;
         public ViewModelHelper()
         {
@@ -177,7 +185,7 @@ namespace ENV.Web
         }
         public void CreateTypeScriptClass(TextWriter tw, string name)
         {
-            tw.WriteLine("export interface " + MakeSingular( name )+ " {");
+            tw.WriteLine("export interface " + MakeSingular(name) + " {");
             init();
             foreach (var item in _columns)
             {
@@ -196,7 +204,7 @@ namespace ENV.Web
                     first = false;
                 else
                     tw.Write(",");
-                tw.Write("\""+item.Key+"\"");
+                tw.Write("\"" + item.Key + "\"");
             }
             tw.WriteLine("]");
         }
@@ -211,7 +219,7 @@ namespace ENV.Web
                     first = false;
                 else
                     tw.WriteLine(",");
-                tw.Write("{key:\"" + item.Key + "\",caption:\""+item.Caption+"\"}");
+                tw.Write("{key:\"" + item.Key + "\",caption:\"" + item.Caption + "\"}");
             }
             tw.WriteLine();
             tw.WriteLine("]");
@@ -538,7 +546,11 @@ namespace ENV.Web
                 var responseType = (System.Web.HttpContext.Current.Request.Params["_response"] ?? "J").ToUpper();
                 Response.Headers.Add("Access-Control-Allow-Credentials", "true");
                 Response.Headers.Add("Access-Control-Allow-Headers", "content-type");
-                Response.Headers.Add("Access-Control-Allow-Origin", Request["HTTP_ORIGIN"]);
+                {
+                    var x = Request["HTTP_ORIGIN"];
+                    if (!string.IsNullOrWhiteSpace(x))
+                        Response.Headers.Add("Access-Control-Allow-Origin", x);
+                }
                 {//fix id stuff
                     var url = Request.RawUrl;
                     var z = url.IndexOf('?');
@@ -549,113 +561,166 @@ namespace ENV.Web
                     if (x[x.Length - 1] != name)
                         id = x[x.Length - 1];
                 }
-                Func<ViewModelHelper> vmcFactory;
-                if (_controllers.TryGetValue(name.ToLower(), out vmcFactory))
+                if (!string.IsNullOrWhiteSpace(name))
                 {
-                    var vmc = vmcFactory();
+                    Func<ViewModelHelper> vmcFactory;
+                    if (_controllers.TryGetValue(name.ToLower(), out vmcFactory))
                     {
-                        string jsonResult = null;
-                        switch (Request.HttpMethod.ToLower())
+                        var vmc = vmcFactory();
                         {
-                            case "get":
-                                using (var sw = new System.IO.StringWriter())
-                                {
-
-                                    ISerializedObjectWriter w = new JsonISerializedObjectWriter(sw);
-                                    if (responseType.StartsWith("X"))
-                                        w = new XmlISerializedObjectWriter(new XmlTextWriter(sw));
-                                    else if (responseType.StartsWith("C"))
-                                        w = new CSVISerializedObjectWriter(sw);
-                                    else if (responseType.StartsWith("H"))
-                                    {
-
-                                        w = new HTMLISerializedObjectWriter(sw, name)
-                                        {
-                                            BodyAddition = @"
-<strong>url options</strong>
-<ul>
-    <li><strong>_limit</strong> - Num of rows per result</li>
-    <li><strong>_page</strong> - Page Number</li>
-    <li><strong>_sort</strong> - Sort Columns</li>
-    <li><strong>_order</strong> - Sort Direction</li>
-    <li><strong>_gt, _gte, _lt, _lte, _ne</strong> - Filter Data Options</li>
-</ul>"
-                                        };
-
-                                    }
-                                    if (responseType.StartsWith("D"))
-                                    {
-                                        sw.WriteLine("// /"+name+"?_responseType=" + responseType);
-                                        sw.WriteLine();
-                                        if (responseType.StartsWith("DE"))
-                                            vmc.Describe(sw, name);
-                                        else if (responseType.StartsWith("DCF"))
-                                            vmc.FullColumnList(sw);
-                                        else if (responseType.StartsWith("DC"))
-                                            vmc.ColumnList(sw);
-                                        else
-                                            vmc.CreateTypeScriptClass(sw, name);
-                                    }
-                                    else if (string.IsNullOrEmpty(id))
-                                        vmc.GetRows().ToWriter(w);
-                                    else
-                                        vmc.GetRow(id).ToWriter(w);
-                                    w.Dispose();
-                                    jsonResult = sw.ToString();
-                                    break;
-                                }
-                            case "post":
-                                if (!vmc.AllowInsert)
-                                    throw new InvalidOperationException("Insert not allowed");
-                                Request.InputStream.Position = 0;
-                                using (var sr = new System.IO.StreamReader(Request.InputStream))
-                                {
-                                    jsonResult = vmc.Insert(DataItem.FromJson(sr.ReadToEnd())).ToJson();
-                                }
-                                break;
-                            case "put":
-                                if (!vmc.AllowUpdate)
-                                    throw new InvalidOperationException("Update not allowed");
-                                Request.InputStream.Position = 0;
-                                using (var sr = new System.IO.StreamReader(Request.InputStream))
-                                {
-                                    jsonResult = vmc.Update(id, DataItem.FromJson(sr.ReadToEnd())).ToJson();
-                                }
-                                break;
-                            case "delete":
-                                if (!vmc.AllowDelete)
-                                    throw new InvalidOperationException("Delete not allowed");
-                                vmc.Delete(id);
-                                break;
-                            case "options":
-                                var allowedMethods = "GET,HEAD,PATCH";
-                                if (vmc.AllowUpdate)
-                                    allowedMethods += ",PUT";
-                                if (vmc.AllowInsert)
-                                    allowedMethods += ",POST";
-                                if (vmc.AllowDelete)
-                                    allowedMethods += ",DELETE";
-                                Response.Headers.Add("Access-Control-Allow-Methods", allowedMethods);
-                                Response.StatusCode = 204;
-                                return;
-                        }
-                        if (!string.IsNullOrEmpty(jsonResult))
-                        {
-                            Response.ContentType = "application/json";
-                            if (responseType.StartsWith("X"))
-                                Response.ContentType = "text/xml";
-                            else if (responseType.StartsWith("C"))
+                            string jsonResult = null;
+                            switch (Request.HttpMethod.ToLower())
                             {
-                                Response.ContentType = "application/csv";
-                                Response.AddHeader("Content-Disposition", "attachment;filename=" + name + ".csv");
+                                case "get":
+                                    using (var sw = new System.IO.StringWriter())
+                                    {
+
+                                        ISerializedObjectWriter w = new JsonISerializedObjectWriter(sw);
+                                        if (responseType.StartsWith("X"))
+                                            w = new XmlISerializedObjectWriter(new XmlTextWriter(sw));
+                                        else if (responseType.StartsWith("C"))
+                                            w = new CSVISerializedObjectWriter(sw);
+                                        else if (responseType.StartsWith("H"))
+                                        {
+
+                                            w = new HTMLISerializedObjectWriter(sw, name)
+                                            {
+                                                BodyAddition = optionalUrlParametersHtmlDoc
+                                            };
+
+                                        }
+                                        if (responseType.StartsWith("D"))
+                                        {
+                                            sw.WriteLine("// /" + name + "?_responseType=" + responseType);
+                                            sw.WriteLine();
+                                            if (responseType.StartsWith("DE"))
+                                                vmc.Describe(sw, name);
+                                            else if (responseType.StartsWith("DCF"))
+                                                vmc.FullColumnList(sw);
+                                            else if (responseType.StartsWith("DC"))
+                                                vmc.ColumnList(sw);
+                                            else
+                                                vmc.CreateTypeScriptClass(sw, name);
+                                        }
+                                        else if (string.IsNullOrEmpty(id))
+                                            vmc.GetRows().ToWriter(w);
+                                        else
+                                            vmc.GetRow(id).ToWriter(w);
+                                        w.Dispose();
+                                        jsonResult = sw.ToString();
+                                        break;
+                                    }
+                                case "post":
+                                    if (!vmc.AllowInsert)
+                                        throw new InvalidOperationException("Insert not allowed");
+                                    Request.InputStream.Position = 0;
+                                    using (var sr = new System.IO.StreamReader(Request.InputStream))
+                                    {
+                                        jsonResult = vmc.Insert(DataItem.FromJson(sr.ReadToEnd())).ToJson();
+                                    }
+                                    break;
+                                case "put":
+                                    if (!vmc.AllowUpdate)
+                                        throw new InvalidOperationException("Update not allowed");
+                                    Request.InputStream.Position = 0;
+                                    using (var sr = new System.IO.StreamReader(Request.InputStream))
+                                    {
+                                        jsonResult = vmc.Update(id, DataItem.FromJson(sr.ReadToEnd())).ToJson();
+                                    }
+                                    break;
+                                case "delete":
+                                    if (!vmc.AllowDelete)
+                                        throw new InvalidOperationException("Delete not allowed");
+                                    vmc.Delete(id);
+                                    break;
+                                case "options":
+                                    var allowedMethods = "GET,HEAD,PATCH";
+                                    if (vmc.AllowUpdate)
+                                        allowedMethods += ",PUT";
+                                    if (vmc.AllowInsert)
+                                        allowedMethods += ",POST";
+                                    if (vmc.AllowDelete)
+                                        allowedMethods += ",DELETE";
+                                    Response.Headers.Add("Access-Control-Allow-Methods", allowedMethods);
+                                    Response.StatusCode = 204;
+                                    return;
                             }
-                            else if (responseType.StartsWith("H"))
-                                Response.ContentType = "text/html";
-                            else if (responseType.StartsWith("D"))
-                                Response.ContentType = "text/plain";
-                            Response.Write(jsonResult);
+                            if (!string.IsNullOrEmpty(jsonResult))
+                            {
+                                Response.ContentType = "application/json";
+                                if (responseType.StartsWith("X"))
+                                    Response.ContentType = "text/xml";
+                                else if (responseType.StartsWith("C"))
+                                {
+                                    Response.ContentType = "application/csv";
+                                    Response.AddHeader("Content-Disposition", "attachment;filename=" + name + ".csv");
+                                }
+                                else if (responseType.StartsWith("H"))
+                                    ResponseIsHtml(Response);
+                                else if (responseType.StartsWith("D"))
+                                    Response.ContentType = "text/plain";
+                                Response.Write(jsonResult);
+                            }
                         }
                     }
+                }
+                else
+                {
+                    ResponseIsHtml(Response);
+                    Response.Write(HTMLISerializedObjectWriter.HTMLPageHeader);
+                    Response.Write($"<h1>{Request.Path} Documentation</h1>");
+                    foreach (var item in _controllers)
+                    {
+
+                        Response.Write("<h2>" + item.Key + "</h2>");
+                        try
+                        {
+                            var c = item.Value();
+                            Response.Write(@"<table class=""table table-responsive table-striped table-hover table-condensed table-responsive""><thead><tr><th>API</th><th><th></tr></thead><tbody>");
+                            string url = Request.Path + "/" + item.Key;
+                            void addLine(string action, Action<Action<string, string>> addLink = null, bool dontNeedId = false)
+                            {
+                                var sw = new StringBuilder();
+                                if (addLink != null)
+                                {
+                                    addLink((linkName, linkResponseType) =>
+                                    {
+                                        var linkUrl = url;
+                                        if (!string.IsNullOrEmpty(linkResponseType))
+                                            linkUrl += "?_response=" + linkResponseType;
+
+                                        sw.Append($"<a href=\"{linkUrl}\">{linkName}</a> ");
+                                    });
+                                }
+
+                                Response.Write($"<tr><td>{action} {url+(dontNeedId?"":"/{id}") }</td><td>{sw.ToString()}</td></tr>");
+                            }
+                            addLine("GET", x => {
+                                x("JSON", "");
+                                x("XML", "xml");
+                                x("HTML", "html");
+                                x("ts interface", "d");
+                                x("column list", "dc");
+                                x("full column list", "dcf");
+                            }, true);
+                            addLine("GET");
+                            if (c.AllowInsert)
+                                addLine("POST");
+                            if (c.AllowUpdate)
+                                addLine("PUT");
+                            if (c.AllowDelete)
+                                addLine("DELETE");
+
+
+                            Response.Write("</tbody></table>");
+                        }
+                        catch (Exception ex)
+                        {
+                            Response.Write("Error: " + ex.Message);
+                        }
+
+                    }
+                    Response.Write(optionalUrlParametersHtmlDoc);
                 }
             }
             finally
@@ -663,6 +728,12 @@ namespace ENV.Web
 
             }
         }
+
+        private static void ResponseIsHtml(System.Web.HttpResponse Response)
+        {
+            Response.ContentType = "text/html";
+        }
+
         internal static string MakeSingular(string name)
         {
             if (name.EndsWith("IES"))
@@ -670,7 +741,7 @@ namespace ENV.Web
             if (name.EndsWith("ies"))
                 return name.Remove(name.Length - 3) + "y";
             if (name.EndsWith("S"))
-                return name.Remove(name.Length - 1) ;
+                return name.Remove(name.Length - 1);
             if (name.EndsWith("s"))
                 return name.Remove(name.Length - 1);
             return name;
@@ -790,166 +861,6 @@ namespace ENV.Web
         {
             throw new NotImplementedException();
         }
-    }
-    public class MockFlow
-    {
-        public void Add(Action action, Func<bool> condition, Direction direction)
-        {
-        }
-        public void Add(Action action, Direction direction)
-        {
-        }
-        public void Add(Action action, FlowMode flowMode, Direction direction)
-        {
-        }
-        public void Add<taskType>(CachedTask<taskType> cachedTask, Action runTask) where taskType : class
-        {
-        }
-        public void Add(Action action, Func<bool> condition, FlowMode flowMode)
-        {
-        }
-        public void Add(Action action, Func<bool> condition)
-        {
-        }
-        public void Add(Action action, Func<bool> condition, FlowMode flowMode, Direction direction)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action, Func<bool> condition, FlowMode flowMode, Direction direction)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action, Func<bool> condition, FlowMode flowMode)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action, Func<bool> condition)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action, Func<bool> condition, Direction direction)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action, Direction direction)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action, FlowMode flowMode, Direction direction)
-        {
-        }
-        public void AddCallByIndex(Func<Number> programIndex, Action<ProgramCollection.Runnable> action, FlowMode flowMode)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action, Func<bool> condition, FlowMode flowMode, Direction direction)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action, Func<bool> condition, FlowMode flowMode)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action, Func<bool> condition)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action, Func<bool> condition, Direction direction)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action, Direction direction)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action, FlowMode flowMode, Direction direction)
-        {
-        }
-        public void AddCallByPublicName(Func<Text> programPublicName, Action<ProgramCollection.Runnable> action, FlowMode flowMode)
-        {
-        }
-        public void Add(Action action)
-        {
-        }
-        public void Add(Action action, FlowMode flowMode)
-        {
-        }
-        public void Add<controller>(CachedTask<controller> cachedTask, Action runTask, Func<bool> condition, FlowMode flowMode, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(CachedTask<controller> cachedTask, Action runTask, Func<bool> condition, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(CachedTask<controller> cachedTask, Action runTask, Func<bool> condition) where controller : class
-        {
-        }
-        public void Add<controller>(CachedTask<controller> cachedTask, Action runTask, FlowMode flowMode, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(CachedTask<controller> cachedTask, Action runTask, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(CachedTask<controller> cachedTask, Action runTask, FlowMode flowMode) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask, Func<bool> condition, FlowMode flowMode, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask, Func<bool> condition, FlowMode flowModel) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask, Func<bool> condition, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask, Func<bool> condition) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask, FlowMode flowMode, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask, Direction direction) where controller : class
-        {
-        }
-        public void Add<controller>(Action<controller> runTask, FlowMode flowMode) where controller : class
-        {
-        }
-        public void Add<taskType>(CachedTask<taskType> cachedTask, Action runTask, Func<bool> condition, FlowMode flowMode) where taskType : class
-        {
-        }
-        public void EndBlock()
-        {
-        }
-        public void RunExpandEventOfParkedColumnEvenIfRaisedByOtherControls(Action runExpandEvent)
-        {
-        }
-        public void StartBlock()
-        {
-        }
-        public void StartBlock(FlowMode flowMode)
-        {
-        }
-        public void StartBlock(Direction direction)
-        {
-        }
-        public void StartBlock(FlowMode flowMode, Direction direction)
-        {
-        }
-        public void StartBlock(Func<bool> condition)
-        {
-        }
-        public void StartBlock(Func<bool> condition, Direction direction)
-        {
-        }
-        public void StartBlock(Func<bool> condition, FlowMode flowMode)
-        {
-        }
-        public void StartBlock(Func<bool> condition, FlowMode flowMode, Direction direction)
-        {
-        }
-        public void StartBlockElse(Func<bool> condition)
-        {
-        }
-        public void StartBlockElse()
-        {
-        }
-        
     }
     interface IMyHttpContext
     {

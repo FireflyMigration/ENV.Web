@@ -11,7 +11,7 @@ namespace WebDemo.Controllers
     {
         static DataApiController()
         {
-            ViewModelHelper.RegisterEntity("Products",typeof(Northwind.Models.Products));
+            ViewModelHelper.RegisterEntity("Products",typeof(Northwind.Models.Products),true);
             ViewModelHelper.RegisterEntity("Categories", typeof(Northwind.Models.Categories),true);
             
         }

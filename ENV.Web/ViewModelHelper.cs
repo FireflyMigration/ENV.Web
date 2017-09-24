@@ -240,9 +240,24 @@ namespace ENV.Web
             try
             {
                 init();
-                var x = new equalToFilter();
-                Caster.Cast(_idColumn, id, x);
-                _tempFilter.Add(x.result);
+                if (_bp.From.PrimaryKeyColumns.Length == 1)
+                {
+                    var x = new equalToFilter();
+                    Caster.Cast(_idColumn, id, x);
+                    _tempFilter.Add(x.result);
+                }
+                else
+                {
+                    var sr = new SeperatedReader(id);
+                    int i = 0;
+                    foreach (var item in _bp.From.PrimaryKeyColumns)
+                    {
+                        var x = new equalToFilter();
+                        Caster.Cast(item, sr[i++], x);
+                        _tempFilter.Add(x.result);
+
+                    }
+                }
                 if (onEnd != null)
                     _bp.End += onEnd;
                 _bp.Activity = activity;
@@ -391,13 +406,34 @@ namespace ENV.Web
             if (!_handledIdentity)
             {
                 _handledIdentity = true;
-                if (_bp.From != null && _bp.From.PrimaryKeyColumns != null && _bp.From.PrimaryKeyColumns.Length == 1)
+                if (_bp.From==null )
+                    throw new NotImplementedException("Must have an Entity - did you forget to set the From");
+                if (_bp.From.PrimaryKeyColumns == null || _bp.From.PrimaryKeyColumns.Length == 0)
+                    throw new NotImplementedException("Entity must have a primary key");
+
+                if (_bp.From.PrimaryKeyColumns.Length == 1)
                 {
                     _idColumn = _bp.From.PrimaryKeyColumns[0];
 
                 }
                 else
-                    throw new NotImplementedException("Primary key cols != 1");
+                {
+                    _idColumn = new TextColumn("id").BindValue(() => {
+
+                        var x = new SeperatedBuilder();
+                        foreach (var item in _bp.From.PrimaryKeyColumns)
+                        {
+                            x.Add(DataItem.FixValueTypes(item.Value));
+                        }
+                        return x.ToString();
+
+                    });
+                    Columns.Add(_bp.From.PrimaryKeyColumns);
+                    Columns.Add(_idColumn);
+                    
+
+                }
+                    
             }
             foreach (var column in columns)
             {

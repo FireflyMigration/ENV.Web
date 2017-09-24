@@ -9,6 +9,41 @@ namespace ENV.Web.Tests
     [TestClass]
     public class TestViewModelHelper
     {
+        internal class TestVMHWithMoreThanOneMemoberInThePrimaryKey : ViewModelHelper
+        {
+            public MockTable mt = new MockTable();
+            public TestVMHWithMoreThanOneMemoberInThePrimaryKey()
+            {
+                From = mt;
+                mt.SetPrimaryKey(mt.c, mt.a);
+            }
+            protected override void OnInsert()
+            {
+                mt.a.Value = mt.Max(mt.a) + 1;
+            }
+
+
+        }
+        [TestMethod]
+        public void TestViewModelHelper_BigPrimaryKey()
+        {
+            var mt = new MockTable();
+            mt.Truncate();
+            mt.InsertRow(1, 1, "noam");
+            mt.InsertRow(2, 2, "yael");
+            var vmc = new TestVMHWithMoreThanOneMemoberInThePrimaryKey();
+            var dl = vmc.GetRows();
+            dl.Count.ShouldBe(2);
+            dl[0]["c1"].Number.ShouldBe(1);
+            dl[1]["c1"].Number.ShouldBe(2);
+            dl[0]["c2"].Number.ShouldBe(1);
+            dl[0]["c3"].Text.ShouldBe("noam");
+
+            var item = vmc.GetRow(dl[0]["id"].Text);
+            item["c1"].Number.ShouldBe(1);
+        }
+
+
         internal class TestVMH : ViewModelHelper
         {
             public MockTable mt = new MockTable();

@@ -38,6 +38,9 @@ namespace WebDemo
             //Instead I use an sql server password for this demo
             ConnectionManager.SetDefaultUserAndPassword("sa", "MASTERKEY");
             
+            // so that btrieve tables will have a primary key we can use.
+            BtrieveEntity.UseBtrievePosition = true;
+            
             Controllers.ProfilerController.Init();
             
 

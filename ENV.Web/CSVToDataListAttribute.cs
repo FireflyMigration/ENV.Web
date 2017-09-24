@@ -188,4 +188,79 @@ namespace ENV.Web
             return _values.GetEnumerator();
         }
     }
-}
+    public class SeperatedBuilder
+    {
+        public static string GetString(params object[] columns)
+        {
+            var sb = new SeperatedBuilder();
+
+            sb.Add(columns);
+
+            return sb.ToString();
+        }
+
+        public SeperatedBuilder(params object[] items)
+        {
+            Add(items);
+        }
+
+        List<object> _cells = new List<object>();
+        public void Add(params object[] a)
+        {
+            _cells.AddRange(a);
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            bool first = true;
+            foreach (var item in _cells)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(Seperator);
+                var a = item;
+
+                var x = a.ToString();
+                if (x.Contains(Seperator.ToString()))
+                    x = "\"" +x.Replace("\"", "\"\"") + "\"";
+                sb.Append(x);
+
+            }
+            return sb.ToString();
+        }
+
+        public int Count { get { return _cells.Count; } }
+
+        public object this[int index]
+        {
+            get { return _cells[index]; }
+            set
+            {
+                var i = index;
+                while (_cells.Count <= i)
+                    _cells.Add("");
+                _cells[i] = value;
+            }
+        }
+
+        public static int ConvertLetter(string index)
+        {
+            int result = 0;
+            foreach (var item in index)
+            {
+                result = result * 26 + (int)item - 'A';
+            }
+            return result;
+        }
+
+        public object this[string index]
+        {
+            get { return this[ConvertLetter(index)]; }
+            set { this[ConvertLetter(index)] = value; }
+        }
+
+        public char Seperator = ',';
+    }
+} 

@@ -13,7 +13,7 @@ namespace WebDemo.Controllers
         {
             ViewModelHelper.RegisterEntity("Products",typeof(Northwind.Models.Products),true);
             ViewModelHelper.RegisterEntity("Categories", typeof(Northwind.Models.Categories),true);
-            
+            ViewModelHelper.RegisterEntity("OrderDetails", typeof(Northwind.Models.Order_Details), true);
         }
         // GET: DataApi
         public void Index(string name, string id = null)

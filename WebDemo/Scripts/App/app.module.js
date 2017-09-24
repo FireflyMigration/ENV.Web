@@ -12,12 +12,30 @@ const app_component_1 = require("./app.component");
 const forms_1 = require("@angular/forms");
 const http_1 = require("@angular/http");
 const table_layout_component_1 = require("./utils/table-layout.component");
+const router_1 = require("@angular/router");
+const categories_1 = require("./demo/categories");
+const products_1 = require("./demo/products");
+const appRoues = [
+    { path: 'categories', component: categories_1.Categories },
+    { path: 'products', component: products_1.Products },
+    { path: '', redirectTo: '/categories', pathMatch: 'full' }
+];
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     core_1.NgModule({
-        imports: [platform_browser_1.BrowserModule, forms_1.FormsModule, http_1.HttpModule],
-        declarations: [app_component_1.AppComponent, table_layout_component_1.TableLayoutComponent],
+        imports: [
+            router_1.RouterModule.forRoot(appRoues, {
+                enableTracing: false // set to true for debugging
+            }),
+            platform_browser_1.BrowserModule, forms_1.FormsModule, http_1.HttpModule
+        ],
+        declarations: [
+            table_layout_component_1.TableLayoutComponent,
+            app_component_1.AppComponent,
+            categories_1.Categories,
+            products_1.Products
+        ],
         bootstrap: [app_component_1.AppComponent]
     })
 ], AppModule);

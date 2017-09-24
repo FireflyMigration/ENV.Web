@@ -538,7 +538,7 @@ namespace ENV.Web
                 var responseType = (System.Web.HttpContext.Current.Request.Params["_response"] ?? "J").ToUpper();
                 Response.Headers.Add("Access-Control-Allow-Credentials", "true");
                 Response.Headers.Add("Access-Control-Allow-Headers", "content-type");
-                Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:20143");
+                Response.Headers.Add("Access-Control-Allow-Origin", Request["HTTP_ORIGIN"]);
                 {//fix id stuff
                     var url = Request.RawUrl;
                     var z = url.IndexOf('?');

@@ -9,16 +9,17 @@ namespace WebDemo.Controllers
 {
     public class DataApiController : Controller
     {
+        static DataApiHelper _dataApi = new DataApiHelper();
         static DataApiController()
         {
-            ViewModelHelper.Register("Products",typeof(Northwind.Models.Products),true);
-            ViewModelHelper.Register("Categories",()=>new CategoriesViewModel());
-            ViewModelHelper.Register("OrderDetails", typeof(Northwind.Models.Order_Details), true);
+            _dataApi.Register("Products",typeof(Northwind.Models.Products),true);
+            _dataApi.Register("Categories",()=>new CategoriesViewModel());
+            _dataApi.Register("OrderDetails", typeof(Northwind.Models.Order_Details), true);
         }
         // GET: DataApi
         public void Index(string name, string id = null)
         {
-            ViewModelHelper.ProcessRequest(name, id);
+            _dataApi.ProcessRequest(name, id);
         }
     }
 }

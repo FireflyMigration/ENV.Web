@@ -17,10 +17,12 @@ namespace ENV.Web.Tests
                 From = mt;
                 mt.SetPrimaryKey(mt.c, mt.a);
             }
-            protected override void OnInsert()
+            protected override void OnSavingRow()
             {
-                mt.a.Value = mt.Max(mt.a) + 1;
+                if (Activity== Activities.Insert)
+                    mt.a.Value = mt.Max(mt.a) + 1;
             }
+            
 
 
         }
@@ -51,9 +53,10 @@ namespace ENV.Web.Tests
             {
                 From = mt;
             }
-            protected override void OnInsert()
+            protected override void OnSavingRow()
             {
-                mt.a.Value = mt.Max(mt.a) + 1;
+                if (Activity== Activities.Insert)
+                    mt.a.Value = mt.Max(mt.a) + 1;
             }
 
 

@@ -349,6 +349,15 @@ namespace ENV.Web
             {
                 _writer.Write(((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
+            else if (value is string[])
+            {
+                WriteStartArray();
+                foreach (var item in (string[]) value)
+                {
+                    WriteValue(item);
+                }
+                WriteEndArray();
+            }
             else
                 _writer.Write("\"" + value.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r") + "\"");
         }

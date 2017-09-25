@@ -1,4 +1,4 @@
-﻿<table class="table table-bordered table-responsive table-condensed">
+﻿<table class="table table-bordered table-responsive table-condensed" *ngIf="settings">
     
     <thead>
         <tr>
@@ -20,4 +20,4 @@
         </tr>
     </tbody>
 </table>
-<button class="btn" *ngIf="settings.editable" (click)="records.add()">Add</button>
+<button class="btn" *ngIf="settings&& settings.editable" (click)="records.add()">Add</button>

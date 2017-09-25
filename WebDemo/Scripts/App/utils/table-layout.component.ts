@@ -42,7 +42,8 @@ export class TableLayoutComponent implements OnChanges {
 
 
     ngOnChanges(): void {
-
+        if (!this.settings)
+            return;
         this.rowButtons = [];
         if (this.settings.editable) {
 
@@ -182,7 +183,7 @@ interface TableSettingsInterface<rowType> {
     columnSettings?: ColumnSetting<rowType>[],
     columnKeys?: string[],
     restUrl?: string,
-    rowClass?: (row: any) => string;
+    rowClass?: (row: rowType) => string;
     rowButtons?: rowButton<rowType>[],
     get?:getOptions<rowType>
 }

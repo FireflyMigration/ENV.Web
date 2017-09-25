@@ -3,9 +3,8 @@ import { TableSettings } from "./utils/table-layout.component";
 
 
 @Component({
-    selector: '$safeitemrootname$',
-    $safeitemrootname$:`
-<h1>Categories</h1>
+    template:`
+<h1>$safeitemrootname$</h1>
 <ct-table [settings]="settings"></ct-table>
 `
 })

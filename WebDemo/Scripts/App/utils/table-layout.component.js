@@ -41,6 +41,8 @@ let TableLayoutComponent = class TableLayoutComponent {
         }));
     }
     ngOnChanges() {
+        if (!this.settings)
+            return;
         this.rowButtons = [];
         if (this.settings.editable) {
             this.addButton({

@@ -7,7 +7,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
-const core_2 = require("@angular/core");
 const table_layout_component_1 = require("../utils/table-layout.component");
 let Categories = class Categories {
     constructor() {
@@ -25,7 +24,7 @@ Categories = __decorate([
 <ct-table [settings]="tableSettings"></ct-table>
 `
     }),
-    core_2.Injectable()
+    core_1.Injectable()
 ], Categories);
 exports.Categories = Categories;
 const apiUrl = '/dataApi/';

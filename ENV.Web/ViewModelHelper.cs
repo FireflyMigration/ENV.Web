@@ -322,7 +322,15 @@ namespace ENV.Web
                     {
                         c.UpdateDataBasedOnItem(item);
                     }
-                    OnSavingRow();
+                    try
+                    {
+                        OnSavingRow();
+                    }
+                    catch (FlowAbortException ex)
+                    {
+                        ModelState.AddError(ex);
+                        throw;
+                    }
                 });
 
             }, Activities.Update, () => result = GetItem());
@@ -926,7 +934,6 @@ namespace ENV.Web
         {
             if (string.IsNullOrWhiteSpace(Message))
                 Message = message;
-            AddErrorByKey("", message);
         }
         public void AddError<T>(TypedColumnBase<T> column, string message)
         {

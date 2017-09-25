@@ -12,11 +12,11 @@ const RestList_1 = require("../utils/RestList");
 const table_layout_component_1 = require("../utils/table-layout.component");
 let Products = class Products {
     constructor() {
-        this.products = new RestList_1.RestList(apiUrl + 'products');
         this.category = new RestList_1.Lookup(apiUrl + 'categories', (product, o) => o.isEqualTo = { id: +product.categoryID });
         this.tableSettings = new table_layout_component_1.TableSettings({
-            // /categories?_responseType=DCF
+            restUrl: apiUrl + 'products',
             editable: true,
+            get: { limit: 5 },
             columnSettings: [
                 { key: "id", caption: "ProductID" },
                 { key: "productName", caption: "ProductName" },
@@ -27,19 +27,12 @@ let Products = class Products {
                     getValue: (r) => this.category.get(r).categoryName,
                     columnClass: r => this.category.found(r) ? '' : 'danger'
                 },
-                {
-                    caption: 'test', getValue: r => r.categoryID
-                }
             ]
         });
-    }
-    ngOnInit() {
-        this.products.get({ limit: 5 });
     }
 };
 Products = __decorate([
     core_1.Component({
-        selector: 'categories',
         templateUrl: './scripts/app/demo/products.html',
     }),
     core_2.Injectable()

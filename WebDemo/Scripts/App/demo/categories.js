@@ -8,23 +8,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const core_2 = require("@angular/core");
-const RestList_1 = require("../utils/RestList");
 const table_layout_component_1 = require("../utils/table-layout.component");
 let Categories = class Categories {
     constructor() {
-        this.categories = new RestList_1.RestList(apiUrl + 'categories');
         this.tableSettings = new table_layout_component_1.TableSettings({
-            editable: true,
-            // /categories?_responseType=DCF
-            columnSettings: [
-                { key: "id", caption: "CategoryID" },
-                { key: "categoryName", caption: "CategoryName" },
-                { key: "description", caption: "Description" }
-            ]
+            restUrl: apiUrl + 'categories',
+            editable: true
         });
-    }
-    ngOnInit() {
-        this.categories.get({ limit: 555 });
     }
 };
 Categories = __decorate([
@@ -32,8 +22,8 @@ Categories = __decorate([
         selector: 'categories',
         template: `
 <h1>Categories</h1>
-<ct-table [records]="categories"
-          [settings]="tableSettings"></ct-table>`
+<ct-table [settings]="tableSettings"></ct-table>
+`
     }),
     core_2.Injectable()
 ], Categories);

@@ -2,13 +2,13 @@
     
     <thead>
         <tr>
-            <th></th>
+            <th *ngIf="rowButtons.length>0"></th>
             <th *ngFor="let map of columnMaps">{{map.caption}}</th>
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let record of records.items" [className]="_getRowClass(record)" >
-            <td>
+        <tr *ngFor="let record of records" [className]="_getRowClass(record)" >
+            <td *ngIf="rowButtons.length>0">
                 <span *ngFor="let b of rowButtons">
                     <button class="btn" *ngIf="b.visible(record)" (click)="b.click(record)">{{b.name}}</button>
                 </span>

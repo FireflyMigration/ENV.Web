@@ -6,22 +6,19 @@ import { TableSettings } from "../utils/table-layout.component";
 
 
 @Component({
-    selector: 'categories',
+    
     templateUrl: './scripts/app/demo/products.html',
 
 })
 
 @Injectable()
-export class Products implements OnInit {
-
-
-    products = new RestList<models.Product>(apiUrl + 'products');
-
+export class Products  {
     category = new Lookup<models.Category, models.Product>(apiUrl + 'categories', (product, o) => o.isEqualTo = { id: +product.categoryID });
 
     tableSettings = new TableSettings<models.Product>({
-        // /categories?_responseType=DCF
+        restUrl: apiUrl + 'products',
         editable: true,
+        get:{limit:5},
         columnSettings: [
             { key: "id", caption: "ProductID" },
             { key: "productName", caption: "ProductName" },
@@ -32,18 +29,10 @@ export class Products implements OnInit {
                 getValue: (r) => this.category.get(r).categoryName,
                 columnClass: r => this.category.found(r) ? '' : 'danger'
             },
-            {
-                caption: 'test', getValue: r => r.categoryID
-            }
+           
         ]
     });
-
-
-    ngOnInit(): void {
-        this.products.get({ limit: 5 });
-    }
-
-
+    
 }
 const apiUrl = '/dataApi/';
 

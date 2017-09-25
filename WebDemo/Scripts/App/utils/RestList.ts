@@ -141,7 +141,7 @@ export interface getOptions<T> {
 }
 export class Lookup<lookupType, mainType> {
 
-    constructor(url: string, private options: (mt: mainType, o: getOptions<lookupType>) => lookupType) {
+    constructor(url: string, private options: (mt: mainType, o: getOptions<lookupType>) => void) {
         this.categories = new RestList<lookupType>(url);
     }
 

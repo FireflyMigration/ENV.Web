@@ -356,7 +356,15 @@ namespace ENV.Web
                     {
                         c.UpdateDataBasedOnItem(item);
                     }
-                    OnSavingRow();
+                    try
+                    {
+                        OnSavingRow();
+                    }
+                    catch (FlowAbortException ex)
+                    {
+                        ModelState.AddError(ex);
+                        throw;
+                    }
                 });
                 return result;
             }

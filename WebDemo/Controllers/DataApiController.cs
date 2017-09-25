@@ -12,9 +12,7 @@ namespace WebDemo.Controllers
         static DataApiHelper _dataApi = new DataApiHelper();
         static DataApiController()
         {
-            _dataApi.Register("Products",typeof(Northwind.Models.Products),true);
-            _dataApi.Register("Categories",()=>new CategoriesViewModel());
-            _dataApi.Register("OrderDetails", typeof(Northwind.Models.Order_Details), true);
+            _dataApi.Register("Categories", typeof(Northwind.Models.Categories));
         }
         // GET: DataApi
         public void Index(string name, string id = null)

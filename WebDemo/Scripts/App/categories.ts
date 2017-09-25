@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit, Injectable } from '@angular/core';
-import { Category } from '../models';
-import { TableSettings } from "../utils/table-layout.component";
+import { Category } from './models';
+import { TableSettings } from "./utils/table-layout.component";
 
 
 @Component({
@@ -15,8 +15,7 @@ import { TableSettings } from "../utils/table-layout.component";
 export class Categories  {
 
     tableSettings = new TableSettings<Category>({
-        restUrl: apiUrl + 'categories',
-        editable:true
+        restUrl: apiUrl + 'categories'
     });
 
 }

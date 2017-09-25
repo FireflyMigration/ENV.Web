@@ -169,7 +169,6 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\CategoriesViewModel.cs" />
     <Compile Include="Controllers\DataApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProfilerController.cs" />
@@ -187,7 +186,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Scripts\App\demo\products.html" />
     <Content Include="Scripts\App\utils\table-layout.component.html" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -246,8 +244,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\app.component.ts" />
     <TypeScriptCompile Include="Scripts\App\app.module.ts" />
-    <TypeScriptCompile Include="Scripts\App\demo\products.ts" />
-    <TypeScriptCompile Include="Scripts\App\demo\categories.ts" />
+    <TypeScriptCompile Include="Scripts\App\categories.ts" />
     <TypeScriptCompile Include="Scripts\App\main.ts" />
     <TypeScriptCompile Include="Scripts\App\models.ts" />
     <TypeScriptCompile Include="Scripts\App\utils\RestList.ts" />

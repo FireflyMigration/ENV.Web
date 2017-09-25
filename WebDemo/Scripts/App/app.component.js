@@ -15,7 +15,6 @@ AppComponent = __decorate([
         selector: 'my-app',
         template: `
 <nav>
-<a routerLink="/products" routerLinkActive="active">Products</a>
 <a routerLink="/categories" routerLinkActive="active">Categories</a>
 </nav>
 <router-outlet></router-outlet>

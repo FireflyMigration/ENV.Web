@@ -8,15 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
 const core_2 = require("@angular/core");
-const RestList_1 = require("../utils/RestList");
-const table_layout_component_1 = require("../utils/table-layout.component");
+const RestList_1 = require("./utils/RestList");
+const table_layout_component_1 = require("./utils/table-layout.component");
 let Products = class Products {
     constructor() {
-        this.products = new RestList_1.RestList(apiUrl + 'products');
         this.category = new RestList_1.Lookup(apiUrl + 'categories', (product, o) => o.isEqualTo = { id: +product.categoryID });
         this.tableSettings = new table_layout_component_1.TableSettings({
-            // /categories?_responseType=DCF
+            restUrl: apiUrl + 'products',
             editable: true,
+            get: { limit: 5 },
             columnSettings: [
                 { key: "id", caption: "ProductID" },
                 { key: "productName", caption: "ProductName" },
@@ -27,23 +27,16 @@ let Products = class Products {
                     getValue: (r) => this.category.get(r).categoryName,
                     columnClass: r => this.category.found(r) ? '' : 'danger'
                 },
-                {
-                    caption: 'test', getValue: r => r.categoryID
-                }
             ]
         });
-    }
-    ngOnInit() {
-        this.products.get({ limit: 9995 });
     }
 };
 Products = __decorate([
     core_1.Component({
-        selector: 'categories',
-        templateUrl: './scripts/app/demo/products.component.html',
+        templateUrl: './scripts/app/products.html',
     }),
     core_2.Injectable()
 ], Products);
 exports.Products = Products;
 const apiUrl = '/dataApi/';
-//# sourceMappingURL=products.component.js.map
+//# sourceMappingURL=products.js.map

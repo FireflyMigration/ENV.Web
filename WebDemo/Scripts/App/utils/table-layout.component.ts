@@ -1,5 +1,6 @@
 ﻿// https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
 import { Component, Input, OnChanges } from '@angular/core';
+import { RestList, getOptions, Lookup } from './RestList';
 
 @Component({
     selector: 'ct-table',
@@ -23,7 +24,7 @@ export class TableLayoutComponent implements OnChanges {
 
     }
     catchErrors(what: any) {
-        what.catch(e => e.json()).then(e => {
+        what.catch(e => e.json().then(e => {
             let message = e.Message;
             if (e.ModelState) {
                 for (let x in e.ModelState) {
@@ -35,7 +36,7 @@ export class TableLayoutComponent implements OnChanges {
 
             }
             alert(message);
-        });
+        }));
 
     }
 
@@ -57,7 +58,14 @@ export class TableLayoutComponent implements OnChanges {
         for (let b of this.settings.buttons) {
             this.addButton(b);
         }
-
+        if (!this.records) {
+            this.settings.getRecords().then(r => {
+                this.records = r;
+                if (this.settings.settings.length == 0)
+                    this.autoGenerateColumnsBasedOnData();
+            });
+            
+        }
 
         if (this.settings.settings.length > 0) { // when settings provided
             this.columnMaps = this.settings.settings;
@@ -65,22 +73,25 @@ export class TableLayoutComponent implements OnChanges {
                 if (!s.caption)
                     s.caption = makeTitle(s.key);
             });
-        } else {
+        } else if (this.records){
             {
-                for (let r of this.records) {
-                    this.columnMaps = [];
-                    Object.keys(r).forEach(key => {
-                        if (typeof (r[key]) != 'function')
-
-                            this.columnMaps.push({
-                                key: key,
-                                caption: makeTitle(key)
-                            });
-                    });
-                    break;
-                }
+                this.autoGenerateColumnsBasedOnData();
 
             }
+        }
+    }
+    private autoGenerateColumnsBasedOnData() {
+        for (let r of this.records) {
+            this.columnMaps = [];
+            Object.keys(r).forEach(key => {
+                if (typeof (r[key]) != 'function')
+
+                    this.columnMaps.push({
+                        key: key,
+                        caption: makeTitle(key)
+                    });
+            });
+            break;
         }
     }
     _getRowClass(row: any) {
@@ -114,8 +125,12 @@ class TableSettingsBase {
     editable = false;
     settings: ColumnSettingBase[] = [];
     buttons: rowButtonBase[] = [];
+    getRecords: () => Promise<Iterable<any>>
 }
 export class TableSettings<rowType> extends TableSettingsBase {
+    static getRecords(): any {
+        throw new Error("Method not implemented.");
+    }
 
     constructor(settings?: TableSettingsInterface<rowType>) {
         super();
@@ -128,8 +143,25 @@ export class TableSettings<rowType> extends TableSettingsBase {
                 this.editable = true;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
+            if (settings.restUrl) {
+                this.restList = new RestList<rowType>(settings.restUrl);
+            }
+            this.getOptions = settings.get;
         }
 
+    }
+   
+    get(options: getOptions<rowType>) {
+        this.restList.get(options);
+    }
+    private getOptions: getOptions<rowType>;
+    getRecords: () => Promise<Iterable<any>> = () => this.restList.get(this.getOptions).then(() => this.restList);
+
+    restList: RestList<rowType>;
+    get items(): rowType[] {
+        if (this.restList)
+            return this.restList.items;
+        return undefined;
     }
 
 
@@ -149,8 +181,10 @@ interface TableSettingsInterface<rowType> {
     editable?: boolean,
     columnSettings?: ColumnSetting<rowType>[],
     columnKeys?: string[],
+    restUrl?: string,
     rowClass?: (row: any) => string;
-    rowButtons?: rowButton<rowType>[]
+    rowButtons?: rowButton<rowType>[],
+    get?:getOptions<rowType>
 }
 
 interface ColumnSettingBase {

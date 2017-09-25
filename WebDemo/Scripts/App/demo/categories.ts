@@ -1,7 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Category } from '../models';
-import { RestList, getOptions, Lookup } from '../utils/RestList';
 import { TableSettings } from "../utils/table-layout.component";
 
 
@@ -9,34 +8,17 @@ import { TableSettings } from "../utils/table-layout.component";
     selector: 'categories',
     template:`
 <h1>Categories</h1>
-<ct-table [records]="categories"
-          [settings]="tableSettings"></ct-table>`
-
+<ct-table [settings]="tableSettings"></ct-table>
+`
 })
 
 @Injectable()
-export class Categories implements OnInit {
-
-
-    categories = new RestList<Category>(apiUrl + 'categories');
-
+export class Categories  {
 
     tableSettings = new TableSettings<Category>({
-        editable: true,
-            // /categories?_responseType=DCF
-
-            columnSettings:[
-                { key: "id", caption: "CategoryID" },
-                { key: "categoryName", caption: "CategoryName" },
-                { key: "description", caption: "Description" }
-            ]
+        restUrl: apiUrl + 'categories',
+        editable:true
     });
-
-
-    ngOnInit(): void {
-        this.categories.get({ limit: 555 });
-    }
-
 
 }
 const apiUrl = '/dataApi/';

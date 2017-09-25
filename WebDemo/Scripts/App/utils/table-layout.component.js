@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
 const core_1 = require("@angular/core");
+const RestList_1 = require("./RestList");
 let TableLayoutComponent = class TableLayoutComponent {
     constructor() {
         this.settings = new TableSettings();
@@ -26,7 +27,7 @@ let TableLayoutComponent = class TableLayoutComponent {
         return b;
     }
     catchErrors(what) {
-        what.catch(e => e.json()).then(e => {
+        what.catch(e => e.json().then(e => {
             let message = e.Message;
             if (e.ModelState) {
                 for (let x in e.ModelState) {
@@ -37,7 +38,7 @@ let TableLayoutComponent = class TableLayoutComponent {
                 }
             }
             alert(message);
-        });
+        }));
     }
     ngOnChanges() {
         this.rowButtons = [];
@@ -52,6 +53,13 @@ let TableLayoutComponent = class TableLayoutComponent {
         for (let b of this.settings.buttons) {
             this.addButton(b);
         }
+        if (!this.records) {
+            this.settings.getRecords().then(r => {
+                this.records = r;
+                if (this.settings.settings.length == 0)
+                    this.autoGenerateColumnsBasedOnData();
+            });
+        }
         if (this.settings.settings.length > 0) {
             this.columnMaps = this.settings.settings;
             this.columnMaps.forEach(s => {
@@ -59,20 +67,23 @@ let TableLayoutComponent = class TableLayoutComponent {
                     s.caption = makeTitle(s.key);
             });
         }
-        else {
+        else if (this.records) {
             {
-                for (let r of this.records) {
-                    this.columnMaps = [];
-                    Object.keys(r).forEach(key => {
-                        if (typeof (r[key]) != 'function')
-                            this.columnMaps.push({
-                                key: key,
-                                caption: makeTitle(key)
-                            });
-                    });
-                    break;
-                }
+                this.autoGenerateColumnsBasedOnData();
             }
+        }
+    }
+    autoGenerateColumnsBasedOnData() {
+        for (let r of this.records) {
+            this.columnMaps = [];
+            Object.keys(r).forEach(key => {
+                if (typeof (r[key]) != 'function')
+                    this.columnMaps.push({
+                        key: key,
+                        caption: makeTitle(key)
+                    });
+            });
+            break;
         }
     }
     _getRowClass(row) {
@@ -124,6 +135,7 @@ class TableSettingsBase {
 class TableSettings extends TableSettingsBase {
     constructor(settings) {
         super();
+        this.getRecords = () => this.restList.get(this.getOptions).then(() => this.restList);
         if (settings) {
             if (settings.columnSettings)
                 this.add(...settings.columnSettings);
@@ -133,7 +145,22 @@ class TableSettings extends TableSettingsBase {
                 this.editable = true;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
+            if (settings.restUrl) {
+                this.restList = new RestList_1.RestList(settings.restUrl);
+            }
+            this.getOptions = settings.get;
         }
+    }
+    static getRecords() {
+        throw new Error("Method not implemented.");
+    }
+    get(options) {
+        this.restList.get(options);
+    }
+    get items() {
+        if (this.restList)
+            return this.restList.items;
+        return undefined;
     }
     add(...columns) {
         for (let c of columns) {

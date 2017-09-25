@@ -11,6 +11,7 @@ using Firefly.Box.Data;
 using System.IO;
 using System.Xml;
 using Firefly.Box.Testing;
+using System.Web;
 
 namespace ENV.Web
 {
@@ -30,7 +31,19 @@ namespace ENV.Web
         {
             u = UserMethods.Instance;
             _bp.Load += OnLoad;
+            _bp.SavingRow += e =>
+            {
+
+                if (!ModelState.IsValid)
+                {
+                    e.Cancel = true;
+                    if (_bp.InTransaction)
+                        throw new RollbackException(false);
+                }
+            };
+            ModelState._translateColumn = c => _colMap[c].Key;
         }
+        protected internal Activities Activity { get { return _bp.Activity; } }
         protected virtual void OnLoad() { }
         public ViewModelHelper(Firefly.Box.Data.Entity e, bool allowInsertUpdateDelete = false) : this()
         {
@@ -74,8 +87,9 @@ namespace ENV.Web
         protected bool AllowInsert { get; set; }
         protected internal Firefly.Box.Data.Entity From { get { return _bp.From; } set { _bp.From = value; } }
 
-        protected virtual void OnInsert() { }
-        protected virtual void OnUpdate() { }
+        protected virtual void OnSavingRow()
+        {
+        }
         void init()
         {
             if (_init)
@@ -237,6 +251,8 @@ namespace ENV.Web
         }
         void forId(string id, Action what, Activities activity = Activities.Update, Action onEnd = null)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new InvalidOperationException("id was not provided");
             try
             {
                 init();
@@ -265,6 +281,8 @@ namespace ENV.Web
             }
             finally
             {
+                if (_bp.Counter == 0)
+                    throw new NotFoundException();
                 _bp.Activity = Activities.Update;
                 if (onEnd != null)
                     _bp.End -= onEnd;
@@ -304,7 +322,7 @@ namespace ENV.Web
                     {
                         c.UpdateDataBasedOnItem(item);
                     }
-                    OnUpdate();
+                    OnSavingRow();
                 });
 
             }, Activities.Update, () => result = GetItem());
@@ -330,7 +348,7 @@ namespace ENV.Web
                     {
                         c.UpdateDataBasedOnItem(item);
                     }
-                    OnInsert();
+                    OnSavingRow();
                 });
                 return result;
             }
@@ -406,7 +424,7 @@ namespace ENV.Web
             if (!_handledIdentity)
             {
                 _handledIdentity = true;
-                if (_bp.From==null )
+                if (_bp.From == null)
                     throw new NotImplementedException("Must have an Entity - did you forget to set the From");
                 if (_bp.From.PrimaryKeyColumns == null || _bp.From.PrimaryKeyColumns.Length == 0)
                     throw new NotImplementedException("Entity must have a primary key");
@@ -418,7 +436,8 @@ namespace ENV.Web
                 }
                 else
                 {
-                    _idColumn = new TextColumn("id").BindValue(() => {
+                    _idColumn = new TextColumn("id").BindValue(() =>
+                    {
 
                         var x = new SeperatedBuilder();
                         foreach (var item in _bp.From.PrimaryKeyColumns)
@@ -430,10 +449,10 @@ namespace ENV.Web
                     });
                     Columns.Add(_bp.From.PrimaryKeyColumns);
                     Columns.Add(_idColumn);
-                    
+
 
                 }
-                    
+
             }
             foreach (var column in columns)
             {
@@ -456,27 +475,29 @@ namespace ENV.Web
                 _columns.Add(cv);
             }
         }
-      
 
-        public static void RegisterViewModel(string key, Func<ViewModelHelper> controller)
+
+        public static void Register(string key, Func<ViewModelHelper> controller)
         {
             _controllers.Add(key.ToLower(), controller);
         }
         public static void RegisterEntityByDbName(System.Type t, bool allowInsertUpdateDelete = false)
         {
             var e = ((ENV.Data.Entity)System.Activator.CreateInstance(t));
-            RegisterEntity(e.EntityName, t, allowInsertUpdateDelete);
+            Register(e.EntityName, t, allowInsertUpdateDelete);
         }
-        public static void RegisterEntity(string name, System.Type t, bool allowInsertUpdateDelete = false)
+        public static void Register(string name, System.Type t, bool allowInsertUpdateDelete = false)
         {
 
-            RegisterViewModel(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t), allowInsertUpdateDelete));
+            Register(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t), allowInsertUpdateDelete));
         }
         public static void RegisterEntityByClassName(System.Type t)
         {
 
-            RegisterEntity(t.Name, t);
+            Register(t.Name, t);
         }
+        ViewModelState _modelState = new ViewModelState();
+        protected ViewModelState ModelState { get { return _modelState; } }
         static Dictionary<string, Func<ViewModelHelper>> _controllers = new Dictionary<string, Func<ViewModelHelper>>();
         public static void ProcessRequest(string name, string id = null)
         {
@@ -510,7 +531,7 @@ namespace ENV.Web
                     {
                         var vmc = vmcFactory();
                         {
-                            string jsonResult = null;
+
                             Response.ContentType = "application/json";
                             switch (Request.HttpMethod.ToLower())
                             {
@@ -556,33 +577,37 @@ namespace ENV.Web
                                         else if (string.IsNullOrEmpty(id))
                                             vmc.GetRows().ToWriter(w);
                                         else
-                                            vmc.GetRow(id).ToWriter(w);
+                                            try
+                                            {
+                                                vmc.GetRow(id).ToWriter(w);
+                                            }
+                                            catch (NotFoundException)
+                                            {
+                                                vmc.ModelState.ApplyNotFound(Response);
+                                                return;
+                                            }
                                         w.Dispose();
                                         Response.Write(sw.ToString());
                                         break;
                                     }
                                 case "post":
-                                    if (!vmc.AllowInsert)
-                                        throw new InvalidOperationException("Insert not allowed");
-                                    Request.InputStream.Position = 0;
-                                    using (var sr = new System.IO.StreamReader(Request.InputStream))
+                                    PerformInsertOrUpdate(Response, Request, vmc, vmc.AllowInsert, "POST", di =>
                                     {
-                                        Response.Write(vmc.Insert(DataItem.FromJson(sr.ReadToEnd())).ToJson());
-                                    }
+                                        var r = vmc.Insert(di);
+                                        if (r != null)
+                                            Response.StatusCode = 201;
+                                        return r;
+                                    });
                                     break;
                                 case "put":
-                                    if (!vmc.AllowUpdate)
-                                        throw new InvalidOperationException("Update not allowed");
-                                    Request.InputStream.Position = 0;
-                                    using (var sr = new System.IO.StreamReader(Request.InputStream))
-                                    {
-                                        Response.Write(vmc.Update(id, DataItem.FromJson(sr.ReadToEnd())).ToJson());
-                                    }
+                                    PerformInsertOrUpdate(Response, Request, vmc, vmc.AllowUpdate, "PUT", di => vmc.Update(id, di));
                                     break;
                                 case "delete":
-                                    if (!vmc.AllowDelete)
-                                        throw new InvalidOperationException("Delete not allowed");
-                                    vmc.Delete(id);
+                                    PerformInsertOrUpdateOrDelete(Response, vmc, vmc.AllowDelete, "DELETE", () =>
+                                   {
+                                       vmc.Delete(id);
+                                       return null;
+                                   });
                                     break;
                                 case "options":
                                     var allowedMethods = "GET,HEAD,PATCH";
@@ -595,9 +620,18 @@ namespace ENV.Web
                                     Response.Headers.Add("Access-Control-Allow-Methods", allowedMethods);
                                     Response.StatusCode = 204;
                                     return;
+                                case "default":
+                                    {
+                                        MethodNotAllowed(Response, vmc, Request.HttpMethod);
+                                    }
+                                    break;
                             }
-                        
+
                         }
+                    }
+                    else {
+                        Response.StatusCode = 404;
+                        return;
                     }
                 }
                 else
@@ -616,7 +650,7 @@ namespace ENV.Web
                             string url = Request.Path;
                             if (!url.EndsWith("/"))
                                 url += "/";
-                            url+= item.Key;
+                            url += item.Key;
                             void addLine(string action, Action<Action<string, string>> addLink = null, bool dontNeedId = false)
                             {
                                 var sw = new StringBuilder();
@@ -632,9 +666,10 @@ namespace ENV.Web
                                     });
                                 }
 
-                                Response.Write($"<tr><td>{action} {url+(dontNeedId?"":"/{id}") }</td><td>{sw.ToString()}</td></tr>");
+                                Response.Write($"<tr><td>{action} {url + (dontNeedId ? "" : "/{id}") }</td><td>{sw.ToString()}</td></tr>");
                             }
-                            addLine("GET", x => {
+                            addLine("GET", x =>
+                            {
                                 x("JSON", "");
                                 x("XML", "xml");
                                 x("CSV", "csv");
@@ -668,13 +703,89 @@ namespace ENV.Web
 
             }
         }
+        class NotFoundException : Exception
+        { }
+        private static void PerformInsertOrUpdate(System.Web.HttpResponse Response, System.Web.HttpRequest Request, ViewModelHelper vmc, bool allowed, string name, Func<DataItem, DataItem> action)
+        {
+            PerformInsertOrUpdateOrDelete(Response, vmc, allowed, name, () => {
+                DataItem r;
+                Request.InputStream.Position = 0;
+                using (var sr = new System.IO.StreamReader(Request.InputStream))
+                {
+                    r = action(DataItem.FromJson(sr.ReadToEnd()));
+                    if (r == null && vmc.ModelState.IsValid)
+                        vmc.ModelState.Message = "The request in invalid";
+                }
+
+                return r;
+
+
+            });
+        }
+        private static void PerformInsertOrUpdateOrDelete(System.Web.HttpResponse Response,  ViewModelHelper vmc, bool allowed, string name,Func<DataItem>  action)
+        {
+            if (!allowed)
+            {
+                MethodNotAllowed(Response, vmc, name);
+                return;
+            }
+
+
+            DataItem r = null;
+            try
+            {
+                r = action();
+            }
+            catch (NotFoundException)
+            {
+                vmc.ModelState.ApplyNotFound(Response);
+                
+                return;
+            }
+            catch (Exception ex)
+            {
+                vmc.ModelState.AddError(ex);
+            }
+            
+            if (!vmc.ModelState.IsValid)
+            {
+                Response.Write(vmc.ModelState.ToJson());
+                Response.StatusCode = 400;
+            }
+            else if (r!=null)
+                Response.Write(r.ToJson());
+
+
+        }
+
+        private static void MethodNotAllowed(HttpResponse Response, ViewModelHelper vmc, string name)
+        {
+            vmc.ModelState.AddError($"The requested resource does not support http method '{name}'.");
+            Response.Write(vmc.ModelState.ToJson());
+            Response.StatusCode = 405;
+            return;
+        }
+
+        private static DataItem DoIt(System.Web.HttpRequest Request, ViewModelHelper vmc, Func<DataItem, DataItem> action)
+        {
+            DataItem r;
+            Request.InputStream.Position = 0;
+            using (var sr = new System.IO.StreamReader(Request.InputStream))
+            {
+                r = action(DataItem.FromJson(sr.ReadToEnd()));
+                if (r == null && vmc.ModelState.IsValid)
+                    vmc.ModelState.Message = "The request in invalid";
+            }
+
+            return r;
+        }
 
         private static void ResponseIsHtml(System.Web.HttpResponse Response)
         {
             Response.ContentType = "text/html";
         }
 
-      
+
     }
     class setValueForColumn : DoSomething
     {
@@ -791,5 +902,73 @@ namespace ENV.Web
             throw new NotImplementedException();
         }
     }
-    
+    public class ViewModelState
+    {
+        internal Func<ColumnBase, string> _translateColumn = x => x.Caption;
+
+        public string Message { get; set; }
+        public bool IsValid { get { return string.IsNullOrWhiteSpace(Message) && _errors.Count == 0; } }
+        Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+        public void AddErrorByKey(string key, string message)
+        {
+            List<string> errors;
+            if (!_errors.TryGetValue(key, out errors))
+                _errors.Add(key, errors = new List<string>());
+            errors.Add(message);
+
+
+        }
+        public void AddError(ColumnBase column, string message)
+        {
+            AddErrorByKey(_translateColumn(column), message);
+        }
+        public void AddError(string message)
+        {
+            if (string.IsNullOrWhiteSpace(Message))
+                Message = message;
+            AddErrorByKey("", message);
+        }
+        public void AddError<T>(TypedColumnBase<T> column, string message)
+        {
+            AddErrorByKey(_translateColumn(column), message);
+        }
+        public void Validate<T>(TypedColumnBase<T> column, Func<T, bool> validCondition, string message)
+        {
+            if (!validCondition(column.Value))
+                AddErrorByKey(_translateColumn(column), message);
+        }
+        public void AddError(Exception ex)
+        {
+            AddError(ex.Message);
+        }
+
+        internal string ToJson()
+        {
+            var di = new DataItem();
+            if (String.IsNullOrEmpty(Message))
+                Message = "The request is invalid";
+            di.Set("Message", Message);
+            var ms = new DataItem();
+            var add = false;
+            foreach (var item in _errors)
+            {
+                ms.Set(item.Key, item.Value.ToArray());
+                add = true;
+            }
+            if (add)
+                di.Set("ModelState", ms);
+
+
+
+            return di.ToJson();
+        }
+
+        internal void ApplyNotFound(HttpResponse response)
+        {
+            response.StatusCode = 404;
+            AddError("Not found");
+            response.Write(ToJson());
+        }
+    }
+
 }

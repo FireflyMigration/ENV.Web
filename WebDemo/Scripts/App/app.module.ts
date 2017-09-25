@@ -5,13 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { TableLayoutComponent } from './utils/table-layout.component';
 import { RouterModule, Routes } from '@angular/router';
-import { Categories} from './demo/categories';
-import { Products } from './demo/products';
+import { Categories } from './categories';
 
 const appRoues: Routes =
     [
         { path: 'categories', component: Categories },
-        {path:'products', component: Products },
+
         { path: '', redirectTo: '/categories', pathMatch: 'full' }
     ]
 
@@ -25,8 +24,7 @@ const appRoues: Routes =
     declarations: [
         TableLayoutComponent,
         AppComponent,
-        Categories,
-        Products
+        Categories
     ],
     bootstrap: [AppComponent]
 })

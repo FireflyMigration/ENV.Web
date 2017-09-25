@@ -7,12 +7,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular/core");
-const table_layout_component_1 = require("../utils/table-layout.component");
+const table_layout_component_1 = require("./utils/table-layout.component");
 let Categories = class Categories {
     constructor() {
         this.tableSettings = new table_layout_component_1.TableSettings({
-            restUrl: apiUrl + 'categories',
-            editable: true
+            restUrl: apiUrl + 'categories'
         });
     }
 };

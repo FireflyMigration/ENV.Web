@@ -24,7 +24,7 @@ let Categories = class Categories {
         });
     }
     ngOnInit() {
-        this.categories.get({ limit: 5 });
+        this.categories.get({ limit: 555 });
     }
 };
 Categories = __decorate([

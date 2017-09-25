@@ -25,12 +25,28 @@ let TableLayoutComponent = class TableLayoutComponent {
         this.rowButtons.push(b);
         return b;
     }
+    catchErrors(what) {
+        what.catch(e => e.json()).then(e => {
+            let message = e.Message;
+            if (e.ModelState) {
+                for (let x in e.ModelState) {
+                    message += "\n" + x + ": ";
+                    for (var i = 0; i < e.ModelState[x].length; i++) {
+                        message += e.ModelState[x][i];
+                    }
+                }
+            }
+            alert(message);
+        });
+    }
     ngOnChanges() {
         this.rowButtons = [];
         if (this.settings.editable) {
-            this.addButton({ name: "save", click: r => r.save() });
             this.addButton({
-                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => r.delete()
+                name: "save", click: r => this.catchErrors(r.save())
+            });
+            this.addButton({
+                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete())
             });
         }
         for (let b of this.settings.buttons) {

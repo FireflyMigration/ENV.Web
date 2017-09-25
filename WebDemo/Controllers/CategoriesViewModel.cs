@@ -20,8 +20,9 @@ namespace WebDemo.Controllers
         protected override void OnSavingRow()
         {
             ModelState.Validate(Categories.Description, v => !Text.IsNullOrEmpty(v), "Please enter a value");
-            ENV.Message.ShowError("bla bla");
 
+            if (Activity == Activities.Insert)
+                Categories.CategoryID.Value = Categories.Max(Categories.CategoryID)+1;
         }
     }
 }

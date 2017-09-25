@@ -34,7 +34,7 @@ export class Categories implements OnInit {
 
 
     ngOnInit(): void {
-        this.categories.get({ limit: 5 });
+        this.categories.get({ limit: 555 });
     }
 
 

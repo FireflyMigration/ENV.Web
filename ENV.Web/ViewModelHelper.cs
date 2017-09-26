@@ -544,6 +544,7 @@ namespace ENV.Web
                 _colMap.Add(column, cv);
                 _colsPerKey.Add(name, cv);
                 _columns.Add(cv);
+                Columns.Add(column);
             }
         }
 

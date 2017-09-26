@@ -58,7 +58,7 @@ class RestList {
                 this.items[this.items.indexOf(c)] = this.map(response);
             });
         else {
-            return myFetch(this.url + '/' + c.id, {
+            return myFetch(this.url + '/' + id, {
                 method: 'put',
                 headers: {
                     'Content-type': "application/json"

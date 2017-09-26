@@ -67,7 +67,7 @@
             });
         else {
 
-            return myFetch(this.url + '/' + c.id, {
+            return myFetch(this.url + '/' + id, {
                 method: 'put',
                 headers: {
                     'Content-type': "application/json"

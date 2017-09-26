@@ -12,7 +12,9 @@ import { TableSettings } from "./utils/table-layout.component";
 @Injectable()
 export class orders  {
 
-   
+    settings = new TableSettings({
+        restUrl:apiUrl+'orders'
+    })
 
 }
 const apiUrl = '/dataApi/';

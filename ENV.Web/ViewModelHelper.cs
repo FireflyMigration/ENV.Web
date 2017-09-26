@@ -52,7 +52,22 @@ namespace ENV.Web
         }
         protected void MapExperssion(string name, Func<Text> exp)
         {
-            MapColumn(Columns.Add(new TextColumn(name)).BindValue(exp));
+            AddExpressionColumn(Columns.Add(new TextColumn(name)).BindValue(exp));
+
+        }
+        void AddExpressionColumn(ColumnBase col)
+        {
+            DenyUpdate(col);
+            MapColumn(col);
+        }
+        protected void MapExperssion(string name, Func<Bool> exp)
+        {
+            AddExpressionColumn(Columns.Add(new BoolColumn(name)).BindValue(exp));
+
+        }
+        protected void MapExperssion(string name, Func<Number> exp)
+        {
+            AddExpressionColumn(Columns.Add(new NumberColumn(name)).BindValue(exp));
 
         }
         protected void AddAllColumns()

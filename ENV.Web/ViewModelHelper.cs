@@ -297,6 +297,20 @@ namespace ENV.Web
                 _tempFilter.Clear();
             }
         }
+
+        internal void ProvideMembersTo(DataList dl)
+        {
+            init();
+            foreach (var item in _columns)
+            {
+                var i = dl.AddItem();
+                i.Set("Key", item.Key);
+                i.Set("Caption", item.Caption);
+                i.Set("Readonly", item.IsReadOnly(_denyUpdateColumns,_onlyAllowUpdateOf)?"true":"");
+                
+            }
+        }
+
         public DataItem GetRow(string id)
         {
             DataItem result = null;

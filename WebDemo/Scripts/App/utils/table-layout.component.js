@@ -141,11 +141,12 @@ class TableSettings extends TableSettingsBase {
     constructor(settings) {
         super();
         this.getRecords = () => this.restList.get(this.getOptions).then(() => this.restList);
+        this.settingsByKey = {};
         if (settings) {
+            if (settings.columnKeys)
+                this.add(...settings.columnKeys);
             if (settings.columnSettings)
                 this.add(...settings.columnSettings);
-            else if (settings.columnKeys)
-                this.add(...settings.columnKeys);
             if (settings.editable)
                 this.editable = true;
             if (settings.rowButtons)
@@ -169,11 +170,33 @@ class TableSettings extends TableSettingsBase {
     }
     add(...columns) {
         for (let c of columns) {
+            let s;
             let x = c;
-            if (x.key || x.getValue)
-                this.settings.push(x);
+            if (x.key || x.getValue) {
+                s = x;
+            }
+            else {
+                s = { key: c };
+            }
+            if (s.key) {
+                let existing = this.settingsByKey[s.key];
+                if (existing) {
+                    if (s.caption)
+                        existing.caption = s.caption;
+                    if (s.columnClass)
+                        existing.columnClass = s.columnClass;
+                    if (s.getValue)
+                        existing.getValue = s.getValue;
+                    if (s.readonly)
+                        existing.readonly = s.readonly;
+                }
+                else {
+                    this.settings.push(s);
+                    this.settingsByKey[s.key] = s;
+                }
+            }
             else
-                this.settings.push({ key: c });
+                this.settings.push(s);
         }
     }
 }

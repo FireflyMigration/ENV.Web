@@ -195,7 +195,7 @@ namespace ENV.Web
             init();
             foreach (var item in _columns)
             {
-                tw.WriteLine("    " + item.Key + "?:string;");
+                tw.WriteLine($"    {item.Key}?:{item.getDataType()};");
             }
             tw.WriteLine("}");
         }
@@ -415,6 +415,15 @@ namespace ENV.Web
             internal void UpdateDataBasedOnItem(DataItem item)
             {
                 _setValueBasedOnDataItem(item[_key]);
+            }
+
+            internal string getDataType()
+            {
+                if (_col is BoolColumn)
+                    return "boolean";
+                else if (_col is NumberColumn)
+                    return "number";
+                return "string";
             }
         }
         List<ColumnInViewModel> _columns = new List<ColumnInViewModel>();

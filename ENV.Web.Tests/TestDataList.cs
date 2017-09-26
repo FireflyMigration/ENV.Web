@@ -51,5 +51,17 @@ namespace ENV.Web.Tests
             newDl[0].GetList("kids")[2].Get("firstName").ShouldBe("ofri");
 
         }
+        [TestMethod]
+        public void TestBool()
+        {
+            var di = new DataItem();
+            di.Set("x", false);
+            di.Set("y", true);
+            var x = di.ToJson();
+            x.ShouldContain("\"x\":false");
+            var z = DataItem.FromJson(x);
+            di["x"].Bool.ShouldBe(false);
+            di["y"].Bool.ShouldBe(true);
+        }
     }
 }

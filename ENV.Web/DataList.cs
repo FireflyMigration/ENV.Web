@@ -349,11 +349,16 @@ namespace ENV.Web
             {
                 _writer.Write(((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
+            else if (value is bool)
+                _writer.Write(value.ToString().ToLower());
             else if (value is string[])
             {
                 WriteStartArray();
-                foreach (var item in (string[]) value)
+                int i = 0;
+                foreach (var item in (string[])value)
                 {
+                    if (i++ > 0)
+                        _writer.Write(", ");
                     WriteValue(item);
                 }
                 WriteEndArray();

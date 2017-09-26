@@ -27,6 +27,7 @@ namespace WebDemo.Controllers
                  Orders.OrderDate,
                 Orders.ShipVia);
             DenyUpdate(Customers.CompanyName);
+            MapExperssion("Day of Week", () => Orders.OrderDate.DayOfWeek.ToString());
 
         }
         protected override void OnSavingRow()

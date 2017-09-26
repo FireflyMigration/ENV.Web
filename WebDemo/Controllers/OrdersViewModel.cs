@@ -20,12 +20,17 @@ namespace WebDemo.Controllers
             Where.Add(Orders.OrderDate.IsGreaterOrEqualTo(1997, 1, 1));
 
             Relations.Add(Customers, Customers.CustomerID.IsEqualTo(Orders.CustomerID));
+            MapColumn(Orders.OrderID, Orders.CustomerID
+                , Customers.CompanyName,
+                 Orders.OrderDate,
+                Orders.ShipVia);
+            
         }
         protected override void OnSavingRow()
         {
             if (Orders.ShipVia == 0)
                 ModelState.AddError(Orders.ShipVia, "Required");
-                
+
         }
     }
 }

@@ -17,7 +17,7 @@ namespace ENV.Web
 {
     public class ViewModelHelper
     {
-        
+
         protected readonly ENV.UserMethods u;
         public ViewModelHelper()
         {
@@ -225,7 +225,7 @@ namespace ENV.Web
                     first = false;
                 else
                     tw.WriteLine(",");
-                tw.Write("{key:\"" + item.Key + "\",caption:\"" + item.Caption + "\"}");
+                tw.Write("{key:\"" + item.Key + "\", caption:\"" + item.Caption.Replace("\"", "\"\"") + "\"" + (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf) ? ", readonly:true" : "") + "}");
             }
             tw.WriteLine();
             tw.WriteLine("]");
@@ -310,23 +310,31 @@ namespace ENV.Web
 
                 _bp.ForFirstRow(() =>
                 {
-                    foreach (var c in _columns)
-                    {
-                        c.UpdateDataBasedOnItem(item);
-                    }
-                    try
-                    {
-                        OnSavingRow();
-                    }
-                    catch (FlowAbortException ex)
-                    {
-                        ModelState.AddError(ex);
-                        throw;
-                    }
+                    UpdateColumnsBasedIn(item);
+
                 });
 
             }, Activities.Update, () => result = GetItem());
             return result;
+        }
+
+        private void UpdateColumnsBasedIn(DataItem item)
+        {
+            foreach (var c in _columns)
+            {
+                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState);
+            }
+            try
+            {
+                if (ModelState.IsValid)
+                    OnSavingRow();
+            }
+            catch (FlowAbortException ex)
+            {
+                ModelState.AddError(ex);
+                throw;
+            }
+
         }
 
         public DataItem Insert(DataItem item)
@@ -344,19 +352,7 @@ namespace ENV.Web
                 _bp.End += onEnd;
                 _bp.ForFirstRow(() =>
                 {
-                    foreach (var c in _columns)
-                    {
-                        c.UpdateDataBasedOnItem(item);
-                    }
-                    try
-                    {
-                        OnSavingRow();
-                    }
-                    catch (FlowAbortException ex)
-                    {
-                        ModelState.AddError(ex);
-                        throw;
-                    }
+                    UpdateColumnsBasedIn(item);
                 });
                 return result;
             }
@@ -412,9 +408,20 @@ namespace ENV.Web
                 x.Set(_key, _getValueFromRow());
             }
 
-            internal void UpdateDataBasedOnItem(DataItem item)
+            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state)
             {
                 _setValueBasedOnDataItem(item[_key]);
+
+                if (!Comparer.Equal(_col.OriginalValue, _col.Value))
+                {
+                    if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf))
+                        state.AddError(_col, "cannot be updated");
+                }
+            }
+
+            internal bool IsReadOnly(HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf)
+            {
+                return denyUpdateOf.Contains(_col) || onlyAllowUpdateOf.Count > 0 && !onlyAllowUpdateOf.Contains(_col) || _col.DbReadOnly;
             }
 
             internal string getDataType()
@@ -425,6 +432,8 @@ namespace ENV.Web
                     return "number";
                 return "string";
             }
+
+
         }
         List<ColumnInViewModel> _columns = new List<ColumnInViewModel>();
         Dictionary<ColumnBase, ColumnInViewModel> _colMap = new Dictionary<ColumnBase, ColumnInViewModel>();
@@ -434,6 +443,22 @@ namespace ENV.Web
         internal protected void MapColumn(params ColumnBase[] columns)
         {
             MapColumns(columns);
+        }
+        HashSet<ColumnBase> _denyUpdateColumns = new HashSet<ColumnBase>(),
+            _onlyAllowUpdateOf = new HashSet<ColumnBase>();
+        internal protected void DenyUpdate(params ColumnBase[] columns)
+        {
+            foreach (var item in columns)
+            {
+                _denyUpdateColumns.Add(item);
+            }
+        }
+        internal protected void OnlyAllowUpdateOf(params ColumnBase[] columns)
+        {
+            foreach (var item in columns)
+            {
+                _onlyAllowUpdateOf.Add(item);
+            }
         }
         void MapColumns(IEnumerable<ColumnBase> columns)
         {
@@ -494,15 +519,15 @@ namespace ENV.Web
         }
 
 
-     
+
         ViewModelState _modelState = new ViewModelState();
         protected internal ViewModelState ModelState { get { return _modelState; } }
-        
-        
-       
-        
 
-        
+
+
+
+
+
 
 
     }

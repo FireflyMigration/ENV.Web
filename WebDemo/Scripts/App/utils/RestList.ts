@@ -14,7 +14,7 @@
         let id = x.id;
         x.save = () => this.save(id, x);
         x.delete = () => {
-            return fetch(this.url + '/' + id, { method: 'delete' }).then(() => {
+            return fetch(this.url + '/' + id, { method: 'delete' }).then(onSuccess, onError).then(() => {
                 this.items.splice(this.items.indexOf(x), 1);
             });
 
@@ -105,16 +105,17 @@ function myFetch(url: string, init?: RequestInit): Promise<any> {
     return fetch(url, init).then(onSuccess, error => {
 
     });
-    function onSuccess(response: Response) {
+  
+}
+function onSuccess(response: Response) {
 
-        if (response.status >= 200 && response.status < 300)
-            return response.json();
-        else throw response;
+    if (response.status >= 200 && response.status < 300)
+        return response.json();
+    else throw response;
 
-    }
-    function onError(error: any) {
-        throw error;
-    }
+}
+function onError(error: any) {
+    throw error;
 }
 interface newItemInList {
     newRow: boolean;
@@ -157,7 +158,7 @@ export class Lookup<lookupType, mainType> {
 
     private getInternal(r: any): lookupRowInfo<lookupType> {
 
-        let find: getOptions<lookupType> = { };
+        let find: getOptions<lookupType> = {};
         this.options(<mainType>r, find);
         let key = JSON.stringify(find);
         if (this.cache == undefined)
@@ -165,7 +166,7 @@ export class Lookup<lookupType, mainType> {
         if (this.cache[key]) {
             return this.cache[key];
         } else {
-            let res = new lookupRowInfo < lookupType>();
+            let res = new lookupRowInfo<lookupType>();
             this.cache[key] = res;
             this.categories.get(find).then(() => {
                 res.loading = false;

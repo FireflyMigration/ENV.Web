@@ -13,7 +13,7 @@ class RestList {
         let id = x.id;
         x.save = () => this.save(id, x);
         x.delete = () => {
-            return fetch(this.url + '/' + id, { method: 'delete' }).then(() => {
+            return fetch(this.url + '/' + id, { method: 'delete' }).then(onSuccess, onError).then(() => {
                 this.items.splice(this.items.indexOf(x), 1);
             });
         };
@@ -94,15 +94,15 @@ class urlBuilder {
 function myFetch(url, init) {
     return fetch(url, init).then(onSuccess, error => {
     });
-    function onSuccess(response) {
-        if (response.status >= 200 && response.status < 300)
-            return response.json();
-        else
-            throw response;
-    }
-    function onError(error) {
-        throw error;
-    }
+}
+function onSuccess(response) {
+    if (response.status >= 200 && response.status < 300)
+        return response.json();
+    else
+        throw response;
+}
+function onError(error) {
+    throw error;
 }
 class Lookup {
     constructor(url, options) {

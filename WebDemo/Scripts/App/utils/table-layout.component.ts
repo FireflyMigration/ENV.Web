@@ -28,8 +28,8 @@ export class TableLayoutComponent implements OnChanges {
             let message = e.Message;
             if (e.ModelState) {
                 for (let x in e.ModelState) {
-                    
-                    let m= x + ": ";
+
+                    let m = x + ": ";
                     for (var i = 0; i < e.ModelState[x].length; i++) {
                         m += e.ModelState[x][i];
                     }
@@ -40,7 +40,7 @@ export class TableLayoutComponent implements OnChanges {
             }
             console.log(e);
             alert(message);
-            
+
         }));
 
     }
@@ -70,7 +70,7 @@ export class TableLayoutComponent implements OnChanges {
                 if (this.settings.settings.length == 0)
                     this.autoGenerateColumnsBasedOnData();
             });
-            
+
         }
 
         if (this.settings.settings.length > 0) { // when settings provided
@@ -79,7 +79,7 @@ export class TableLayoutComponent implements OnChanges {
                 if (!s.caption)
                     s.caption = makeTitle(s.key);
             });
-        } else if (this.records){
+        } else if (this.records) {
             {
                 this.autoGenerateColumnsBasedOnData();
 
@@ -141,10 +141,11 @@ export class TableSettings<rowType> extends TableSettingsBase {
     constructor(settings?: TableSettingsInterface<rowType>) {
         super();
         if (settings) {
+            if (settings.columnKeys)
+                this.add(...settings.columnKeys);
             if (settings.columnSettings)
                 this.add(...settings.columnSettings);
-            else if (settings.columnKeys)
-                this.add(...settings.columnKeys);
+
             if (settings.editable)
                 this.editable = true;
             if (settings.rowButtons)
@@ -156,7 +157,7 @@ export class TableSettings<rowType> extends TableSettingsBase {
         }
 
     }
-   
+
     get(options: getOptions<rowType>) {
         this.restList.get(options);
     }
@@ -170,15 +171,43 @@ export class TableSettings<rowType> extends TableSettingsBase {
         return undefined;
     }
 
+    private settingsByKey = {};
 
     add(...columns: ColumnSetting<rowType>[]);
     add(...columns: string[]);
     add(...columns: any[]) {
         for (let c of columns) {
+            let s: ColumnSetting<rowType>;
             let x = c as ColumnSetting<rowType>;
-            if (x.key || x.getValue)
-                this.settings.push(x);
-            else this.settings.push({ key: c });
+            if (x.key || x.getValue) {
+                s = x;
+            }
+            else {
+                s = { key: c };
+            }
+            if (s.key) {
+                let existing: ColumnSetting<rowType> = this.settingsByKey[s.key];
+                if (existing) {
+                    if (s.caption)
+                        existing.caption = s.caption;
+                    if (s.columnClass)
+                        existing.columnClass = s.columnClass;
+                    if (s.getValue)
+                        existing.getValue = s.getValue;
+                    if (s.readonly)
+                        existing.readonly = s.readonly;
+
+                }
+                else {
+                    this.settings.push(s);
+                    this.settingsByKey[s.key] = s;
+                }
+
+            }
+            else
+                this.settings.push(s);
+
+
         }
     }
 
@@ -190,7 +219,7 @@ interface TableSettingsInterface<rowType> {
     restUrl?: string,
     rowClass?: (row: rowType) => string;
     rowButtons?: rowButton<rowType>[],
-    get?:getOptions<rowType>
+    get?: getOptions<rowType>
 }
 
 interface ColumnSettingBase {

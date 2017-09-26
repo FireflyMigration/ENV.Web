@@ -11,21 +11,21 @@ namespace ENV.Web
     public class DataApiHelper
     {
         Dictionary<string, Func<ViewModelHelper>> _controllers = new Dictionary<string, Func<ViewModelHelper>>();
-        public  void Register(string key, Func<ViewModelHelper> controller)
+        public void Register(string key, Func<ViewModelHelper> controller)
         {
             _controllers.Add(key.ToLower(), controller);
         }
-        public  void RegisterEntityByDbName(System.Type t, bool allowInsertUpdateDelete = false)
+        public void RegisterEntityByDbName(System.Type t, bool allowInsertUpdateDelete = false)
         {
             var e = ((ENV.Data.Entity)System.Activator.CreateInstance(t));
             Register(e.EntityName, t, allowInsertUpdateDelete);
         }
-        public  void Register(string name, System.Type t, bool allowInsertUpdateDelete = false)
+        public void Register(string name, System.Type t, bool allowInsertUpdateDelete = false)
         {
 
             Register(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t), allowInsertUpdateDelete));
         }
-        public  void RegisterEntityByClassName(System.Type t)
+        public void RegisterEntityByClassName(System.Type t)
         {
 
             Register(t.Name, t);
@@ -170,46 +170,51 @@ namespace ENV.Web
                 {
                     ResponseIsHtml(Response);
                     Response.Write(HTMLISerializedObjectWriter.HTMLPageHeader);
+                    Response.Write("<div class=\"container\">");
                     Response.Write($"<h1>{Request.Path} Documentation</h1>");
                     foreach (var item in _controllers)
                     {
 
-                        Response.Write("<h2>" + item.Key + "</h2>");
+                        Response.Write("<h2>" + item.Key + "</h2><hr/>");
+                        string url = Request.Path;
+                        if (!url.EndsWith("/"))
+                            url += "/";
+                        url += item.Key;
+                        var sw = new StringBuilder();
+                        void x(string linkName, string linkResponseType)
+                        {
+                            var linkUrl = url;
+                            if (!string.IsNullOrEmpty(linkResponseType))
+                                linkUrl += "?_response=" + linkResponseType;
+                            if (sw.Length != 0)
+                                sw.Append(" | ");
+                            sw.Append($"<a href=\"{linkUrl}\">{linkName}</a> ");
+                        };
+                        x("JSON", "");
+                        x("XML", "xml");
+                        x("CSV", "csv");
+                        x("HTML", "html");
+                        x("ts interface", "d");
+                        x("column list", "dc");
+                        x("full column list", "dcf");
+                        Response.Write(sw.ToString());
+
+                       
                         try
                         {
                             var c = item.Value();
-                            Response.Write(@"<table class=""table table-responsive table-striped table-hover table-condensed table-responsive""><thead><tr><th>API</th><th><th></tr></thead><tbody>");
-                            string url = Request.Path;
-                            if (!url.EndsWith("/"))
-                                url += "/";
-                            url += item.Key;
-                            void addLine(string action, Action<Action<string, string>> addLink = null, bool dontNeedId = false)
+                            
+                          
+                            Response.Write("<h4>API:</h4>");
+                           var  dl = new DataList();
+void addLine(string action,bool dontNeedId = false)
                             {
-                                var sw = new StringBuilder();
-                                if (addLink != null)
-                                {
-                                    addLink((linkName, linkResponseType) =>
-                                    {
-                                        var linkUrl = url;
-                                        if (!string.IsNullOrEmpty(linkResponseType))
-                                            linkUrl += "?_response=" + linkResponseType;
-
-                                        sw.Append($"<a href=\"{linkUrl}\">{linkName}</a> ");
-                                    });
-                                }
-
-                                Response.Write($"<tr><td>{action} {url + (dontNeedId ? "" : "/{id}") }</td><td>{sw.ToString()}</td></tr>");
+                                var i = dl.AddItem();
+                                i.Set("HTTP Method", action);
+                                i.Set("URL", url + (dontNeedId ? "" : "/{id}"));
+                                
                             }
-                            addLine("GET", x =>
-                            {
-                                x("JSON", "");
-                                x("XML", "xml");
-                                x("CSV", "csv");
-                                x("HTML", "html");
-                                x("ts interface", "d");
-                                x("column list", "dc");
-                                x("full column list", "dcf");
-                            }, true);
+                            addLine("GET", true);
                             addLine("GET");
                             if (c.AllowInsert)
                                 addLine("POST");
@@ -219,7 +224,12 @@ namespace ENV.Web
                                 addLine("DELETE");
 
 
-                            Response.Write("</tbody></table>");
+                            Response.Write(dl.ToHTML());
+                            Response.Write("<h4>Body Parameters:</h4>");
+                            dl = new DataList();
+                            c.ProvideMembersTo(dl);
+                            Response.Write(dl.ToHTML());
+
                         }
                         catch (Exception ex)
                         {
@@ -228,6 +238,7 @@ namespace ENV.Web
 
                     }
                     Response.Write(optionalUrlParametersHtmlDoc);
+                    Response.Write("</div>");
                 }
             }
             finally
@@ -237,7 +248,8 @@ namespace ENV.Web
         }
         private static void PerformInsertOrUpdate(System.Web.HttpResponse Response, System.Web.HttpRequest Request, ViewModelHelper vmc, bool allowed, string name, Func<DataItem, DataItem> action)
         {
-            PerformInsertOrUpdateOrDelete(Response, vmc, allowed, name, () => {
+            PerformInsertOrUpdateOrDelete(Response, vmc, allowed, name, () =>
+            {
                 DataItem r;
                 Request.InputStream.Position = 0;
                 using (var sr = new System.IO.StreamReader(Request.InputStream))

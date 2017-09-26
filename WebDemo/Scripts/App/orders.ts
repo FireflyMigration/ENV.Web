@@ -13,7 +13,8 @@ import { TableSettings } from "./utils/table-layout.component";
 export class orders  {
 
     settings = new TableSettings({
-        restUrl:apiUrl+'orders'
+        restUrl: apiUrl + 'orders'
+        ,columnKeys:["id","customerID","orderDate","shipVia"]
     })
 
 }

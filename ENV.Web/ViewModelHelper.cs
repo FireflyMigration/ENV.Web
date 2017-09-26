@@ -634,6 +634,8 @@ namespace ENV.Web
             if (!_errors.TryGetValue(key, out errors))
                 _errors.Add(key, errors = new List<string>());
             errors.Add(message);
+            if (string.IsNullOrWhiteSpace(Message))
+                Message = key + ": " + message;
 
 
         }

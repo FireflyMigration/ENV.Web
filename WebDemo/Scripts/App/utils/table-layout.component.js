@@ -31,12 +31,15 @@ let TableLayoutComponent = class TableLayoutComponent {
             let message = e.Message;
             if (e.ModelState) {
                 for (let x in e.ModelState) {
-                    message += "\n" + x + ": ";
+                    let m = x + ": ";
                     for (var i = 0; i < e.ModelState[x].length; i++) {
-                        message += e.ModelState[x][i];
+                        m += e.ModelState[x][i];
                     }
+                    if (m != message)
+                        message += "\n" + m;
                 }
             }
+            console.log(e);
             alert(message);
         }));
     }

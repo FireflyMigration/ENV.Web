@@ -20,7 +20,8 @@ namespace WebDemo.Controllers
         protected override void OnSavingRow()
         {
             if (Orders.ShipVia == 0)
-                Message.ShowError("Ship via is required");
+                ModelState.AddError(Orders.ShipVia, "Required");
+                
         }
     }
 }

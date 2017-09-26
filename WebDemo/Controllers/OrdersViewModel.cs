@@ -20,11 +20,14 @@ namespace WebDemo.Controllers
             Where.Add(Orders.OrderDate.IsGreaterOrEqualTo(1997, 1, 1));
 
             Relations.Add(Customers, Customers.CustomerID.IsEqualTo(Orders.CustomerID));
-            MapColumn(Orders.OrderID, Orders.CustomerID
-                , Customers.CompanyName,
+            
+            MapColumn(Orders.OrderID,
+                Orders.CustomerID,
+                 Customers.CompanyName,
                  Orders.OrderDate,
                 Orders.ShipVia);
-            
+            DenyUpdate(Customers.CompanyName);
+
         }
         protected override void OnSavingRow()
         {

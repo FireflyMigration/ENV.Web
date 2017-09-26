@@ -14,7 +14,8 @@ export class orders  {
 
     settings = new TableSettings({
         restUrl: apiUrl + 'orders'
-        ,columnKeys:["id","customerID","orderDate","shipVia"]
+        , columnKeys: ["id", "customerID", "orderDate", "shipVia"]
+        , editable:true
     })
 
 }

@@ -17,5 +17,10 @@ namespace WebDemo.Controllers
             AllowUpdate = true;
             Where.Add(Orders.OrderDate.IsGreaterOrEqualTo(1997, 1, 1));
         }
+        protected override void OnSavingRow()
+        {
+            if (Orders.ShipVia == 0)
+                Message.ShowError("Ship via is required");
+        }
     }
 }

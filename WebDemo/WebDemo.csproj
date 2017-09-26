@@ -247,6 +247,7 @@
     <TypeScriptCompile Include="Scripts\App\categories.ts" />
     <TypeScriptCompile Include="Scripts\App\main.ts" />
     <TypeScriptCompile Include="Scripts\App\models.ts" />
+    <TypeScriptCompile Include="Scripts\App\orders.ts" />
     <TypeScriptCompile Include="Scripts\App\utils\RestList.ts" />
     <TypeScriptCompile Include="Scripts\App\utils\table-layout.component.ts" />
   </ItemGroup>
@@ -268,7 +269,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>56557</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

@@ -15,6 +15,7 @@ namespace WebDemo.Controllers
         {
             From = Orders;
             AllowUpdate = true;
+            Where.Add(Orders.OrderDate.IsGreaterOrEqualTo(1997, 1, 1));
         }
     }
 }

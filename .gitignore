@@ -275,3 +275,5 @@ __pycache__/
 /Northwind Full.sln
 /msbuild.xml
 /buildDebug.log.NoErrors.txt
+app/**/*.js
+app/**/*.map

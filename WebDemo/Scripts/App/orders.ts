@@ -14,13 +14,22 @@ import { order } from './models';
 export class orders {
 
     settings = new TableSettings<order>({
-        restUrl: apiUrl + 'orders'
-        , columnKeys: ["id", "customerID", "companyName", "orderDate", "shipVia"]
+        restUrl: apiUrl + 'orders',
+        // /orders?_responseType=DCF
+
+        columnSettings: [
+            { key: "id", caption: "OrderID" },
+            { key: "customerID", caption: "CustomerID" },
+            { key: "companyName", caption: "CompanyName", readonly: true },
+            { key: "orderDate", caption: "OrderDate" },
+            { key: "shipVia", caption: "ShipVia" },
+            { key: "dayofWeek", caption: "Day of Week", readonly: true }
+        ]
         , editable: true
         , get: {
             sort: "orderDate",
             order: "desc",
-            isEqualTo: { shipVia: 1, customerID:"ALFKI" }
+            isEqualTo: { shipVia: 1, customerID: "ALFKI" }
         }
 
     })

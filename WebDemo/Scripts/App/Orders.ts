@@ -20,7 +20,10 @@ export class Orders {
                 { key: "id", caption: "OrderID", inputType: "number", cssClass:"col-sm-1" },
                 { key: "customerID", caption: "CustomerID", cssClass:"col-sm-1" },
                 { key: "orderDate", caption: "OrderDate", inputType: "date" },
-                { caption: "Day of Week", getValue: o => utils.getDayOfWeekName(o.orderDate) },
+                {
+                    caption: "Day of Week", getValue: o => utils.getDayOfWeekName(o.orderDate),
+                    cssClass: o => utils.getDayOfWeek(o.orderDate)==1? "bg-danger":""
+                },
                 { key: "shipVia", caption: "ShipVia", inputType: "number", cssClass:'col-sm-1' },
             ],
             onSavingRow: ms => {

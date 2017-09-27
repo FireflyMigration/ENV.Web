@@ -17,11 +17,11 @@ export class Orders {
         {
             restUrl: apiUrl + 'orders',
             columnSettings: [
-                { key: "id", caption: "OrderID", inputType: "number" },
-                { key: "customerID", caption: "CustomerID" },
+                { key: "id", caption: "OrderID", inputType: "number", cssClass:"col-sm-1" },
+                { key: "customerID", caption: "CustomerID", cssClass:"col-sm-1" },
                 { key: "orderDate", caption: "OrderDate", inputType: "date" },
                 { caption: "Day of Week", getValue: o => utils.getDayOfWeekName(o.orderDate) },
-                { key: "shipVia", caption: "ShipVia", inputType: "number" },
+                { key: "shipVia", caption: "ShipVia", inputType: "number", cssClass:'col-sm-1' },
             ],
             onSavingRow: ms => {
                 ms.required('shipVia');

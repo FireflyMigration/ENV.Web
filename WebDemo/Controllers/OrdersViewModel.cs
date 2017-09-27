@@ -32,8 +32,8 @@ namespace WebDemo.Controllers
         }
         protected override void OnSavingRow()
         {
-            if (Orders.ShipVia == 0)
-                ModelState.AddError(Orders.ShipVia, "Required");
+            ModelState.Required(Orders.CustomerID);
+            
 
         }
     }

@@ -21,7 +21,7 @@ export class orders {
             { key: "id", caption: "OrderID" },
             { key: "customerID", caption: "CustomerID" },
             { key: "companyName", caption: "CompanyName", readonly: true },
-            { key: "orderDate", caption: "OrderDate" },
+            { key: "orderDate", caption: "OrderDate", inputType:'date' },
             { key: "shipVia", caption: "ShipVia" },
             { key: "dayofWeek", caption: "Day of Week", readonly: true },
             { caption: 'Day of Week', getValue: r => new Date(r.orderDate).getDay() }

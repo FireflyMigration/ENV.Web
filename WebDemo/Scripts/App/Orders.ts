@@ -22,7 +22,7 @@ Customer: {{o.customerId}}
 export class Orders {
 
     title = 'Orders';
-    orders = [{
+    orders: order[]= [{
         orderId: 5,
         customerId: "abc"
     },
@@ -37,11 +37,26 @@ export class Orders {
         {
             orderId: 8,
             customerId: "xyz"
+        },
+        {
+            orderId: 9,
+            customerId: "asd"
+        },
+        {
+            orderId: 10,
+            customerId:"xaw"
+        },
+        {
+            orderId:11
         }
     ];
 
     click() {
         this.title += "button was clicked";
     }
+}
+export interface order {
+    orderId?: number;
+    customerId?: string;
 }
 const apiUrl = '/dataApi/';

@@ -661,6 +661,14 @@ interface MenuEntry {
     path: string,
     text: string
 }
+export function getDayOfWeek(date: string)
+{
+    return new Date(date).getDay();
+}
+export function getDayOfWeekName(date: string)
+{
+    return new Date(date).toLocaleDateString("en-us", { weekday: "long" });
+}
 
 
 

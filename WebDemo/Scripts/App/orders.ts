@@ -26,6 +26,7 @@ export class orders {
             { key: "dayofWeek", caption: "Day of Week", readonly: true },
             { caption: 'Day of Week', getValue: r => new Date(r.orderDate).getDay() }
         ]
+        , rowClass: r => new Date(r.orderDate).getDay()==1?"bg-danger":""
         , editable: true
         , get: {
             sort: "orderDate",

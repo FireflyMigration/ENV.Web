@@ -15,20 +15,38 @@ namespace ENV.Web
         {
             _controllers.Add(key.ToLower(), controller);
         }
-        public void RegisterEntityByDbName(System.Type t, bool allowInsertUpdateDelete = false)
-        {
-            var e = ((ENV.Data.Entity)System.Activator.CreateInstance(t));
-            Register(e.EntityName, t, allowInsertUpdateDelete);
-        }
+       
         public void Register(string name, System.Type t, bool allowInsertUpdateDelete = false)
         {
-
-            Register(name, () => new ViewModelHelper((ENV.Data.Entity)System.Activator.CreateInstance(t), allowInsertUpdateDelete));
+            Register(name, () =>
+            {
+                var item = System.Activator.CreateInstance(t);
+                var vmh = item as ViewModelHelper;
+                if (vmh != null)
+                    return vmh;
+                return 
+                new ViewModelHelper((ENV.Data.Entity)item, allowInsertUpdateDelete);
+            });
         }
-        public void RegisterEntityByClassName(System.Type t)
+        public void Register(System.Type t)
         {
-
-            Register(t.Name, t);
+            Register(t, false);
+        }
+        public void Register(ApplicationControllerBase app)
+        {
+            foreach (var item in app.AllEntities._entities)
+            {
+                Register(item.Value);
+            }
+        }
+        void Register(System.Type t,bool onlyIfKeyNotAlreadyInUsed)
+        {
+            var x = t.Name.ToLower();
+            if (x.EndsWith("viewmodel"))
+                x = x.Remove(x.Length - 9);
+            if (onlyIfKeyNotAlreadyInUsed && _controllers.ContainsKey(x))
+                return;
+            Register(x, t);
         }
         public void ProcessRequest(string name, string id = null)
         {
@@ -103,7 +121,7 @@ namespace ENV.Web
                                             else if (responseType.StartsWith("DC"))
                                                 vmc.ColumnKeys(sw);
                                             else
-                                                vmc.CreateTypeScriptClass(sw, name);
+                                                vmc.CreateTypeScriptInterface(sw, name);
                                         }
                                         else if (string.IsNullOrEmpty(id))
                                             vmc.GetRows().ToWriter(w);
@@ -224,7 +242,7 @@ namespace ENV.Web
                             string api = dl.ToHTML();
 
 
-                         
+
                             dl = new DataList();
                             c.ProvideMembersTo(dl);
                             string bodyParameters = dl.ToHTML();
@@ -255,7 +273,7 @@ namespace ENV.Web
     <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Key}_api"">{ api}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_parameters"">{bodyParameters}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_interface""><pre>{getCodeSnippet(tw=>c.Describe(tw,item.Key))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptInterface(tw, item.Key))}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
   </div>
 

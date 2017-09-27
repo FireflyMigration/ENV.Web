@@ -204,7 +204,7 @@ namespace ENV.Web
     }");
             tw.WriteLine("}");
         }
-        public void CreateTypeScriptClass(TextWriter tw, string name)
+        public void CreateTypeScriptInterface(TextWriter tw, string name)
         {
             tw.WriteLine("export interface " + NameFixer.MakeSingular(name) + " {");
             init();

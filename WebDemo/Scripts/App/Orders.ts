@@ -11,8 +11,8 @@ import * as models from './models';
 <br/>
 <ul>
 <li *ngFor="let o of orders">
-Order: {{o.orderId}}<br/>
-Customer: {{o.customerId}}
+Order: {{o.id}}<br/>
+Customer: {{o.customerID}}
 </li>
 </ul>
 `
@@ -23,31 +23,31 @@ export class Orders {
 
     title = 'Orders';
     orders: order[]= [{
-        orderId: 5,
-        customerId: "abc"
+        id: 5,
+        customerID: "abc"
     },
         {
-            orderId: 6,
-            customerId: "xyz"
+            id: 6,
+            customerID: "xyz"
         },
         {
-            orderId: 7,
-            customerId: "xyz"
+            id: 7,
+            customerID: "xyz"
         },
         {
-            orderId: 8,
-            customerId: "xyz"
+            id: 8,
+            customerID: "xyz"
         },
         {
-            orderId: 9,
-            customerId: "asd"
+            id: 9,
+            customerID: "asd"
         },
         {
-            orderId: 10,
-            customerId:"xaw"
+            id: 10,
+            customerID:"xaw"
         },
         {
-            orderId:11
+            id:11
         }
     ];
 
@@ -56,7 +56,19 @@ export class Orders {
     }
 }
 export interface order {
-    orderId?: number;
-    customerId?: string;
+    id?: number;
+    customerID?: string;
+    employeeID?: number;
+    orderDate?: string;
+    requiredDate?: string;
+    shippedDate?: string;
+    shipVia?: number;
+    freight?: number;
+    shipName?: string;
+    shipAddress?: string;
+    shipCity?: string;
+    shipRegion?: string;
+    shipPostalCode?: string;
+    shipCountry?: string;
 }
 const apiUrl = '/dataApi/';

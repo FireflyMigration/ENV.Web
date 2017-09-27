@@ -12,7 +12,7 @@ import { order } from './models';
 
 @Injectable()
 export class orders {
-
+    
     settings = new TableSettings<order>({
         restUrl: apiUrl + 'orders',
         // /orders?_responseType=DCF

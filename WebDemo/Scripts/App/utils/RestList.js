@@ -25,8 +25,8 @@ class RestList {
             url.addObject({
                 _limit: options.limit,
                 _page: options.page,
-                _sort: options.sort,
-                _order: options.order
+                _sort: options.orderBy,
+                _order: options.orderByDir
             });
             url.addObject(options.isEqualTo);
             url.addObject(options.isGreaterOrEqualTo, "_gte");

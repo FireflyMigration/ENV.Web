@@ -6,12 +6,12 @@ import { HttpModule } from '@angular/http';
 import { TableLayoutComponent } from './utils/table-layout.component';
 import { RouterModule, Routes } from '@angular/router';
 import { Categories } from './categories';
-import { orders } from './orders';
+
 
 const appRoues: Routes =
     [
         { path: 'categories', component: Categories },
-        { path: 'orders', component: orders },
+        
 
         { path: '', redirectTo: '/categories', pathMatch: 'full' }
     ]
@@ -27,7 +27,6 @@ const appRoues: Routes =
         TableLayoutComponent,
         AppComponent,
         Categories,
-        orders
     ],
     bootstrap: [AppComponent]
 })

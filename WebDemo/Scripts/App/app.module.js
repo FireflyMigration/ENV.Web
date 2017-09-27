@@ -14,10 +14,8 @@ const http_1 = require("@angular/http");
 const table_layout_component_1 = require("./utils/table-layout.component");
 const router_1 = require("@angular/router");
 const categories_1 = require("./categories");
-const orders_1 = require("./orders");
 const appRoues = [
     { path: 'categories', component: categories_1.Categories },
-    { path: 'orders', component: orders_1.orders },
     { path: '', redirectTo: '/categories', pathMatch: 'full' }
 ];
 let AppModule = class AppModule {
@@ -34,7 +32,6 @@ AppModule = __decorate([
             table_layout_component_1.TableLayoutComponent,
             app_component_1.AppComponent,
             categories_1.Categories,
-            orders_1.orders
         ],
         bootstrap: [app_component_1.AppComponent]
     })

@@ -171,7 +171,6 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\DataApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\OrdersViewModel.cs" />
     <Compile Include="Controllers\ProfilerController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -248,7 +247,6 @@
     <TypeScriptCompile Include="Scripts\App\categories.ts" />
     <TypeScriptCompile Include="Scripts\App\main.ts" />
     <TypeScriptCompile Include="Scripts\App\models.ts" />
-    <TypeScriptCompile Include="Scripts\App\orders.ts" />
     <TypeScriptCompile Include="Scripts\App\utils\RestList.ts" />
     <TypeScriptCompile Include="Scripts\App\utils\table-layout.component.ts" />
   </ItemGroup>

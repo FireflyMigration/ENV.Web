@@ -16,12 +16,12 @@ export class Orders {
     orders = new utils.DataSettings<models.order>(
         {
             restUrl: apiUrl + 'orders',
-            columnKeys: ["id", "customerID", "orderDate", "shipVia"],
-            columnSettings: [{
-                key: 'orderDate',
-                caption: "Order Date",
-                inputType:"date"
-            }],
+            columnSettings: [
+                { key: "id", caption: "OrderID", inputType: "number" },
+                { key: "customerID", caption: "CustomerID" },
+                { key: "orderDate", caption: "OrderDate", inputType: "date" },
+                { key: "shipVia", caption: "ShipVia", inputType: "number" },
+            ],
             allowUpdate: true,
             get: {
                 limit: 5,

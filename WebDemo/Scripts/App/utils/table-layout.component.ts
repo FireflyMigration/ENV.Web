@@ -101,6 +101,8 @@ export class TableLayoutComponent implements OnChanges {
         }
     }
     _getRowClass(row: any) {
+        if (this.settings.rowClass)
+            return this.settings.rowClass(row);
         return "";
     }
     _getColValue(col: ColumnSettingBase, row: any) {
@@ -131,7 +133,8 @@ class TableSettingsBase {
     editable = false;
     settings: ColumnSettingBase[] = [];
     buttons: rowButtonBase[] = [];
-    getRecords: () => Promise<Iterable<any>>
+    getRecords: () => Promise<Iterable<any>>;
+    rowClass?: (row: any) => string;
 }
 export class TableSettings<rowType> extends TableSettingsBase {
     static getRecords(): any {
@@ -152,7 +155,8 @@ export class TableSettings<rowType> extends TableSettingsBase {
                 this.buttons = settings.rowButtons;
             if (settings.restUrl) {
                 this.restList = new RestList<rowType>(settings.restUrl);
-            }
+            } if (settings.rowClass)
+                this.rowClass = settings.rowClass;
             this.getOptions = settings.get;
         }
 

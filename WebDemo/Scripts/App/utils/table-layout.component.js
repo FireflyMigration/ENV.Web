@@ -92,6 +92,8 @@ let TableLayoutComponent = class TableLayoutComponent {
         }
     }
     _getRowClass(row) {
+        if (this.settings.rowClass)
+            return this.settings.rowClass(row);
         return "";
     }
     _getColValue(col, row) {
@@ -154,6 +156,8 @@ class TableSettings extends TableSettingsBase {
             if (settings.restUrl) {
                 this.restList = new RestList_1.RestList(settings.restUrl);
             }
+            if (settings.rowClass)
+                this.rowClass = settings.rowClass;
             this.getOptions = settings.get;
         }
     }

@@ -17,7 +17,19 @@ export class Orders {
         {
             restUrl: apiUrl + 'orders',
             columnKeys: ["id", "customerID", "orderDate", "shipVia"],
-            allowUpdate: true
+            allowUpdate: true,
+            get: {
+                limit: 5,
+                isEqualTo: {
+                    shipVia: 2,
+                    customerID:"HANAR"
+                },
+                isGreaterOrEqualTo: {
+                    orderDate:"1997-01-01"
+                },
+                orderBy:'orderDate'
+            }
+
         });
 
 }

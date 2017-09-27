@@ -214,7 +214,7 @@ namespace ENV.Web
             }
             tw.WriteLine("}");
         }
-        public void ColumnList(TextWriter tw)
+        public void ColumnKeys(TextWriter tw)
         {
             init();
             tw.WriteLine("columnKeys:[");
@@ -242,12 +242,12 @@ namespace ENV.Web
                     first = false;
                 else
                     tw.WriteLine(",");
-                tw.Write("{key:\"" + item.Key + "\", caption:\"" + item.Caption.Replace("\"", "\"\"") + "\"");
+                tw.Write("   {key:\"" + item.Key + "\", caption:\"" + item.Caption.Replace("\"", "\"\"") + "\"");
                 if (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf))
                     tw.Write(", readonly:true");
                 if (item.getInputType() != "text")
-                    tw.Write(", inputtype:\"" + item.getInputType() + "\"");
-                tw.Write("}");
+                    tw.Write(", inputType:\"" + item.getInputType() + "\"");
+                tw.Write(" }");
             }
             tw.WriteLine();
             tw.WriteLine("]");

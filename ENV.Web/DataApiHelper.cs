@@ -101,7 +101,7 @@ namespace ENV.Web
                                             else if (responseType.StartsWith("DCF"))
                                                 vmc.FullColumnList(sw);
                                             else if (responseType.StartsWith("DC"))
-                                                vmc.ColumnList(sw);
+                                                vmc.ColumnKeys(sw);
                                             else
                                                 vmc.CreateTypeScriptClass(sw, name);
                                         }
@@ -194,23 +194,23 @@ namespace ENV.Web
                         x("XML", "xml");
                         x("CSV", "csv");
                         x("HTML", "html");
-                        
+
                         Response.Write(sw.ToString());
 
-                       
+
                         try
                         {
                             var c = item.Value();
-                            
-                          
-                            Response.Write("<h4>API:</h4>");
-                           var  dl = new DataList();
-                            void addLine(string action,bool dontNeedId = false)
+
+
+
+                            var dl = new DataList();
+                            void addLine(string action, bool dontNeedId = false)
                             {
                                 var i = dl.AddItem();
                                 i.Set("HTTP Method", action);
                                 i.Set("URL", url + (dontNeedId ? "" : "/{id}"));
-                                
+
                             }
                             addLine("GET", true);
                             addLine("GET");
@@ -221,17 +221,46 @@ namespace ENV.Web
                             if (c.AllowDelete)
                                 addLine("DELETE");
 
+                            string api = dl.ToHTML();
 
-                            Response.Write(dl.ToHTML());
-                            Response.Write("<h4>Body Parameters:</h4>");
-                            sw = new StringBuilder();
-                            x("JSON Column List", "dcf");
-                            x("JSON column Keys", "dc");
-                            x("Typescript Interface", "d");
-                            Response.Write(sw.ToString());
+
+                         
                             dl = new DataList();
                             c.ProvideMembersTo(dl);
-                            Response.Write(dl.ToHTML());
+                            string bodyParameters = dl.ToHTML();
+
+                            string getCodeSnippet(Action<System.IO.TextWriter> method)
+                            {
+                                using (var tw = new System.IO.StringWriter())
+                                {
+                                    method(tw);
+                                    return tw.ToString();
+                                }
+                            }
+
+                            Response.Write($@"
+<div>
+
+  <!-- Nav tabs -->
+  <ul class=""nav nav-tabs"" role=""tablist"">
+    <li role=""presentation"" class=""active""><a href=""#{item.Key}_api"" aria-controls=""api"" role=""tab"" data-toggle=""tab"">API</a></li>
+    <li role=""presentation""><a href=""#{item.Key}_parameters"" aria-controls=""profile"" role=""tab"" data-toggle=""tab"">Body Parameters</a></li>
+    <li role=""presentation""><a href=""#{item.Key}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Column List</a></li>
+    <li role=""presentation""><a href=""#{item.Key}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript Interface</a></li>
+    <li role=""presentation""><a href=""#{item.Key}_keys"" aria-controls=""keys"" role=""tab"" data-toggle=""tab"">Typescript Column Keys</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class=""tab-content"">
+    <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Key}_api"">{ api}</div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_parameters"">{bodyParameters}</div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_interface""><pre>{getCodeSnippet(tw=>c.Describe(tw,item.Key))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
+  </div>
+
+</div>
+");
 
                         }
                         catch (Exception ex)
@@ -240,8 +269,13 @@ namespace ENV.Web
                         }
 
                     }
+
                     Response.Write(optionalUrlParametersHtmlDoc);
                     Response.Write("</div>");
+                    Response.Write(@"<script src=""./Scripts/jquery-1.10.2.js""></script>");
+                    Response.Write(@"<script src=""../Scripts/jquery-1.10.2.js""></script>");
+                    Response.Write(@"<script src=""./Scripts/bootstrap.js""></script>");
+                    Response.Write(@"<script src=""../Scripts/bootstrap.js""></script>");
                 }
             }
             finally

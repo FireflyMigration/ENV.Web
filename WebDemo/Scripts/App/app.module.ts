@@ -18,25 +18,9 @@ app.Register(Categories);
 
 
 
-
-
-
-
-
-
-
-
-
 @Component({
     selector: 'my-app',
-    template: `
-<nav>
-<span *ngFor="let m of app.menues">
-<a routerLink="{{m.path}}" routerLinkActive="active">{{m.text}}</a> 
-</span>
-</nav>
-<router-outlet></router-outlet>
-`,
+    templateUrl: `./scripts/app/main.html`,
 })
 export class AppComponent {
     app = app;

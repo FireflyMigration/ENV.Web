@@ -10,9 +10,9 @@ import * as models from './models';
 <button (click)="click()">my button</button>
 <br/>
 <ul>
-<li>
-Order: {{orders[0].orderId}}<br/>
-Customer: {{orders[0].customerId}}
+<li *ngFor="let o of orders">
+Order: {{o.orderId}}<br/>
+Customer: {{o.customerId}}
 </li>
 </ul>
 `
@@ -28,6 +28,14 @@ export class Orders {
     },
         {
             orderId: 6,
+            customerId: "xyz"
+        },
+        {
+            orderId: 7,
+            customerId: "xyz"
+        },
+        {
+            orderId: 8,
             customerId: "xyz"
         }
     ];

@@ -210,7 +210,7 @@ namespace ENV.Web
             init();
             foreach (var item in _columns)
             {
-                tw.WriteLine($"    {item.Key}?:{item.getDataType()};");
+                tw.WriteLine($"    {item.Key}?:{item.getJsonType()};");
             }
             tw.WriteLine("}");
         }
@@ -218,6 +218,7 @@ namespace ENV.Web
         {
             init();
             tw.WriteLine("columnKeys:[");
+            tw.Write("    ");
             bool first = true;
             foreach (var item in _columns)
             {
@@ -227,6 +228,7 @@ namespace ENV.Web
                     tw.Write(",");
                 tw.Write("\"" + item.Key + "\"");
             }
+            tw.WriteLine();
             tw.WriteLine("]");
         }
         public void FullColumnList(TextWriter tw)
@@ -240,7 +242,12 @@ namespace ENV.Web
                     first = false;
                 else
                     tw.WriteLine(",");
-                tw.Write("{key:\"" + item.Key + "\", caption:\"" + item.Caption.Replace("\"", "\"\"") + "\"" + (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf) ? ", readonly:true" : "") + "}");
+                tw.Write("{key:\"" + item.Key + "\", caption:\"" + item.Caption.Replace("\"", "\"\"") + "\"");
+                if (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf))
+                    tw.Write(", readonly:true");
+                if (item.getInputType() != "text")
+                    tw.Write(", inputtype:\"" + item.getInputType() + "\"");
+                tw.Write("}");
             }
             tw.WriteLine();
             tw.WriteLine("]");
@@ -306,8 +313,10 @@ namespace ENV.Web
                 var i = dl.AddItem();
                 i.Set("Key", item.Key);
                 i.Set("Caption", item.Caption);
-                i.Set("Readonly", item.IsReadOnly(_denyUpdateColumns,_onlyAllowUpdateOf)?"true":"");
-                
+                i.Set("Type", item.getJsonType());
+                i.Set("Input Type", item.getInputType());
+                i.Set("Readonly", item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf) ? "true" : "");
+
             }
         }
 
@@ -453,7 +462,7 @@ namespace ENV.Web
                 return denyUpdateOf.Contains(_col) || onlyAllowUpdateOf.Count > 0 && !onlyAllowUpdateOf.Contains(_col) || _col.DbReadOnly;
             }
 
-            internal string getDataType()
+            internal string getJsonType()
             {
                 if (_col is BoolColumn)
                     return "boolean";
@@ -461,6 +470,20 @@ namespace ENV.Web
                     return "number";
                 return "string";
             }
+            internal string getInputType()
+            {
+
+                if (_col is BoolColumn)
+                    return "checkbox";
+                else if (_col is NumberColumn)
+                    return "number";
+                else if (_col is DateColumn)
+                    return "date";
+                else if (_col is TimeColumn)
+                    return "time";
+                return "text";
+            }
+
 
 
         }

@@ -175,7 +175,7 @@ namespace ENV.Web
                     foreach (var item in _controllers)
                     {
 
-                        Response.Write("<h2>" + item.Key + "</h2><hr/>");
+                        Response.Write("<h2>" + item.Key + "</h2>");
                         string url = Request.Path;
                         if (!url.EndsWith("/"))
                             url += "/";
@@ -194,9 +194,7 @@ namespace ENV.Web
                         x("XML", "xml");
                         x("CSV", "csv");
                         x("HTML", "html");
-                        x("ts interface", "d");
-                        x("column list", "dc");
-                        x("full column list", "dcf");
+                        
                         Response.Write(sw.ToString());
 
                        
@@ -207,7 +205,7 @@ namespace ENV.Web
                           
                             Response.Write("<h4>API:</h4>");
                            var  dl = new DataList();
-void addLine(string action,bool dontNeedId = false)
+                            void addLine(string action,bool dontNeedId = false)
                             {
                                 var i = dl.AddItem();
                                 i.Set("HTTP Method", action);
@@ -226,6 +224,11 @@ void addLine(string action,bool dontNeedId = false)
 
                             Response.Write(dl.ToHTML());
                             Response.Write("<h4>Body Parameters:</h4>");
+                            sw = new StringBuilder();
+                            x("JSON Column List", "dcf");
+                            x("JSON column Keys", "dc");
+                            x("Typescript Interface", "d");
+                            Response.Write(sw.ToString());
                             dl = new DataList();
                             c.ProvideMembersTo(dl);
                             Response.Write(dl.ToHTML());

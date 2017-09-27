@@ -15,7 +15,7 @@
             </td>
             <td *ngFor="let map of columnMaps" [className]="_getColumnClass(map,record)">
                 <span *ngIf="!_getEditable(map)">{{_getColValue(map,record)}}</span>
-                <input *ngIf="_getEditable(map)" class="form-control" [(ngModel)]="record[map.key]" />
+                <input *ngIf="_getEditable(map)" class="form-control" [(ngModel)]="record[map.key]" type="{{_getColDataType(map)}}" />
             </td>
         </tr>
     </tbody>

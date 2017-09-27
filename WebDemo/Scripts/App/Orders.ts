@@ -17,6 +17,11 @@ export class Orders {
         {
             restUrl: apiUrl + 'orders',
             columnKeys: ["id", "customerID", "orderDate", "shipVia"],
+            columnSettings: [{
+                key: 'orderDate',
+                caption: "Order Date",
+                inputType:"date"
+            }],
             allowUpdate: true,
             get: {
                 limit: 5,

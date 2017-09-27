@@ -1,5 +1,6 @@
 ﻿
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, Type } from '@angular/core';
+import { Routes } from '@angular/router';
 
 
 
@@ -10,7 +11,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 
 export class DataGridComponent implements OnChanges {
 
-// Inspired by  https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
+    // Inspired by  https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
 
     @Input() records: Iterable<any>;
     @Input() settings = new DataSettings();
@@ -26,7 +27,7 @@ export class DataGridComponent implements OnChanges {
         return b;
 
     }
-    catchErrors(what: any,r:any) {
+    catchErrors(what: any, r: any) {
         what.catch(e => e.json().then(e => {
             console.log(e);
             let s = new ModelState(r);
@@ -57,15 +58,15 @@ export class DataGridComponent implements OnChanges {
         alert(message);
     }
 
-    _getError(col: ColumnSettingBase, r:any) {
+    _getError(col: ColumnSettingBase, r: any) {
         if (r.__modelState) {
             let m = <ModelState<any>>r.__modelState();
             if (m.modelState) {
-                let errors = m.modelState[col.key] ;
-                if (errors && errors.length>0)
+                let errors = m.modelState[col.key];
+                if (errors && errors.length > 0)
                     return errors[0];
             }
-              
+
         }
         return undefined;
     }
@@ -84,18 +85,18 @@ export class DataGridComponent implements OnChanges {
             this.addButton({
                 name: "save", click: r => {
                     let s = new ModelState(r);
-                    r.__modelState = ()=>s;
+                    r.__modelState = () => s;
                     if (this.settings.onSavingRow)
                         this.settings.onSavingRow(s);
                     if (s.isValid)
-                        this.catchErrors(r.save(),r);
+                        this.catchErrors(r.save(), r);
                     else
                         this.showError(s.message, s.modelState);
                 }
             });
 
             this.addButton({
-                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete(),r)
+                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete(), r)
             });
 
         }
@@ -154,7 +155,7 @@ export class DataGridComponent implements OnChanges {
         return "text";
     }
     _getColumnClass(col: ColumnSettingBase, row: any) {
-        
+
         if (col.cssClass)
             if (isFunction(col.cssClass)) {
                 let anyFunc: any = col.cssClass;
@@ -282,7 +283,7 @@ class ModelState<rowType> {
     constructor(private _row: any) {
         this.row = _row;
     }
-    
+
     isValid = true;
     message: string;
     addError(key: string, message: string) {
@@ -315,7 +316,7 @@ interface ColumnSettingBase {
 }
 interface ColumnSetting<rowType> extends ColumnSettingBase {
     getValue?: (row: rowType) => any;
-    cssClass?: (string| ((row: rowType) => string ));
+    cssClass?: (string | ((row: rowType) => string));
 }
 interface rowButtonBase {
 
@@ -528,3 +529,37 @@ class lookupRowInfo<type> {
     value: type = {} as type;
 
 }
+export class AppHelper {
+    constructor() {
+        
+    }
+    Routes: Routes =
+    [
+    ];
+    menues: MenuEntry[]=[];
+
+    Components: Type<any>[] = [DataGridComponent];
+
+    Register(component: Type<any>) {
+        this.Components.push(component);
+        let name = component.name;
+        if (this.Routes.length == 0)
+            this.Routes.push({ path: '', redirectTo: '/' + name, pathMatch: 'full' });
+        this.Routes.splice(0, 0, { path: name, component: component });
+        this.menues.push({
+            path: '/' + name,
+            text:name
+        });
+    }
+    Add(c: Type<any>) {
+        this.Components.push(c);
+    }
+
+}
+interface MenuEntry {
+    path: string,
+    text:string
+}
+
+
+

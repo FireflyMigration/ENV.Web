@@ -242,7 +242,6 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\App\app.component.ts" />
     <TypeScriptCompile Include="Scripts\App\app.module.ts" />
     <TypeScriptCompile Include="Scripts\App\Categories.ts" />
     <TypeScriptCompile Include="Scripts\App\main.ts" />

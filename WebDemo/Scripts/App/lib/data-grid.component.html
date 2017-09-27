@@ -1,13 +1,17 @@
 ﻿<div class="pull-right" *ngIf="settings&&records">
-    <button class="btn glyphicon glyphicon-chevron-left" *ngIf="settings.page>1"  (click)="settings.previousPage()"></button>
-    <button class="btn glyphicon glyphicon-chevron-right" *ngIf="records.items.length>0"  (click)="settings.nextPage()"></button>
+    <button class="btn glyphicon glyphicon-chevron-left" *ngIf="settings.page>1" (click)="settings.previousPage()"></button>
+    <button class="btn glyphicon glyphicon-chevron-right" *ngIf="records.items.length>0" (click)="settings.nextPage()"></button>
     <button class="btn btn-primary glyphicon glyphicon-plus" *ngIf="settings.allowUpdate &&settings.allowInsert" (click)="records.add()"></button>
 </div>
 <table class="table table-bordered table-responsive table-condensed table-striped table-hover" *ngIf="settings">
 
     <thead>
         <tr>
-            <th *ngFor="let map of columnMaps">{{map.caption}}</th>
+            <th *ngFor="let map of columnMaps" (click)="settings.sort(map.key)">
+                {{map.caption}} 
+                <span class="glyphicon glyphicon-chevron-down pull-right" *ngIf="settings.sortedAscending(map.key)"></span>
+                <span class="glyphicon glyphicon-chevron-up pull-right" *ngIf="settings.sortedDescending(map.key)"></span>
+            </th>
             <th *ngIf="rowButtons.length>0" [class.col-xs-1]="rowButtons.length<3" [class.col-xs-2]="rowButtons.length>=3"></th>
         </tr>
     </thead>

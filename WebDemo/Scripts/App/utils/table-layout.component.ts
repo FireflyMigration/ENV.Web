@@ -111,8 +111,8 @@ export class TableLayoutComponent implements OnChanges {
         return row[col.key];
     }
     _getColDataType(col: ColumnSettingBase, row: any) {
-        if (col.dataType)
-            return col.dataType;
+        if (col.inputType)
+            return col.inputType;
         return "text";
     }
     _getColumnClass(col: ColumnSettingBase, row: any) {
@@ -237,7 +237,7 @@ interface ColumnSettingBase {
     readonly?: boolean;
     getValue?: (row: any) => any;
     columnClass?: (row: any) => string;
-    dataType?: string;
+    inputType?: string;
 }
 interface ColumnSetting<rowType> extends ColumnSettingBase {
     getValue?: (row: rowType) => any;

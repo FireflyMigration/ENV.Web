@@ -28,9 +28,9 @@ namespace ENV.Web
                 new ViewModelHelper((ENV.Data.Entity)item, allowInsertUpdateDelete);
             });
         }
-        public void Register(System.Type t)
+        public void Register(System.Type t, bool allowInsertUpdateDelete = false)
         {
-            Register(t, false);
+            InternalRegister(t, allowInsertUpdateDelete);
         }
         public void Register(ApplicationControllerBase app)
         {
@@ -39,7 +39,7 @@ namespace ENV.Web
                 Register(item.Value);
             }
         }
-        void Register(System.Type t,bool onlyIfKeyNotAlreadyInUsed)
+        void InternalRegister(System.Type t,bool onlyIfKeyNotAlreadyInUsed)
         {
             var x = t.Name.ToLower();
             if (x.EndsWith("viewmodel"))

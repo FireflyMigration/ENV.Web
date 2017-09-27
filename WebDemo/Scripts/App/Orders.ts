@@ -8,6 +8,9 @@ import * as models from './models';
 <input [(ngModel)]="title">
 <h2 *ngIf="title.length>15"> the title is long!!!</h2>
 <button (click)="click()">my button</button>
+<br/>
+Order: {{orderId}}<br/>
+Customer: {{customerId}}
 
 `
 })
@@ -15,7 +18,9 @@ import * as models from './models';
 @Injectable()
 export class Orders  {
 
-    title = 'the title';
+    title = 'Orders';
+    orderId = 5;
+    customerId = "abc";
     click() {
         this.title += "button was clicked";
     }

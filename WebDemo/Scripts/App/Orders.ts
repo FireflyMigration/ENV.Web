@@ -9,9 +9,12 @@ import * as models from './models';
 <h2 *ngIf="title.length>15"> the title is long!!!</h2>
 <button (click)="click()">my button</button>
 <br/>
+<ul>
+<li>
 Order: {{orders[0].orderId}}<br/>
 Customer: {{orders[0].customerId}}
-
+</li>
+</ul>
 `
 })
 

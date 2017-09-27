@@ -9,18 +9,21 @@ import * as models from './models';
 <h2 *ngIf="title.length>15"> the title is long!!!</h2>
 <button (click)="click()">my button</button>
 <br/>
-Order: {{orderId}}<br/>
-Customer: {{customerId}}
+Order: {{order.orderId}}<br/>
+Customer: {{order.customerId}}
 
 `
 })
 
 @Injectable()
 export class Orders  {
-
+  
     title = 'Orders';
-    orderId = 5;
-    customerId = "abc";
+    order = {
+        orderId: 5,
+        customerId: "abc"
+    };
+   
     click() {
         this.title += "button was clicked";
     }

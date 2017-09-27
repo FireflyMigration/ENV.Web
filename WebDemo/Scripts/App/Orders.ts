@@ -6,6 +6,7 @@ import * as models from './models';
     template:`
 <h1>{{ title }} ({{title.length}})</h1>
 <input [(ngModel)]="title">
+<h2 *ngIf="title.length>15"> the title is long!!!</h2>
 
 `
 })

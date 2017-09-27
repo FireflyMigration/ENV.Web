@@ -22,6 +22,12 @@ export class Orders {
                 { key: "orderDate", caption: "OrderDate", inputType: "date" },
                 { key: "shipVia", caption: "ShipVia", inputType: "number" },
             ],
+            onSavingRow: ms => {
+                ms.required('shipVia');
+                ms.required('customerID');
+                if (ms.row.orderDate < "1990-01-01")
+                    ms.addError("orderDate", "invalid date");
+            },
             allowUpdate: true,
             get: {
                 limit: 5,

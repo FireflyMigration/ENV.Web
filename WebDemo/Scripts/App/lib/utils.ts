@@ -44,6 +44,7 @@ export class DataGridComponent implements OnChanges {
             return;
         this.page--;
     }
+
     catchErrors(what: any, r: any) {
         what.catch(e => e.json().then(e => {
             console.log(e);
@@ -263,18 +264,38 @@ export class DataSettings<rowType> extends DataSettingsBase {
         this.page--;
         this.getRecords();
     }
-
     get(options: getOptions<rowType>) {
         this.getOptions = options;
         this.page = 1;
         this.getRecords();
     }
-
+    sort(key: string) {
+        if (!this.getOptions)
+            this.getOptions = {};
+        if (this.getOptions.orderBy == key && this.getOptions.orderByDir == undefined) {
+            this.getOptions.orderByDir = 'd';
+        }
+        else {
+            this.getOptions.orderBy = key;
+            this.getOptions.orderByDir = undefined;
+        }
+        this.getRecords();
+    }
+    sortedAscending(key: string) {
+        if (!this.getOptions)
+            return false;
+        return this.getOptions.orderBy == key && !this.getOptions.orderByDir;
+    }
+    sortedDescending(key: string) {
+        if (!this.getOptions)
+            return false;
+        return this.getOptions.orderBy == key && this.getOptions.orderByDir && this.getOptions.orderByDir.toLowerCase().startsWith('d');
+    }
 
 
     private getOptions: getOptions<rowType>;
     getRecords: () => Promise<Iterable<any>> = () => {
-        
+
         let opt: getOptions<rowType> = {};
         if (this.getOptions)
             opt = JSON.parse(JSON.stringify(this.getOptions));

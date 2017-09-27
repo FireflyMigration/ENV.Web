@@ -141,8 +141,13 @@ let TableLayoutComponent = class TableLayoutComponent {
         return "text";
     }
     _getColumnClass(col, row) {
-        if (col.columnClass)
-            return col.columnClass(row);
+        if (col.cssClass)
+            if (isFunction(col.cssClass)) {
+                let anyFunc = col.cssClass;
+                return anyFunc(row);
+            }
+            else
+                return col.cssClass;
         return '';
     }
     _getEditable(col) {
@@ -195,8 +200,8 @@ class TableSettings extends TableSettingsBase {
             if (settings.restUrl) {
                 this.restList = new RestList_1.RestList(settings.restUrl);
             }
-            if (settings.rowClass)
-                this.rowClass = settings.rowClass;
+            if (settings.rowCssClass)
+                this.rowClass = settings.rowCssClass;
             if (settings.onSavingRow)
                 this.onSavingRow = settings.onSavingRow;
             this.getOptions = settings.get;
@@ -228,8 +233,8 @@ class TableSettings extends TableSettingsBase {
                 if (existing) {
                     if (s.caption)
                         existing.caption = s.caption;
-                    if (s.columnClass)
-                        existing.columnClass = s.columnClass;
+                    if (s.cssClass)
+                        existing.cssClass = s.cssClass;
                     if (s.getValue)
                         existing.getValue = s.getValue;
                     if (s.readonly)
@@ -270,5 +275,9 @@ class ModelState {
         this.isValid = false;
         this.message = message;
     }
+}
+function isFunction(functionToCheck) {
+    var getType = {};
+    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
 }
 //# sourceMappingURL=table-layout.component.js.map

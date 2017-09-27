@@ -1,9 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { Injectable } from '@angular/core';
-import {  category } from './models';
-import { RestList, getOptions, Lookup } from './utils/RestList';
-import { TableSettings } from "./utils/table-layout.component";
-
+import * as utils from './lib/utils';
 
 @Component({
     selector: 'my-app',

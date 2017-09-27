@@ -3,16 +3,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { TableLayoutComponent } from './utils/table-layout.component';
+import * as utils from './lib/utils';
 import { RouterModule, Routes } from '@angular/router';
-import { Categories } from './categories';
+import { Categories } from './Categories';
 
 
 const appRoues: Routes =
     [
         { path: 'categories', component: Categories },
-        
-
         { path: '', redirectTo: '/categories', pathMatch: 'full' }
     ]
 
@@ -20,11 +18,11 @@ const appRoues: Routes =
 
     imports: [
         RouterModule.forRoot(appRoues, {
-            enableTracing: false// set to true for debugging
+            enableTracing: true// set to true for debugging
         })
         , BrowserModule, FormsModule, HttpModule],
     declarations: [
-        TableLayoutComponent,
+        utils.DataGridComponent,
         AppComponent,
         Categories,
     ],

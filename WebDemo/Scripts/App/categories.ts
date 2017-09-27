@@ -1,20 +1,19 @@
 ﻿import { Component, OnInit, Injectable } from '@angular/core';
+import * as utils from './lib/utils';
 import * as models from './models';
-import { TableSettings } from "./utils/table-layout.component";
-
 
 @Component({
-    selector: 'categories',
-    template:`
+
+    template: `
 <h1>Categories</h1>
-<ct-table [settings]="tableSettings"></ct-table>
+<data-grid [settings]="dataSettings"></data-grid>
 `
 })
 
 @Injectable()
-export class Categories  {
+export class Categories {
 
-    tableSettings = new TableSettings<models.category>({
+    dataSettings = new utils.DataSettings<models.category>({
         restUrl: apiUrl + 'categories'
     });
 

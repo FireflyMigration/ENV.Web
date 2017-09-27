@@ -186,7 +186,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Scripts\App\utils\table-layout.component.html" />
+    <Content Include="Scripts\App\lib\data-grid.component.html" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config">
@@ -244,11 +244,10 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\app.component.ts" />
     <TypeScriptCompile Include="Scripts\App\app.module.ts" />
-    <TypeScriptCompile Include="Scripts\App\categories.ts" />
+    <TypeScriptCompile Include="Scripts\App\Categories.ts" />
     <TypeScriptCompile Include="Scripts\App\main.ts" />
     <TypeScriptCompile Include="Scripts\App\models.ts" />
-    <TypeScriptCompile Include="Scripts\App\utils\RestList.ts" />
-    <TypeScriptCompile Include="Scripts\App\utils\table-layout.component.ts" />
+    <TypeScriptCompile Include="Scripts\App\lib\utils.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

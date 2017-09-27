@@ -29,8 +29,8 @@ export class orders {
         , rowClass: r => new Date(r.orderDate).getDay()==1?"bg-danger":""
         , editable: true
         , get: {
-            sort: "orderDate",
-            order: "desc",
+            orderBy: "orderDate",
+            orderByDir: "desc",
             isEqualTo: { shipVia: 1, customerID: "ALFKI" }
         }
 

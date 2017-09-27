@@ -22,37 +22,11 @@ Customer: {{o.customerID}}
 export class Orders {
 
     title = 'Orders';
-    orders: models.order[]= [{
-        id: 5,
-        customerID: "abc"
-    },
-        {
-            id: 6,
-            customerID: "xyz"
-        },
-        {
-            id: 7,
-            customerID: "xyz"
-        },
-        {
-            id: 8,
-            customerID: "xyz"
-        },
-        {
-            id: 9,
-            customerID: "asd"
-        },
-        {
-            id: 10,
-            customerID:"xaw"
-        },
-        {
-            id:11
-        }
-    ];
+    orders = new utils.RestList<models.order>(apiUrl + 'orders');
 
     click() {
         this.title += "button was clicked";
+        this.orders.get();
     }
 }
 const apiUrl = '/dataApi/';

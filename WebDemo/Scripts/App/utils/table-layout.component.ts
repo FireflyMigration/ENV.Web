@@ -2,6 +2,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { RestList, getOptions, Lookup } from './RestList';
 
+
 @Component({
     selector: 'ct-table',
     templateUrl: './scripts/app/utils/table-layout.component.html'
@@ -153,8 +154,13 @@ export class TableLayoutComponent implements OnChanges {
         return "text";
     }
     _getColumnClass(col: ColumnSettingBase, row: any) {
-        if (col.columnClass)
-            return col.columnClass(row);
+        
+        if (col.cssClass)
+            if (isFunction(col.cssClass)) {
+                let anyFunc: any = col.cssClass;
+                return anyFunc(row);
+            }
+            else return col.cssClass;
         return '';
 
     }
@@ -198,8 +204,8 @@ export class TableSettings<rowType> extends TableSettingsBase {
                 this.buttons = settings.rowButtons;
             if (settings.restUrl) {
                 this.restList = new RestList<rowType>(settings.restUrl);
-            } if (settings.rowClass)
-                this.rowClass = settings.rowClass;
+            } if (settings.rowCssClass)
+                this.rowClass = settings.rowCssClass;
             if (settings.onSavingRow)
                 this.onSavingRow = settings.onSavingRow;
             this.getOptions = settings.get;
@@ -239,8 +245,8 @@ export class TableSettings<rowType> extends TableSettingsBase {
                 if (existing) {
                     if (s.caption)
                         existing.caption = s.caption;
-                    if (s.columnClass)
-                        existing.columnClass = s.columnClass;
+                    if (s.cssClass)
+                        existing.cssClass = s.cssClass;
                     if (s.getValue)
                         existing.getValue = s.getValue;
                     if (s.readonly)
@@ -266,7 +272,7 @@ interface TableSettingsInterface<rowType> {
     columnSettings?: ColumnSetting<rowType>[],
     columnKeys?: string[],
     restUrl?: string,
-    rowClass?: (row: rowType) => string;
+    rowCssClass?: (row: rowType) => string;
     rowButtons?: rowButton<rowType>[],
     get?: getOptions<rowType>,
     onSavingRow?: (s: ModelState<rowType>) => void;
@@ -304,12 +310,12 @@ interface ColumnSettingBase {
     caption?: string;
     readonly?: boolean;
     getValue?: (row: any) => any;
-    columnClass?: (row: any) => string;
+    cssClass?: (string | ((row: any) => string));
     inputType?: string;
 }
 interface ColumnSetting<rowType> extends ColumnSettingBase {
     getValue?: (row: rowType) => any;
-    columnClass?: (row: rowType) => string;
+    cssClass?: (string| ((row: rowType) => string ));
 }
 interface rowButtonBase {
 
@@ -322,4 +328,8 @@ interface rowButton<rowType> extends rowButtonBase {
     visible?: (r: rowType) => boolean;
     click?: (r: rowType) => void;
 
+}
+function isFunction(functionToCheck) {
+    var getType = {};
+    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
 }

@@ -21,16 +21,16 @@ export class orders {
         // /orders?_responseType=DCF
 
         columnSettings: [
-            { key: "id", caption: "OrderID" },
-            { key: "customerID", caption: "CustomerID" },
+            { key: "id", caption: "OrderID", cssClass: "col-sm-1" },
+            { key: "customerID", caption: "CustomerID", cssClass:"col-sm-1" },
             { getValue: o => this.customers.get(o.customerID).companyName, caption: "Company Name", readonly: true },
             { key: "orderDate", caption: "OrderDate", inputType: 'date' },
-            { key: "shipVia", caption: "ShipVia" },
+            { key: "shipVia", caption: "ShipVia", cssClass: "col-sm-1"  },
             { key: "dayofWeek", caption: "Day of Week", readonly: true },
             { caption: 'Day of Week', getValue: r => new Date(r.orderDate).getDay() }
             
         ]
-        , rowClass: r => new Date(r.orderDate).getDay() == 1 ? "bg-danger" : ""
+        , rowCssClass: r => new Date(r.orderDate).getDay() == 1 ? "bg-danger" : ""
         , editable: true
         , onSavingRow: s => s.required('shipVia')
         , get: {

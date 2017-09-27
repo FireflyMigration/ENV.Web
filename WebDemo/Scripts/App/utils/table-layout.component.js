@@ -101,6 +101,11 @@ let TableLayoutComponent = class TableLayoutComponent {
             return col.getValue(row);
         return row[col.key];
     }
+    _getColDataType(col, row) {
+        if (col.dataType)
+            return col.dataType;
+        return "text";
+    }
     _getColumnClass(col, row) {
         if (col.columnClass)
             return col.columnClass(row);

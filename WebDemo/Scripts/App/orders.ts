@@ -32,6 +32,7 @@ export class orders {
         ]
         , rowClass: r => new Date(r.orderDate).getDay() == 1 ? "bg-danger" : ""
         , editable: true
+        , onSavingRow: s => s.required('shipVia')
         , get: {
             orderBy: "orderDate",
             orderByDir: "desc",

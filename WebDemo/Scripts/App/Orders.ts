@@ -16,7 +16,8 @@ export class Orders {
     orders = new utils.DataSettings<models.order>(
         {
             restUrl: apiUrl + 'orders',
-            columnKeys: ["id", "customerID", "orderDate","shipVia"]
+            columnKeys: ["id", "customerID", "orderDate", "shipVia"],
+            allowUpdate: true
         });
 
 }

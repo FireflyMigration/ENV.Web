@@ -20,6 +20,7 @@ export class Orders {
                 { key: "id", caption: "OrderID", inputType: "number" },
                 { key: "customerID", caption: "CustomerID" },
                 { key: "orderDate", caption: "OrderDate", inputType: "date" },
+                { caption: "Day of Week", getValue: o => utils.getDayOfWeekName(o.orderDate) },
                 { key: "shipVia", caption: "ShipVia", inputType: "number" },
             ],
             onSavingRow: ms => {

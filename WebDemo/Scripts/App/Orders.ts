@@ -3,27 +3,32 @@ import * as utils from './lib/utils';
 import * as models from './models';
 
 @Component({
-    template:`
+    template: `
 <h1>{{ title }} ({{title.length}})</h1>
 <input [(ngModel)]="title">
 <h2 *ngIf="title.length>15"> the title is long!!!</h2>
 <button (click)="click()">my button</button>
 <br/>
-Order: {{order.orderId}}<br/>
-Customer: {{order.customerId}}
+Order: {{orders[0].orderId}}<br/>
+Customer: {{orders[0].customerId}}
 
 `
 })
 
 @Injectable()
-export class Orders  {
-  
+export class Orders {
+
     title = 'Orders';
-    order = {
+    orders = [{
         orderId: 5,
         customerId: "abc"
-    };
-   
+    },
+        {
+            orderId: 6,
+            customerId: "xyz"
+        }
+    ];
+
     click() {
         this.title += "button was clicked";
     }

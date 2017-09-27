@@ -339,6 +339,11 @@ namespace ENV.Web
 
                 return;
             }
+            catch (Firefly.Box.Data.DataProvider.DatabaseErrorException ex)
+            {
+                
+                vmc.ModelState.AddError(ex.ErrorType.ToString());
+            }
             catch (Exception ex)
             {
                 vmc.ModelState.AddError(ex);

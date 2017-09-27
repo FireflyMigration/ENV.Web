@@ -9,11 +9,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
 const core_1 = require("@angular/core");
 const RestList_1 = require("./RestList");
 let TableLayoutComponent = class TableLayoutComponent {
     constructor() {
+        // Inspired by  https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
         this.settings = new TableSettings();
         this.rowButtons = [];
         this.keys = [];
@@ -28,20 +28,24 @@ let TableLayoutComponent = class TableLayoutComponent {
     }
     catchErrors(what) {
         what.catch(e => e.json().then(e => {
-            let message = e.Message;
-            if (e.ModelState) {
-                for (let x in e.ModelState) {
-                    let m = x + ": ";
-                    for (var i = 0; i < e.ModelState[x].length; i++) {
-                        m += e.ModelState[x][i];
-                    }
-                    if (m != message)
-                        message += "\n" + m;
-                }
-            }
             console.log(e);
-            alert(message);
+            this.showError(e.Message, e.ModelState);
         }));
+    }
+    showError(message, state) {
+        if (!message)
+            message = "";
+        if (state) {
+            for (let x in state) {
+                let m = x + ": ";
+                for (var i = 0; i < state[x].length; i++) {
+                    m += state[x][i];
+                }
+                if (m != message)
+                    message += "\n" + m;
+            }
+        }
+        alert(message);
     }
     ngOnChanges() {
         if (!this.settings)
@@ -49,7 +53,15 @@ let TableLayoutComponent = class TableLayoutComponent {
         this.rowButtons = [];
         if (this.settings.editable) {
             this.addButton({
-                name: "save", click: r => this.catchErrors(r.save())
+                name: "save", click: r => {
+                    let s = new ModelState(r);
+                    if (this.settings.onSavingRow)
+                        this.settings.onSavingRow(s);
+                    if (s.isValid)
+                        this.catchErrors(r.save());
+                    else
+                        this.showError(s.message, s.modelState);
+                }
             });
             this.addButton({
                 name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete())
@@ -163,6 +175,8 @@ class TableSettings extends TableSettingsBase {
             }
             if (settings.rowClass)
                 this.rowClass = settings.rowClass;
+            if (settings.onSavingRow)
+                this.onSavingRow = settings.onSavingRow;
             this.getOptions = settings.get;
         }
     }
@@ -210,4 +224,29 @@ class TableSettings extends TableSettingsBase {
     }
 }
 exports.TableSettings = TableSettings;
+class ModelState {
+    constructor(_row) {
+        this._row = _row;
+        this.isValid = true;
+        this.modelState = {};
+        this.row = _row;
+    }
+    addError(key, message) {
+        this.isValid = false;
+        let current = this.modelState[key];
+        if (!current) {
+            current = this.modelState[key] = [];
+        }
+        current.push(message);
+    }
+    required(key, message = 'Required') {
+        let value = this._row[key];
+        if (value == undefined || value == null || value == "" || value == 0)
+            this.addError(key, message);
+    }
+    addErrorMessage(message) {
+        this.isValid = false;
+        this.message = message;
+    }
+}
 //# sourceMappingURL=table-layout.component.js.map

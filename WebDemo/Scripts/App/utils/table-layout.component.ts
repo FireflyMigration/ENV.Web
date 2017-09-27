@@ -1,4 +1,4 @@
-﻿// https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
+﻿
 import { Component, Input, OnChanges } from '@angular/core';
 import { RestList, getOptions, Lookup } from './RestList';
 
@@ -6,8 +6,10 @@ import { RestList, getOptions, Lookup } from './RestList';
     selector: 'ct-table',
     templateUrl: './scripts/app/utils/table-layout.component.html'
 })
+
 export class TableLayoutComponent implements OnChanges {
 
+// Inspired by  https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
 
     @Input() records: Iterable<any>;
     @Input() settings = new TableSettings();
@@ -25,24 +27,29 @@ export class TableLayoutComponent implements OnChanges {
     }
     catchErrors(what: any) {
         what.catch(e => e.json().then(e => {
-            let message = e.Message;
-            if (e.ModelState) {
-                for (let x in e.ModelState) {
-
-                    let m = x + ": ";
-                    for (var i = 0; i < e.ModelState[x].length; i++) {
-                        m += e.ModelState[x][i];
-                    }
-                    if (m != message)
-                        message += "\n" + m;
-                }
-
-            }
             console.log(e);
-            alert(message);
+            this.showError(e.Message, e.ModelState);
 
         }));
 
+    }
+    private showError(message: string, state: any) {
+        if (!message)
+            message = "";
+        if (state) {
+            for (let x in state) {
+
+                let m = x + ": ";
+                for (var i = 0; i < state[x].length; i++) {
+                    m += state[x][i];
+                }
+                if (m != message)
+                    message += "\n" + m;
+            }
+
+        }
+
+        alert(message);
     }
 
 
@@ -53,7 +60,15 @@ export class TableLayoutComponent implements OnChanges {
         if (this.settings.editable) {
 
             this.addButton({
-                name: "save", click: r => this.catchErrors(r.save())
+                name: "save", click: r => {
+                    let s = new ModelState(r);
+                    if (this.settings.onSavingRow)
+                        this.settings.onSavingRow(s);
+                    if (s.isValid)
+                        this.catchErrors(r.save());
+                    else
+                        this.showError(s.message, s.modelState);
+                }
             });
 
             this.addButton({
@@ -140,6 +155,7 @@ class TableSettingsBase {
     buttons: rowButtonBase[] = [];
     getRecords: () => Promise<Iterable<any>>;
     rowClass?: (row: any) => string;
+    onSavingRow?: (s: ModelState<any>) => void;
 }
 export class TableSettings<rowType> extends TableSettingsBase {
     static getRecords(): any {
@@ -162,6 +178,8 @@ export class TableSettings<rowType> extends TableSettingsBase {
                 this.restList = new RestList<rowType>(settings.restUrl);
             } if (settings.rowClass)
                 this.rowClass = settings.rowClass;
+            if (settings.onSavingRow)
+                this.onSavingRow = settings.onSavingRow;
             this.getOptions = settings.get;
         }
 
@@ -228,7 +246,35 @@ interface TableSettingsInterface<rowType> {
     restUrl?: string,
     rowClass?: (row: rowType) => string;
     rowButtons?: rowButton<rowType>[],
-    get?: getOptions<rowType>
+    get?: getOptions<rowType>,
+    onSavingRow?: (s: ModelState<rowType>) => void;
+}
+class ModelState<rowType> {
+    row: rowType;
+    constructor(private _row: any) {
+        this.row = _row;
+    }
+    
+    isValid = true;
+    message: string;
+    addError(key: string, message: string) {
+        this.isValid = false;
+        let current = this.modelState[key];
+        if (!current) {
+            current = this.modelState[key] = [];
+        }
+        current.push(message);
+    }
+    required(key: string, message = 'Required') {
+        let value = this._row[key];
+        if (value == undefined || value == null || value == "" || value == 0)
+            this.addError(key, message);
+    }
+    addErrorMessage(message: string) {
+        this.isValid = false;
+        this.message = message;
+    }
+    modelState = {};
 }
 
 interface ColumnSettingBase {

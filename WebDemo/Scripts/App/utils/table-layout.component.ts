@@ -25,10 +25,14 @@ export class TableLayoutComponent implements OnChanges {
         return b;
 
     }
-    catchErrors(what: any) {
+    catchErrors(what: any,r:any) {
         what.catch(e => e.json().then(e => {
             console.log(e);
-            this.showError(e.Message, e.ModelState);
+            let s = new ModelState(r);
+            r.__modelState = () => s;
+            s.message = e.Message;
+            s.modelState = e.ModelState;
+            this.showError(s.message, s.modelState);
 
         }));
 
@@ -52,7 +56,24 @@ export class TableLayoutComponent implements OnChanges {
         alert(message);
     }
 
-
+    _getError(col: ColumnSettingBase, r:any) {
+        if (r.__modelState) {
+            let m = <ModelState<any>>r.__modelState();
+            if (m.modelState) {
+                let errors = m.modelState[col.key] ;
+                if (errors && errors.length>0)
+                    return errors[0];
+            }
+              
+        }
+        return undefined;
+    }
+    _colValueChanged(col: ColumnSettingBase, r: any) {
+        if (r.__modelState) {
+            let m = <ModelState<any>>r.__modelState();
+            m.modelState[col.key] = undefined;
+        }
+    }
     ngOnChanges(): void {
         if (!this.settings)
             return;
@@ -62,17 +83,18 @@ export class TableLayoutComponent implements OnChanges {
             this.addButton({
                 name: "save", click: r => {
                     let s = new ModelState(r);
+                    r.__modelState = ()=>s;
                     if (this.settings.onSavingRow)
                         this.settings.onSavingRow(s);
                     if (s.isValid)
-                        this.catchErrors(r.save());
+                        this.catchErrors(r.save(),r);
                     else
                         this.showError(s.message, s.modelState);
                 }
             });
 
             this.addButton({
-                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete())
+                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete(),r)
             });
 
         }

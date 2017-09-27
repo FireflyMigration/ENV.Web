@@ -26,10 +26,14 @@ let TableLayoutComponent = class TableLayoutComponent {
         this.rowButtons.push(b);
         return b;
     }
-    catchErrors(what) {
+    catchErrors(what, r) {
         what.catch(e => e.json().then(e => {
             console.log(e);
-            this.showError(e.Message, e.ModelState);
+            let s = new ModelState(r);
+            r.__modelState = () => s;
+            s.message = e.Message;
+            s.modelState = e.ModelState;
+            this.showError(s.message, s.modelState);
         }));
     }
     showError(message, state) {
@@ -47,6 +51,23 @@ let TableLayoutComponent = class TableLayoutComponent {
         }
         alert(message);
     }
+    _getError(col, r) {
+        if (r.__modelState) {
+            let m = r.__modelState();
+            if (m.modelState) {
+                let errors = m.modelState[col.key];
+                if (errors && errors.length > 0)
+                    return errors[0];
+            }
+        }
+        return undefined;
+    }
+    _colValueChanged(col, r) {
+        if (r.__modelState) {
+            let m = r.__modelState();
+            m.modelState[col.key] = undefined;
+        }
+    }
     ngOnChanges() {
         if (!this.settings)
             return;
@@ -55,16 +76,17 @@ let TableLayoutComponent = class TableLayoutComponent {
             this.addButton({
                 name: "save", click: r => {
                     let s = new ModelState(r);
+                    r.__modelState = () => s;
                     if (this.settings.onSavingRow)
                         this.settings.onSavingRow(s);
                     if (s.isValid)
-                        this.catchErrors(r.save());
+                        this.catchErrors(r.save(), r);
                     else
                         this.showError(s.message, s.modelState);
                 }
             });
             this.addButton({
-                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete())
+                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete(), r)
             });
         }
         for (let b of this.settings.buttons) {

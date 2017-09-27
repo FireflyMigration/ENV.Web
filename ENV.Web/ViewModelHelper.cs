@@ -7,11 +7,12 @@ using Firefly.Box;
 using Firefly.Box.Data.Advanced;
 using ENV.Utilities;
 using Firefly.Box.Advanced;
-using Firefly.Box.Data;
+
 using System.IO;
 using System.Xml;
 using Firefly.Box.Testing;
 using System.Web;
+using ENV.Data;
 
 namespace ENV.Web
 {
@@ -360,7 +361,7 @@ namespace ENV.Web
         {
             foreach (var c in _columns)
             {
-                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState);
+                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState,_bp.From);
             }
             try
             {
@@ -446,14 +447,17 @@ namespace ENV.Web
                 x.Set(_key, _getValueFromRow());
             }
 
-            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state)
+            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state,Firefly.Box.Data.Entity updatebleEntity)
             {
-                _setValueBasedOnDataItem(item[_key]);
-
-                if (!Comparer.Equal(_col.OriginalValue, _col.Value))
+                if (_col.Entity == null || _col.Entity == updatebleEntity)
                 {
-                    if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf))
-                        state.AddError(_col, "cannot be updated");
+                    _setValueBasedOnDataItem(item[_key]);
+
+                    if (!Comparer.Equal(_col.OriginalValue, _col.Value))
+                    {
+                        if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf))
+                            state.AddError(_col, "cannot be updated");
+                    }
                 }
             }
 
@@ -767,6 +771,24 @@ namespace ENV.Web
             AddError("Not found");
             response.Write(ToJson());
         }
+
+        public void Required(Data.NumberColumn col,string message= "Required")
+        {
+            Validate(col, v => !Number.IsNullOrZero(v), message);
+        }
+        public void Required(Data.TextColumn col, string message = "Required")
+        {
+            Validate(col, v => !Text.IsNullOrEmpty(v), message);
+        }
+        public void Required(Data.DateColumn col, string message = "Required")
+        {
+            Validate(col, v => !Date.IsNullOrEmpty(v), message);
+        }
+        public void Required(Data.TimeColumn col, string message = "Required")
+        {
+            Validate(col, v => !Time.IsNullOrStartOfDay(v), message);
+        }
+
     }
 
 }

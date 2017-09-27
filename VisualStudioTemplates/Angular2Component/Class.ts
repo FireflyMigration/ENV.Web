@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit, Injectable } from '@angular/core';
 import { TableSettings } from "./utils/table-layout.component";
-
+import { Lookup, RestList } from './utils/RestList';
 
 @Component({
     template:`

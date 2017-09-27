@@ -37,7 +37,7 @@ export class Orders {
                 limit: 5,
                 isEqualTo: {
                     shipVia: 2,
-                    customerID:"HANAR"
+                    
                 },
                 isGreaterOrEqualTo: {
                     orderDate:"1997-01-01"

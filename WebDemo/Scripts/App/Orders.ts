@@ -13,7 +13,11 @@ import * as models from './models';
 export class Orders {
 
     title = 'Orders';
-    orders = new utils.DataSettings<models.order>({ restUrl: apiUrl + 'orders' });
-    
+    orders = new utils.DataSettings<models.order>(
+        {
+            restUrl: apiUrl + 'orders',
+            columnKeys: ["id", "customerID", "orderDate","shipVia"]
+        });
+
 }
 const apiUrl = '/dataApi/';

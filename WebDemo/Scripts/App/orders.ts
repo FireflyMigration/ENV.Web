@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, Injectable } from '@angular/core';
 import { TableSettings } from "./utils/table-layout.component";
-import { order } from './models';
+import * as models from './models';
+import { Lookup, RestList } from './utils/RestList';
 
 
 @Component({
@@ -12,21 +13,24 @@ import { order } from './models';
 
 @Injectable()
 export class orders {
-    
-    settings = new TableSettings<order>({
-        restUrl: apiUrl + 'orders',
+
+    customers = new Lookup<models.customer,string>(apiUrl + 'customers');
+
+    settings = new TableSettings<models.order>({
+        restUrl: apiUrl + 'orders', 
         // /orders?_responseType=DCF
 
         columnSettings: [
             { key: "id", caption: "OrderID" },
             { key: "customerID", caption: "CustomerID" },
-            { key: "companyName", caption: "CompanyName", readonly: true },
-            { key: "orderDate", caption: "OrderDate", inputType:'date' },
+            { getValue: o => this.customers.get(o.customerID).companyName, caption: "Company Name", readonly: true },
+            { key: "orderDate", caption: "OrderDate", inputType: 'date' },
             { key: "shipVia", caption: "ShipVia" },
             { key: "dayofWeek", caption: "Day of Week", readonly: true },
             { caption: 'Day of Week', getValue: r => new Date(r.orderDate).getDay() }
+            
         ]
-        , rowClass: r => new Date(r.orderDate).getDay()==1?"bg-danger":""
+        , rowClass: r => new Date(r.orderDate).getDay() == 1 ? "bg-danger" : ""
         , editable: true
         , get: {
             orderBy: "orderDate",

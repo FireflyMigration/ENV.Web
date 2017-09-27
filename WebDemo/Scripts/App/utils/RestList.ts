@@ -105,7 +105,7 @@ function myFetch(url: string, init?: RequestInit): Promise<any> {
     return fetch(url, init).then(onSuccess, error => {
 
     });
-  
+
 }
 function onSuccess(response: Response) {
 
@@ -140,9 +140,13 @@ export interface getOptions<T> {
     isDifferentFrom?: T;
 
 }
-export class Lookup<lookupType, mainType> {
 
-    constructor(url: string, private options: (mt: mainType, o: getOptions<lookupType>) => void) {
+export class Lookup<lookupType, idTypeOrMainTableType> {
+
+    constructor(url: string, private options?: (mt: idTypeOrMainTableType, o: getOptions<lookupType>) => void) {
+        if (!options) {
+            this.options = (mt, o) => o.isEqualTo = <lookupType><any>{ id: mt };
+        }
         this.categories = new RestList<lookupType>(url);
     }
 
@@ -159,7 +163,7 @@ export class Lookup<lookupType, mainType> {
     private getInternal(r: any): lookupRowInfo<lookupType> {
 
         let find: getOptions<lookupType> = {};
-        this.options(<mainType>r, find);
+        this.options(<idTypeOrMainTableType>r, find);
         let key = JSON.stringify(find);
         if (this.cache == undefined)
             this.cache = {};
@@ -180,6 +184,7 @@ export class Lookup<lookupType, mainType> {
 
     }
 }
+
 class lookupRowInfo<type> {
     found = false;
     loading = true;

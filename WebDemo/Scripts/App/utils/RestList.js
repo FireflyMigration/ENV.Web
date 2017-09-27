@@ -107,6 +107,9 @@ function onError(error) {
 class Lookup {
     constructor(url, options) {
         this.options = options;
+        if (!options) {
+            this.options = (mt, o) => o.isEqualTo = { id: mt };
+        }
         this.categories = new RestList(url);
     }
     get(r) {

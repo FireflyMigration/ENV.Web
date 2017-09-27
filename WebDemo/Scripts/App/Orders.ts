@@ -7,6 +7,7 @@ import * as models from './models';
 <h1>{{ title }} ({{title.length}})</h1>
 <input [(ngModel)]="title">
 <h2 *ngIf="title.length>15"> the title is long!!!</h2>
+<button (click)="click()">my button</button>
 
 `
 })
@@ -15,6 +16,8 @@ import * as models from './models';
 export class Orders  {
 
     title = 'the title';
-
+    click() {
+        this.title += "button was clicked";
+    }
 }
 const apiUrl = '/dataApi/';

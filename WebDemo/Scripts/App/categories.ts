@@ -14,7 +14,8 @@ import * as models from './models';
 export class Categories {
 
     dataSettings = new utils.DataSettings<models.category>({
-        restUrl: apiUrl + 'categories'
+        restUrl: apiUrl + 'categories',
+      
     });
 
 }

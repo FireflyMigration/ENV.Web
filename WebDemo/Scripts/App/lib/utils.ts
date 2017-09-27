@@ -23,9 +23,26 @@ export class DataGridComponent implements OnChanges {
             b.click = (r) => { };
         if (!b.visible)
             b.visible = r => true;
+        if (!b.cssClass)
+            b.cssClass = r => "btn";
+        else if (!isFunction(b.cssClass)) {
+            let x = b.cssClass;
+            b.cssClass = <any>(r => x);
+        }
+
         this.rowButtons.push(b);
         return b;
 
+    }
+
+    page = 1;
+    nextPage() {
+        this.page++;
+    }
+    previousPage() {
+        if (this.page <= 1)
+            return;
+        this.page--;
     }
     catchErrors(what: any, r: any) {
         what.catch(e => e.json().then(e => {
@@ -80,10 +97,12 @@ export class DataGridComponent implements OnChanges {
         if (!this.settings)
             return;
         this.rowButtons = [];
-        if (this.settings.editable) {
-
+        if (this.settings.allowUpdate) {
             this.addButton({
-                name: "save", click: r => {
+                name: "",
+                cssClass: "glyphicon glyphicon-ok btn-success",
+                visible: r => r.__wasChanged(),
+                click: r => {
                     let s = new ModelState(r);
                     r.__modelState = () => s;
                     if (this.settings.onSavingRow)
@@ -92,14 +111,27 @@ export class DataGridComponent implements OnChanges {
                         this.catchErrors(r.save(), r);
                     else
                         this.showError(s.message, s.modelState);
+                },
+
+            });
+            this.addButton({
+                name: "",
+                cssClass: "btn btn-danger glyphicon glyphicon-ban-circle",
+                visible: r => r.__wasChanged(),
+                click: r => {
+                    r.reset();
                 }
             });
 
-            this.addButton({
-                name: 'Delete', visible: (r) => r.newRow == undefined, click: r => this.catchErrors(r.delete(), r)
-            });
 
         }
+        if (this.settings.allowDelete)
+            this.addButton({
+                name: '',
+                visible: (r) => r.newRow == undefined,
+                click: r => this.catchErrors(r.delete(), r),
+                cssClass: "btn-danger glyphicon glyphicon-trash"
+            });
         for (let b of this.settings.buttons) {
             this.addButton(b);
         }
@@ -166,7 +198,7 @@ export class DataGridComponent implements OnChanges {
 
     }
     _getEditable(col: ColumnSettingBase) {
-        if (!this.settings.editable)
+        if (!this.settings.allowUpdate)
             return false;
         if (!col.key)
             return false
@@ -179,7 +211,9 @@ function makeTitle(key: string) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
 class DataSettingsBase {
-    editable = false;
+    allowUpdate = false;
+    allowInsert = false;
+    allowDelete = false;
     settings: ColumnSettingBase[] = [];
     buttons: rowButtonBase[] = [];
     getRecords: () => Promise<Iterable<any>>;
@@ -199,8 +233,12 @@ export class DataSettings<rowType> extends DataSettingsBase {
             if (settings.columnSettings)
                 this.add(...settings.columnSettings);
 
-            if (settings.editable)
-                this.editable = true;
+            if (settings.allowUpdate)
+                this.allowUpdate = true;
+            if (settings.allowDelete)
+                this.allowDelete = true;
+            if (settings.allowInsert)
+                this.allowInsert = true;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
             if (settings.restUrl) {
@@ -214,11 +252,36 @@ export class DataSettings<rowType> extends DataSettingsBase {
 
     }
 
-    get(options: getOptions<rowType>) {
-        this.restList.get(options);
+    page = 1;
+    nextPage() {
+        this.page++;
+        this.getRecords();
     }
+    previousPage() {
+        if (this.page <= 1)
+            return;
+        this.page--;
+        this.getRecords();
+    }
+
+    get(options: getOptions<rowType>) {
+        this.getOptions = options;
+        this.page = 1;
+        this.getRecords();
+    }
+
+
+
     private getOptions: getOptions<rowType>;
-    getRecords: () => Promise<Iterable<any>> = () => this.restList.get(this.getOptions).then(() => this.restList);
+    getRecords: () => Promise<Iterable<any>> = () => {
+        
+        let opt: getOptions<rowType> = {};
+        if (this.getOptions)
+            opt = JSON.parse(JSON.stringify(this.getOptions));
+        if (this.page > 1)
+            opt.page = this.page;
+        return this.restList.get(opt).then(() => this.restList);
+    };
 
     restList: RestList<rowType>;
     get items(): rowType[] {
@@ -269,7 +332,9 @@ export class DataSettings<rowType> extends DataSettingsBase {
 
 }
 interface IDataSettings<rowType> {
-    editable?: boolean,
+    allowUpdate?: boolean,
+    allowInsert?: boolean,
+    allowDelete?: boolean,
     columnSettings?: ColumnSetting<rowType>[],
     columnKeys?: string[],
     restUrl?: string,
@@ -323,11 +388,13 @@ interface rowButtonBase {
     name?: string;
     visible?: (r: any) => boolean;
     click?: (r: any) => void;
+    cssClass?: (string | ((row: any) => string));
 
 }
 interface rowButton<rowType> extends rowButtonBase {
     visible?: (r: rowType) => boolean;
     click?: (r: rowType) => void;
+    cssClass?: (string | ((row: rowType) => string));
 
 }
 function isFunction(functionToCheck) {
@@ -350,6 +417,15 @@ export class RestList<T extends hasId> implements Iterable<T>{
 
         let x = <any>item;
         let id = x.id;
+        let orig = JSON.stringify(item);
+        x.__wasChanged = () => orig != JSON.stringify(item) || (<any>item).newRow;
+        x.reset = () => {
+            if ((<any>item).newRow)
+                this.items.splice(this.items.indexOf(x), 1);
+            else
+                this.items[this.items.indexOf(<any>item)] = this.map(JSON.parse(orig));
+        }
+
         x.save = () => this.save(id, x);
         x.delete = () => {
             return fetch(this.url + '/' + id, { method: 'delete' }).then(onSuccess, onError).then(() => {
@@ -464,6 +540,8 @@ interface hasId {
 interface restListItem {
     save: () => void;
     delete: () => void;
+    _wasChanged: () => boolean;
+    reset: () => void;
 }
 export interface getOptions<T> {
     isEqualTo?: T;
@@ -531,12 +609,12 @@ class lookupRowInfo<type> {
 }
 export class AppHelper {
     constructor() {
-        
+
     }
     Routes: Routes =
     [
     ];
-    menues: MenuEntry[]=[];
+    menues: MenuEntry[] = [];
 
     Components: Type<any>[] = [DataGridComponent];
 
@@ -548,7 +626,7 @@ export class AppHelper {
         this.Routes.splice(0, 0, { path: name, component: component });
         this.menues.push({
             path: '/' + name,
-            text:name
+            text: name
         });
     }
     Add(c: Type<any>) {
@@ -558,7 +636,7 @@ export class AppHelper {
 }
 interface MenuEntry {
     path: string,
-    text:string
+    text: string
 }
 
 

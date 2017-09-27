@@ -23,7 +23,8 @@ export class orders {
             { key: "companyName", caption: "CompanyName", readonly: true },
             { key: "orderDate", caption: "OrderDate" },
             { key: "shipVia", caption: "ShipVia" },
-            { key: "dayofWeek", caption: "Day of Week", readonly: true }
+            { key: "dayofWeek", caption: "Day of Week", readonly: true },
+            { caption: 'Day of Week', getValue: r => new Date(r.orderDate).toLocaleDateString("en-us", { weekday:'long' }) }
         ]
         , editable: true
         , get: {

@@ -336,6 +336,8 @@ export class DataSettings<rowType> extends DataSettingsBase {
                         existing.getValue = s.getValue;
                     if (s.readonly)
                         existing.readonly = s.readonly;
+                    if (s.inputType)
+                        existing.inputType = s.inputType;
 
                 }
                 else {

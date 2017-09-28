@@ -28,5 +28,10 @@ namespace WebDemo.ViewModels
                 Shippers.CompanyName);
             MapExperssion("ServerSideDayOfWeek", () => u.NDOW(u.DOW(Orders.OrderDate)));
         }
+        protected override void OnSavingRow()
+        {
+            if (Orders.OrderDate.Year < 1995)
+                Message.ShowError("Please enter valid date");
+        }
     }
 }

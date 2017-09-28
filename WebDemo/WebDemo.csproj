@@ -64,6 +64,9 @@
     <Reference Include="Northwind">
       <HintPath>..\bin\Northwind.exe</HintPath>
     </Reference>
+    <Reference Include="Northwind.Orders">
+      <HintPath>..\bin\Northwind.Orders.dll</HintPath>
+    </Reference>
     <Reference Include="NorthwindBase">
       <HintPath>..\bin\NorthwindBase.dll</HintPath>
     </Reference>

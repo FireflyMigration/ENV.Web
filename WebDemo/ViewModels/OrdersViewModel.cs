@@ -15,6 +15,12 @@ namespace WebDemo.ViewModels
         {
             From = Orders;
             AllowUpdate = true;
+
+            MapColumn(Orders.OrderID,
+                Orders.CustomerID,
+                Orders.OrderDate,
+                Orders.ShipVia);
+            MapExperssion("ServerSideDayOfWeek", () => u.NDOW(u.DOW(Orders.OrderDate)));
         }
     }
 }

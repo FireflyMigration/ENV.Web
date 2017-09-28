@@ -4,7 +4,7 @@ import * as models from './models';
 
 @Component({
     template: `
-<h1>{{ title }} ({{title.length}})</h1>
+<h1>{{ title }}</h1>
 <data-grid [settings]="orders"></data-grid>
 `
 })

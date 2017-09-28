@@ -17,12 +17,9 @@ MVC.NET, REST Api and the migrated code.
 3. Angular2 - as the application framework
 4. Typescript - as the coding language
 
-## This toturial
-In this tutorial we'll cover a few basic development tasks all the way from creating the server side API to developing the front end with Typescript and Angular.
-
-Let's get started.
-
-https://youtu.be/BGBVX1ES45I
+## Toturial
+For a Tutorial on how to use this code, please visit:
+http://doc.fireflymigration.com/tutorial.html
 
 ## Support
 You are welcome to raise any issues or questions regarding this project on GitHub. This project is not officially supported by Firefly Migration. 

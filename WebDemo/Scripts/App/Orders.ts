@@ -45,7 +45,9 @@ export class Orders {
                     orderDate:"1997-01-01"
                 },
                 orderBy:'orderDate'
-            }
+            },
+            rowButtons: [{ name: '', click: o => window.open('/home/print/' + o.id, '_blank'), cssClass:'glyphicon glyphicon-print' }]
+            
 
         });
 

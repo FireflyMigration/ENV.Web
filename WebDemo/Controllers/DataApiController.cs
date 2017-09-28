@@ -13,7 +13,7 @@ namespace WebDemo.Controllers
         static DataApiController()
         {
             _dataApi.Register(typeof(Northwind.Models.Categories));
-            _dataApi.Register(typeof(Northwind.Models.Orders),true);
+            _dataApi.Register(typeof(ViewModels.OrdersViewModel));
             _dataApi.Register(typeof(Northwind.Models.Customers));
 
         }

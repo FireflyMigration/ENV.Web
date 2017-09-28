@@ -27,6 +27,8 @@ namespace WebDemo.ViewModels
                 Orders.ShipVia,
                 Shippers.CompanyName);
             MapExperssion("ServerSideDayOfWeek", () => u.NDOW(u.DOW(Orders.OrderDate)));
+
+            DenyUpdate(Orders.OrderID);
         }
         protected override void OnSavingRow()
         {

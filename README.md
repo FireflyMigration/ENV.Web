@@ -23,9 +23,7 @@ In this Tutorial we'll cover everything from creating the server side API to dev
 
 Let's get started.
 
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/BGBVX1ES45I?list=PL1DEQjXG2xnJOSQf2421r1S040NkvCApp" frameborder="0" allowfullscreen></iframe>
-
+https://youtu.be/BGBVX1ES45I
 
 
 * Please note that this is a code sample, and not a supported product - you can change the code as you see fit, and are welcome to open issues for it on GitHub, and even fork it and suggest pull requests.

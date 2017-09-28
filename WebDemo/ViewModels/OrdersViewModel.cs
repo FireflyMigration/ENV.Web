@@ -31,7 +31,10 @@ namespace WebDemo.ViewModels
         protected override void OnSavingRow()
         {
             if (Orders.OrderDate.Year < 1995)
-                Message.ShowError("Please enter valid date");
+                ModelState.AddError(Orders.OrderDate, "invalid date");
+            ModelState.Required(Orders.OrderID);
+            if (Orders.ShipVia > 9)
+                ModelState.AddError(Orders.ShipVia, "Please enter valid ship via");
         }
     }
 }

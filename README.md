@@ -17,7 +17,7 @@ MVC.NET, REST Api and the migrated code.
 3. Angular2 - as the application framework
 4. Typescript - as the coding language
 
-## Toturial
+## Tutorial
 For a Tutorial on how to use this code, please visit:
 http://doc.fireflymigration.com/tutorial.html
 

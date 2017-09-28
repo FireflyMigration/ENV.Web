@@ -15,6 +15,7 @@ namespace WebDemo.ViewModels
         {
             From = Orders;
             AllowUpdate = true;
+            Where.Add(Orders.OrderDate.IsGreaterOrEqualTo(1997, 1, 1));
 
             MapColumn(Orders.OrderID,
                 Orders.CustomerID,

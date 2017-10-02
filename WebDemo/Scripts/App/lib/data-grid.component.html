@@ -18,12 +18,8 @@
     <tbody>
         <tr *ngFor="let record of records" [className]="_getRowClass(record)" (click)="rowClicked(record)">
 
-            <td *ngFor="let map of columnMaps" [className]="_getColumnClass(map,record)" >
-                <span *ngIf="!_getEditable(map)">{{_getColValue(map,record)}}</span>
-                <div *ngIf="_getEditable(map)" class="form-group " [class.has-error]="_getError(map,record)">
-                    <input class="form-control" [(ngModel)]="record[map.key]" type="{{_getColDataType(map)}}" (ngModelChange)="_colValueChanged(map,record)" />
-                    <span class="help-block" *ngIf="_getError(map,record)">{{_getError(map,record)}}</span>
-                </div>
+            <td *ngFor="let map of columnMaps" [className]="settings._getColumnClass(map,record)" >
+                <data-control [settings]="settings" [map]="map" [record]="record"></data-control>
             </td>
             <td *ngIf="rowButtons.length>0">
                 <span *ngFor="let b of rowButtons">

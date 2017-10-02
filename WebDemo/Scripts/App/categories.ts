@@ -7,10 +7,8 @@ import * as models from './models';
     template: `
 <h1>Categories</h1>
 <data-grid [settings]="dataSettings"></data-grid>
-Selected: {{dataSettings.currentRow}}
-<div *ngIf="dataSettings.currentRow">
-{{dataSettings.currentRow.categoryName}}
-</div>
+<data-area [settings]="dataSettings"></data-area>
+
 `
 })
 
@@ -19,7 +17,8 @@ export class Categories {
 
     dataSettings = new utils.DataSettings<models.category>({
         restUrl: apiUrl + 'categories',
-      
+        columnKeys: ["id","categoryName","categoryDescription"],
+        allowUpdate:true
     });
 
 }

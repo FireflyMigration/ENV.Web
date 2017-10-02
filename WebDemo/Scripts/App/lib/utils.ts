@@ -5,9 +5,50 @@ import { Routes } from '@angular/router';
 
 
 @Component({
+    selector: 'data-area',
+    template: `
+<div class="form-horizontal" *ngIf="settings.currentRow" >
+    <div class="form-group" *ngFor="let map of columnMaps" [className]="settings._getColumnClass(map,settings.currentRow)">
+        <label for="inputEmail3" class="col-sm-2 control-label">{{map.caption}}</label>
+        <div class="col-sm-10">
+            <data-control [settings]="settings" [map]="map" [record]="settings.currentRow"></data-control>
+        </div>
+    </div>
+</div>`
+})
+export class DataAreaCompnent implements OnChanges {
+    columnMaps: ColumnSettingBase[];
+    ngOnChanges(): void {
+        this.columnMaps = this.settings.settings;
+    }
+    @Input() settings = new DataSettings();
+}
+@Component({
+    selector: 'data-control',
+    template: `
+<span *ngIf="!settings._getEditable(map)" >{{settings._getColValue(map,record)}}</span>
+<div *ngIf="settings._getEditable(map)" class="form-group " [class.has-error]="settings._getError(map,record)">
+    <input class="form-control" [(ngModel)]="record[map.key]" type="{{settings._getColDataType(map)}}" (ngModelChange)="settings._colValueChanged(map,record)" />
+    <span class="help-block" *ngIf="settings._getError(map,record)">{{settings._getError(map,record)}}</span>
+</div>`
+})
+export class DataControlComponent implements OnChanges {
+    @Input() map: ColumnSettingBase;
+    @Input() record: any;
+    
+    ngOnChanges(): void {
+        
+    }
+    @Input() settings = new DataSettings();
+}
+
+
+
+@Component({
     selector: 'data-grid',
     templateUrl: './scripts/app/lib/data-grid.component.html'
 })
+
 
 export class DataGridComponent implements OnChanges {
 
@@ -80,24 +121,8 @@ export class DataGridComponent implements OnChanges {
         alert(message);
     }
 
-    _getError(col: ColumnSettingBase, r: any) {
-        if (r.__modelState) {
-            let m = <ModelState<any>>r.__modelState();
-            if (m.modelState) {
-                let errors = m.modelState[col.key];
-                if (errors && errors.length > 0)
-                    return errors[0];
-            }
-
-        }
-        return undefined;
-    }
-    _colValueChanged(col: ColumnSettingBase, r: any) {
-        if (r.__modelState) {
-            let m = <ModelState<any>>r.__modelState();
-            m.modelState[col.key] = undefined;
-        }
-    }
+    
+    
     ngOnChanges(): void {
         if (!this.settings)
             return;
@@ -183,6 +208,32 @@ export class DataGridComponent implements OnChanges {
             return this.settings.rowClass(row);
         return "";
     }
+
+    
+}
+function makeTitle(key: string) {
+    return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
+}
+class DataSettingsBase {
+    allowUpdate = false;
+    allowInsert = false;
+    allowDelete = false;
+    settings: ColumnSettingBase[] = [];
+    buttons: rowButtonBase[] = [];
+    getRecords: () => Promise<Iterable<any>>;
+    rowClass?: (row: any) => string;
+    onSavingRow?: (s: ModelState<any>) => void;
+    currentRow: any;
+    currentRowChanged: (r: any) => void;
+    _getEditable(col: ColumnSettingBase) {
+        if (!this.allowUpdate)
+            return false;
+        if (!col.key)
+            return false
+        return !col.readonly;
+
+
+    }
     _getColValue(col: ColumnSettingBase, row: any) {
         if (col.getValue)
             return col.getValue(row);
@@ -204,30 +255,24 @@ export class DataGridComponent implements OnChanges {
         return '';
 
     }
-    _getEditable(col: ColumnSettingBase) {
-        if (!this.settings.allowUpdate)
-            return false;
-        if (!col.key)
-            return false
-        return !col.readonly;
+    _getError(col: ColumnSettingBase, r: any) {
+        if (r.__modelState) {
+            let m = <ModelState<any>>r.__modelState();
+            if (m.modelState) {
+                let errors = m.modelState[col.key];
+                if (errors && errors.length > 0)
+                    return errors[0];
+            }
 
-
+        }
+        return undefined;
     }
-}
-function makeTitle(key: string) {
-    return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
-}
-class DataSettingsBase {
-    allowUpdate = false;
-    allowInsert = false;
-    allowDelete = false;
-    settings: ColumnSettingBase[] = [];
-    buttons: rowButtonBase[] = [];
-    getRecords: () => Promise<Iterable<any>>;
-    rowClass?: (row: any) => string;
-    onSavingRow?: (s: ModelState<any>) => void;
-    currentRow: any;
-    currentRowChanged: (r: any) => void;
+    _colValueChanged(col: ColumnSettingBase, r: any) {
+        if (r.__modelState) {
+            let m = <ModelState<any>>r.__modelState();
+            m.modelState[col.key] = undefined;
+        }
+    }
 }
 export class DataSettings<rowType> extends DataSettingsBase {
     static getRecords(): any {
@@ -658,7 +703,7 @@ export class AppHelper {
     ];
     menues: MenuEntry[] = [];
 
-    Components: Type<any>[] = [DataGridComponent];
+    Components: Type<any>[] = [DataGridComponent, DataAreaCompnent, DataControlComponent];
 
     Register(component: Type<any>) {
         this.Components.push(component);

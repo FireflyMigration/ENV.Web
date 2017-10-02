@@ -5,13 +5,52 @@
 </div>
 
 <table class="table table-bordered table-responsive table-condensed table-hover" *ngIf="settings">
-    
+
     <thead>
         <tr>
-            <th *ngFor="let map of settings.getGridColumns()" (click)="settings.sort(map.key)">
-                {{map.caption}} 
+            <th *ngFor="let map of settings.getGridColumns()">
+                <span *ngIf="!map.designMode" (click)="settings.sort(map.key)">{{map.caption}}</span>
+
+
+                <div *ngIf="map.designMode">
+                    
+                    <div class="form-group">
+                        <input type="text" class="form-control" [(ngModel)]="map.caption">
+                    </div>
+                    <label>Key</label>
+                    <div class="form-group">
+                        <select class="form-control" [(ngModel)]="map.key">
+                            <option value="" selected></option>
+                            <option  selected *ngFor="let k of settings._optionalKeys()">{{k}}</option>
+                        </select>
+                    </div>
+                    <label>Input Type</label>
+                    <div class="form-group">
+                        <select class="form-control" [(ngModel)]="map.inputType" placeholder="inputType">
+                            <option value="" selected>text</option>
+                            <option value="number">number</option>
+                            <option value="date">date</option>
+                            <option value="checkbox">checkbox</option>
+                        </select>
+                    </div>
+                    
+                   
+                    <div class="form-group">
+                        <button class="glyphicon glyphicon-chevron-right  pull-right" (click)="settings.moveCol(map,1)"></button>
+                        <button class="glyphicon glyphicon-chevron-left pull-right" (click)="settings.moveCol(map,-1)"></button>
+                        <button class="glyphicon glyphicon-trash pull-right" (click)="settings.deleteCol(map)"></button>
+                        <button class="glyphicon glyphicon-plus pull-right" (click)="settings.addCol(map)"></button>
+                    </div>
+                </div>
                 <span class="glyphicon glyphicon-chevron-down pull-right" *ngIf="settings.sortedAscending(map.key)"></span>
                 <span class="glyphicon glyphicon-chevron-up pull-right" *ngIf="settings.sortedDescending(map.key)"></span>
+                <span class="pull-right glyphicon glyphicon-pencil" (click)="settings.designColumn(map,$event)"></span>
+
+
+
+
+
+
             </th>
             <th *ngIf="rowButtons.length>0" [class.col-xs-1]="rowButtons.length<3" [class.col-xs-2]="rowButtons.length>=3"></th>
         </tr>
@@ -19,7 +58,7 @@
     <tbody>
         <tr *ngFor="let record of records" [className]="_getRowClass(record)" (click)="rowClicked(record)">
 
-            <td *ngFor="let map of settings.getGridColumns()" [className]="settings._getColumnClass(map,record)" >
+            <td *ngFor="let map of settings.getGridColumns()" [className]="settings._getColumnClass(map,record)">
                 <data-control [settings]="settings" [map]="map" [record]="record"></data-control>
             </td>
             <td *ngIf="rowButtons.length>0">

@@ -15,7 +15,7 @@ export class Orders  {
     customers= new utils.Lookup<models.customer, string>(apiUrl + 'customers');
     orders = new utils.DataSettings<models.order>({
         restUrl: apiUrl + "orders",
-        allowUpdate:true,
+        allowUpdate:true
    
     });
    

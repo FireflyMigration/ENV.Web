@@ -301,6 +301,29 @@ export class DataSettings<rowType> extends DataSettingsBase {
         }
 
     }
+    moveCol(col: ColumnSettingBase,move:number)
+    {
+        let currentIndex = this.columnMap.indexOf(col);
+        let newIndex = currentIndex + move;
+        if (newIndex < 0 || newIndex >= this.columnMap.length)
+            return;
+        this.columnMap.splice(currentIndex,1);
+        this.columnMap.splice(newIndex, 0, col);
+        this._lastColumnCount = -1;
+    }
+    deleteCol(col: ColumnSettingBase)
+    {
+        this.columnMap.splice(this.columnMap.indexOf(col), 1);
+        this._lastColumnCount = -1;
+    }
+    addCol(col: ColumnSettingBase) {
+        this.columnMap.splice(this.columnMap.indexOf(col), 0, { designMode:true });
+        this._lastColumnCount = -1;
+    }
+    designColumn(col: ColumnSettingBase)
+    {
+        col.designMode = !col.designMode;
+    }
     private gridColumns: ColumnSettingBase[];
     private nonGridColumns: ColumnSettingBase[];
     private numOfColumnsInGrid = 5;
@@ -411,6 +434,12 @@ export class DataSettings<rowType> extends DataSettingsBase {
                 break;
             }
     }
+    _optionalKeys()
+    {
+        if (!this.items || this.items.length == 0)
+            return [];
+        return Object.keys(this.items[0]);
+    }
 
     restList: RestList<rowType>;
     get items(): rowType[] {
@@ -512,6 +541,7 @@ interface ColumnSettingBase {
     cssClass?: (string | ((row: any) => string));
     inputType?: string;
     click?: (row: any) => void;
+    designMode?: boolean;
 }
 interface ColumnSetting<rowType> extends ColumnSettingBase {
     getValue?: (row: rowType) => any;

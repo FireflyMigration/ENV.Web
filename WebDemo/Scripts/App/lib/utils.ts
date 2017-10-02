@@ -227,12 +227,18 @@ class DataSettingsBase {
     rowClass?: (row: any) => string;
     onSavingRow?: (s: ModelState<any>) => void;
     currentRow: any;
+    currentRowChanged: (r: any) => void;
 }
 export class DataSettings<rowType> extends DataSettingsBase {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
     currentRow: rowType;
+    private setCurrentRow(row: rowType)
+    {
+        this.currentRow = row;
+        this.currentRowChanged(row);
+    }
     constructor(settings?: IDataSettings<rowType>) {
         super();
         if (settings) {

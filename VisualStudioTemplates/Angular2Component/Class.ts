@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, Injectable } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import * as utils from './lib/utils';
 import * as models from './models';
 
@@ -7,8 +7,6 @@ import * as models from './models';
 <h1>$safeitemrootname$</h1>
 `
 })
-
-@Injectable()
 export class $safeitemrootname$  {
 
    

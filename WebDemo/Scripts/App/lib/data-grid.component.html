@@ -3,7 +3,7 @@
     <button class="btn glyphicon glyphicon-chevron-right" *ngIf="records.items.length>0" (click)="settings.nextPage()"></button>
     <button class="btn btn-primary glyphicon glyphicon-plus" *ngIf="settings.allowUpdate &&settings.allowInsert" (click)="records.add()"></button>
 </div>
-<table class="table table-bordered table-responsive table-condensed table-striped table-hover" *ngIf="settings">
+<table class="table table-bordered table-responsive table-condensed table-hover" *ngIf="settings">
 
     <thead>
         <tr>
@@ -16,9 +16,9 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let record of records" [className]="_getRowClass(record)">
+        <tr *ngFor="let record of records" [className]="_getRowClass(record)" (click)="rowClicked(record)">
 
-            <td *ngFor="let map of columnMaps" [className]="_getColumnClass(map,record)">
+            <td *ngFor="let map of columnMaps" [className]="_getColumnClass(map,record)" >
                 <span *ngIf="!_getEditable(map)">{{_getColValue(map,record)}}</span>
                 <div *ngIf="_getEditable(map)" class="form-group " [class.has-error]="_getError(map,record)">
                     <input class="form-control" [(ngModel)]="record[map.key]" type="{{_getColDataType(map)}}" (ngModelChange)="_colValueChanged(map,record)" />
@@ -27,7 +27,7 @@
             </td>
             <td *ngIf="rowButtons.length>0">
                 <span *ngFor="let b of rowButtons">
-                    <button class="btn btn-success {{b.cssClass(record)}}" *ngIf="b.visible(record)" (click)="b.click(record)">{{b.name}}</button>
+                    <button class="btn {{b.cssClass(record)}}" *ngIf="b.visible(record)" (click)="b.click(record)">{{b.name}}</button>
                 </span>
             </td>
         </tr>

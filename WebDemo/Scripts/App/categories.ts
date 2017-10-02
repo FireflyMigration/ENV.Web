@@ -7,6 +7,10 @@ import * as models from './models';
     template: `
 <h1>Categories</h1>
 <data-grid [settings]="dataSettings"></data-grid>
+Selected: {{dataSettings.currentRow}}
+<div *ngIf="dataSettings.currentRow">
+{{dataSettings.currentRow.categoryName}}
+</div>
 `
 })
 

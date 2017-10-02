@@ -34,6 +34,10 @@ export class DataGridComponent implements OnChanges {
         return b;
 
     }
+    rowClicked(row)
+    {
+        this.settings.currentRow = row;
+    }
 
     page = 1;
     nextPage() {
@@ -173,6 +177,8 @@ export class DataGridComponent implements OnChanges {
         }
     }
     _getRowClass(row: any) {
+        if (row == this.settings.currentRow)
+            return "active";
         if (this.settings.rowClass)
             return this.settings.rowClass(row);
         return "";
@@ -220,12 +226,13 @@ class DataSettingsBase {
     getRecords: () => Promise<Iterable<any>>;
     rowClass?: (row: any) => string;
     onSavingRow?: (s: ModelState<any>) => void;
+    currentRow: any;
 }
 export class DataSettings<rowType> extends DataSettingsBase {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
-
+    currentRow: rowType;
     constructor(settings?: IDataSettings<rowType>) {
         super();
         if (settings) {
@@ -301,7 +308,13 @@ export class DataSettings<rowType> extends DataSettingsBase {
             opt = JSON.parse(JSON.stringify(this.getOptions));
         if (this.page > 1)
             opt.page = this.page;
-        return this.restList.get(opt).then(() => this.restList);
+        return this.restList.get(opt).then(() => {
+            if (this.restList.items.length == 0)
+                this.currentRow = undefined;
+            else
+                this.currentRow = this.restList.items[0];
+            return this.restList;
+        });
     };
 
     restList: RestList<rowType>;

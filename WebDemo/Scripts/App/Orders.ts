@@ -6,7 +6,6 @@ import * as models from './models';
     template:`
 <h1>Orders</h1>
 <data-grid [settings]="orders"></data-grid>
-<data-area [settings]="orders" ></data-area>
 `
 })
 

@@ -17,7 +17,16 @@ export class Categories {
 
     dataSettings = new utils.DataSettings<models.category>({
         restUrl: apiUrl + 'categories',
-        columnKeys: ["id","categoryName","categoryDescription"],
+        columnKeys: ["id", "categoryName", "categoryDescription"],
+        columnSettings: [{
+            key: "categoryName",
+            getValue: c => c.categoryName + c.categoryName,
+            click: c => c.categoryName += " 1"
+        }, {
+                key: "id",
+                click: o => alert(o.id)
+        }],
+
         allowUpdate:true
     });
 

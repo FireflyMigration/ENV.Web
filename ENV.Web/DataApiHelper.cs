@@ -263,8 +263,8 @@ namespace ENV.Web
   <ul class=""nav nav-tabs"" role=""tablist"">
     <li role=""presentation"" class=""active""><a href=""#{item.Key}_api"" aria-controls=""api"" role=""tab"" data-toggle=""tab"">API</a></li>
     <li role=""presentation""><a href=""#{item.Key}_parameters"" aria-controls=""profile"" role=""tab"" data-toggle=""tab"">Body Parameters</a></li>
-    <li role=""presentation""><a href=""#{item.Key}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Column List</a></li>
     <li role=""presentation""><a href=""#{item.Key}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript Interface</a></li>
+    <li role=""presentation""><a href=""#{item.Key}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Column List</a></li>
     <li role=""presentation""><a href=""#{item.Key}_keys"" aria-controls=""keys"" role=""tab"" data-toggle=""tab"">Typescript Column Keys</a></li>
   </ul>
 
@@ -272,8 +272,8 @@ namespace ENV.Web
   <div class=""tab-content"">
     <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Key}_api"">{ api}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_parameters"">{bodyParameters}</div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptInterface(tw, item.Key))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
   </div>
 

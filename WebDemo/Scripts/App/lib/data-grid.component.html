@@ -3,11 +3,12 @@
     <button class="btn glyphicon glyphicon-chevron-right" *ngIf="records.items.length>0" (click)="settings.nextPage()"></button>
     <button class="btn btn-primary glyphicon glyphicon-plus" *ngIf="settings.allowUpdate &&settings.allowInsert" (click)="records.add()"></button>
 </div>
-<table class="table table-bordered table-responsive table-condensed table-hover" *ngIf="settings">
 
+<table class="table table-bordered table-responsive table-condensed table-hover" *ngIf="settings">
+    
     <thead>
         <tr>
-            <th *ngFor="let map of columnMaps" (click)="settings.sort(map.key)">
+            <th *ngFor="let map of settings.getGridColumns()" (click)="settings.sort(map.key)">
                 {{map.caption}} 
                 <span class="glyphicon glyphicon-chevron-down pull-right" *ngIf="settings.sortedAscending(map.key)"></span>
                 <span class="glyphicon glyphicon-chevron-up pull-right" *ngIf="settings.sortedDescending(map.key)"></span>
@@ -18,7 +19,7 @@
     <tbody>
         <tr *ngFor="let record of records" [className]="_getRowClass(record)" (click)="rowClicked(record)">
 
-            <td *ngFor="let map of columnMaps" [className]="settings._getColumnClass(map,record)" >
+            <td *ngFor="let map of settings.getGridColumns()" [className]="settings._getColumnClass(map,record)" >
                 <data-control [settings]="settings" [map]="map" [record]="record"></data-control>
             </td>
             <td *ngIf="rowButtons.length>0">

@@ -3,3 +3,32 @@
     categoryName?: string;
     description?: string;
 }
+export interface order {
+    id?: number;
+    customerID?: string;
+    employeeID?: number;
+    orderDate?: string;
+    requiredDate?: string;
+    shippedDate?: string;
+    shipVia?: number;
+    freight?: number;
+    shipName?: string;
+    shipAddress?: string;
+    shipCity?: string;
+    shipRegion?: string;
+    shipPostalCode?: string;
+    shipCountry?: string;
+}
+export interface customer {
+    id?: string;
+    companyName?: string;
+    contactName?: string;
+    contactTitle?: string;
+    address?: string;
+    city?: string;
+    region?: string;
+    postalCode?: string;
+    country?: string;
+    phone?: string;
+    fax?: string;
+}

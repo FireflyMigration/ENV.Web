@@ -248,6 +248,7 @@
     <TypeScriptCompile Include="Scripts\App\main.ts" />
     <TypeScriptCompile Include="Scripts\App\models.ts" />
     <TypeScriptCompile Include="Scripts\App\lib\utils.ts" />
+    <TypeScriptCompile Include="Scripts\App\Orders.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

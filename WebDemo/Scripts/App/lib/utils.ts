@@ -8,36 +8,53 @@ import { Routes } from '@angular/router';
     selector: 'data-area',
     template: `
 <div class="form-horizontal" *ngIf="settings.currentRow" >
-    <div class="form-group" *ngFor="let map of columnMaps" [className]="settings._getColumnClass(map,settings.currentRow)">
+    <div class="form-group {{settings._getColumnClass(map,settings.currentRow)}}" *ngFor="let map of settings.getNonGridColumns()" >
         <label for="inputEmail3" class="col-sm-2 control-label">{{map.caption}}</label>
         <div class="col-sm-10">
             <data-control [settings]="settings" [map]="map" [record]="settings.currentRow"></data-control>
         </div>
     </div>
-</div>`
+</div>
+
+`
+
 })
 export class DataAreaCompnent implements OnChanges {
-    columnMaps: ColumnSettingBase[];
+    
     ngOnChanges(): void {
-        this.columnMaps = this.settings.settings;
+        
     }
     @Input() settings = new DataSettings();
 }
+
+
 @Component({
     selector: 'data-control',
     template: `
 <span *ngIf="!settings._getEditable(map)" >{{settings._getColValue(map,record)}}</span>
 <div *ngIf="settings._getEditable(map)" class="form-group " [class.has-error]="settings._getError(map,record)">
-    <input class="form-control" [(ngModel)]="record[map.key]" type="{{settings._getColDataType(map)}}" (ngModelChange)="settings._colValueChanged(map,record)" />
+    <div >
+        <div [class.input-group]="showDescription()||map.click">
+            <div class="input-group-btn" *ngIf="map.click">
+                <button type="button" class="btn btn-default" (click)="map.click(record)" > <span class="glyphicon glyphicon-chevron-down"></span></button>
+            </div>
+            <input class="form-control"  [(ngModel)]="record[map.key]" type="{{settings._getColDataType(map)}}" (ngModelChange)="settings._colValueChanged(map,record)" />
+            <div class="input-group-addon" *ngIf="showDescription()">{{map.getValue(record)}}</div>
+            </div>
+        </div>
     <span class="help-block" *ngIf="settings._getError(map,record)">{{settings._getError(map,record)}}</span>
 </div>`
 })
 export class DataControlComponent implements OnChanges {
     @Input() map: ColumnSettingBase;
     @Input() record: any;
-    
+
+    showDescription() {
+        return this.map.key && this.map.getValue;
+    }
+
     ngOnChanges(): void {
-        
+
     }
     @Input() settings = new DataSettings();
 }
@@ -56,7 +73,7 @@ export class DataGridComponent implements OnChanges {
 
     @Input() records: Iterable<any>;
     @Input() settings = new DataSettings();
-    columnMaps: ColumnSettingBase[];
+    
     rowButtons: rowButtonBase[] = [];
     keys: string[] = [];
     private addButton(b: rowButtonBase) {
@@ -75,8 +92,7 @@ export class DataGridComponent implements OnChanges {
         return b;
 
     }
-    rowClicked(row)
-    {
+    rowClicked(row) {
         this.settings.currentRow = row;
     }
 
@@ -121,8 +137,8 @@ export class DataGridComponent implements OnChanges {
         alert(message);
     }
 
-    
-    
+
+
     ngOnChanges(): void {
         if (!this.settings)
             return;
@@ -168,39 +184,14 @@ export class DataGridComponent implements OnChanges {
         if (!this.records) {
             this.settings.getRecords().then(r => {
                 this.records = r;
-                if (this.settings.settings.length == 0)
-                    this.autoGenerateColumnsBasedOnData();
+                
             });
 
         }
 
-        if (this.settings.settings.length > 0) { // when settings provided
-            this.columnMaps = this.settings.settings;
-            this.columnMaps.forEach(s => {
-                if (!s.caption)
-                    s.caption = makeTitle(s.key);
-            });
-        } else if (this.records) {
-            {
-                this.autoGenerateColumnsBasedOnData();
-
-            }
-        }
+        
     }
-    private autoGenerateColumnsBasedOnData() {
-        for (let r of this.records) {
-            this.columnMaps = [];
-            Object.keys(r).forEach(key => {
-                if (typeof (r[key]) != 'function')
 
-                    this.columnMaps.push({
-                        key: key,
-                        caption: makeTitle(key)
-                    });
-            });
-            break;
-        }
-    }
     _getRowClass(row: any) {
         if (row == this.settings.currentRow)
             return "active";
@@ -209,7 +200,7 @@ export class DataGridComponent implements OnChanges {
         return "";
     }
 
-    
+
 }
 function makeTitle(key: string) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
@@ -218,7 +209,7 @@ class DataSettingsBase {
     allowUpdate = false;
     allowInsert = false;
     allowDelete = false;
-    settings: ColumnSettingBase[] = [];
+    columnMap: ColumnSettingBase[] = [];
     buttons: rowButtonBase[] = [];
     getRecords: () => Promise<Iterable<any>>;
     rowClass?: (row: any) => string;
@@ -279,8 +270,7 @@ export class DataSettings<rowType> extends DataSettingsBase {
         throw new Error("Method not implemented.");
     }
     currentRow: rowType;
-    private setCurrentRow(row: rowType)
-    {
+    private setCurrentRow(row: rowType) {
         this.currentRow = row;
         this.currentRowChanged(row);
     }
@@ -307,9 +297,41 @@ export class DataSettings<rowType> extends DataSettingsBase {
             if (settings.onSavingRow)
                 this.onSavingRow = settings.onSavingRow;
             this.getOptions = settings.get;
+
         }
 
     }
+    private gridColumns: ColumnSettingBase[];
+    private nonGridColumns: ColumnSettingBase[];
+    private numOfColumnsInGrid = 5;
+
+    private _lastColumnCount;
+    private _lastNumOfColumnsInGrid;
+    private _initColumnsArrays() {
+        if (this._lastColumnCount != this.columnMap.length || this._lastNumOfColumnsInGrid != this.numOfColumnsInGrid) {
+            this._lastNumOfColumnsInGrid = this.numOfColumnsInGrid;
+            this._lastColumnCount = this.columnMap.length;
+            this.gridColumns = [];
+            this.nonGridColumns = [];
+            let i = 0;
+            for (let c of this.columnMap) {
+                if (i++ < this._lastNumOfColumnsInGrid)
+                    this.gridColumns.push(c);
+                else
+                    this.nonGridColumns.push(c);
+            }
+        }
+    }
+    getGridColumns()
+    {
+        this._initColumnsArrays();
+        return this.gridColumns;
+    }
+    getNonGridColumns() {
+        this._initColumnsArrays();
+        return this.nonGridColumns;
+    }
+
 
     page = 1;
     nextPage() {
@@ -357,16 +379,38 @@ export class DataSettings<rowType> extends DataSettingsBase {
         let opt: getOptions<rowType> = {};
         if (this.getOptions)
             opt = JSON.parse(JSON.stringify(this.getOptions));
+        if (!opt.limit)
+            opt.limit = 7;
         if (this.page > 1)
             opt.page = this.page;
         return this.restList.get(opt).then(() => {
+
+
             if (this.restList.items.length == 0)
                 this.currentRow = undefined;
-            else
+            else {
+
+                this.autoGenerateColumnsBasedOnData();
                 this.currentRow = this.restList.items[0];
+            }
             return this.restList;
         });
     };
+    private autoGenerateColumnsBasedOnData() {
+        if (this.columnMap.length == 0)
+            for (let r of this.items) {
+                
+                Object.keys(r).forEach(key => {
+                    if (typeof (r[key]) != 'function')
+
+                        this.columnMap.push({
+                            key: key,
+                            caption: makeTitle(key)
+                        });
+                });
+                break;
+            }
+    }
 
     restList: RestList<rowType>;
     get items(): rowType[] {
@@ -402,16 +446,18 @@ export class DataSettings<rowType> extends DataSettingsBase {
                         existing.readonly = s.readonly;
                     if (s.inputType)
                         existing.inputType = s.inputType;
+                    if (s.click)
+                        existing.click = s.click;
 
                 }
                 else {
-                    this.settings.push(s);
+                    this.columnMap.push(s);
                     this.settingsByKey[s.key] = s;
                 }
 
             }
             else
-                this.settings.push(s);
+                this.columnMap.push(s);
 
 
         }
@@ -465,10 +511,12 @@ interface ColumnSettingBase {
     getValue?: (row: any) => any;
     cssClass?: (string | ((row: any) => string));
     inputType?: string;
+    click?: (row: any) => void;
 }
 interface ColumnSetting<rowType> extends ColumnSettingBase {
     getValue?: (row: rowType) => any;
     cssClass?: (string | ((row: rowType) => string));
+    click?: (row: rowType) => void;
 }
 interface rowButtonBase {
 
@@ -725,12 +773,10 @@ interface MenuEntry {
     path: string,
     text: string
 }
-export function getDayOfWeek(date: string)
-{
+export function getDayOfWeek(date: string) {
     return new Date(date).getDay();
 }
-export function getDayOfWeekName(date: string)
-{
+export function getDayOfWeekName(date: string) {
     return new Date(date).toLocaleDateString("en-us", { weekday: "long" });
 }
 

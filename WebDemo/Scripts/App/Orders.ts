@@ -15,7 +15,14 @@ export class Orders  {
     customers= new utils.Lookup<models.customer, string>(apiUrl + 'customers');
     orders = new utils.DataSettings<models.order>({
         restUrl: apiUrl + "orders",
-        allowUpdate:true
+        allowUpdate: true,
+        columnSettings: [
+            { key: "id", caption: "Order ID" },
+            { key: "customerID", caption: "CustomerID" },
+            { key: "orderDate", caption: "OrderDate", inputType: "date" },
+            { key: "shipVia", caption: "ShipVia" },
+        ]
+        
    
     });
    

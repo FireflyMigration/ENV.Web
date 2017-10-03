@@ -16,6 +16,7 @@ import * as models from './models';
 export class Categories {
 
     dataSettings = new utils.DataSettings<models.category>({
+        allowDelete:true,
         restUrl: apiUrl + 'categories',
         columnKeys: ["id", "categoryName", "categoryDescription"],
         columnSettings: [{

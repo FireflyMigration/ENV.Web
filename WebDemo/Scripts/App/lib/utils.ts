@@ -9,7 +9,11 @@ import { Routes } from '@angular/router';
     template: `
 <div class="form-horizontal" *ngIf="settings.currentRow" >
     <div class="form-group {{settings._getColumnClass(map,settings.currentRow)}}" *ngFor="let map of settings.getNonGridColumns()" >
-        <label for="inputEmail3" class="col-sm-2 control-label">{{map.caption}}</label>
+    <div class="col-sm-2">
+        <label for="inputEmail3" class="control-label" *ngIf="!map.designMode">{{map.caption}}</label>
+        <column-designer [settings]="settings" [map]="map"></column-designer>
+    </div>
+        
         <div class="col-sm-10">
             <data-control [settings]="settings" [map]="map" [record]="settings.currentRow"></data-control>
         </div>
@@ -20,9 +24,9 @@ import { Routes } from '@angular/router';
 
 })
 export class DataAreaCompnent implements OnChanges {
-    
+
     ngOnChanges(): void {
-        
+
     }
     @Input() settings = new DataSettings();
 }
@@ -45,7 +49,7 @@ export class DataAreaCompnent implements OnChanges {
     <span class="help-block" *ngIf="settings._getError(map,record)">{{settings._getError(map,record)}}</span>
 </div>`
 })
-export class DataControlComponent implements OnChanges {
+export class DataControlComponent {
     @Input() map: ColumnSettingBase;
     @Input() record: any;
 
@@ -60,6 +64,46 @@ export class DataControlComponent implements OnChanges {
 }
 
 
+@Component({
+    selector: 'column-designer',
+    template: `
+<div *ngIf="map.designMode">
+    <div class="form-group">
+        <input type="text" class="form-control" [(ngModel)]="map.caption">
+    </div>
+    <label>Key</label>
+    <div class="form-group">
+        <select class="form-control" [(ngModel)]="map.key">
+            <option value="" selected></option>
+            <option  selected *ngFor="let k of settings._optionalKeys()">{{k}}</option>
+        </select>
+    </div>
+    <label>Input Type</label>
+    <div class="form-group">
+        <select class="form-control" [(ngModel)]="map.inputType" placeholder="inputType">
+            <option value="" selected>text</option>
+            <option value="number">number</option>
+            <option value="date">date</option>
+            <option value="checkbox">checkbox</option>
+        </select>
+    </div>
+                    
+                   
+    <div class="form-group">
+        <button class="glyphicon glyphicon-chevron-right  pull-right" (click)="settings.moveCol(map,1)"></button>
+        <button class="glyphicon glyphicon-chevron-left pull-right" (click)="settings.moveCol(map,-1)"></button>
+        <button class="glyphicon glyphicon-trash pull-right" (click)="settings.deleteCol(map)"></button>
+        <button class="glyphicon glyphicon-plus pull-right" (click)="settings.addCol(map)"></button>
+    </div>
+</div>
+<span class="pull-right glyphicon glyphicon-pencil" (click)="settings.designColumn(map,$event)"></span>
+`
+})
+class ColumnDesigner {
+    @Input() map: ColumnSettingBase;
+    @Input() settings = new DataSettings();
+}
+
 
 @Component({
     selector: 'data-grid',
@@ -73,7 +117,7 @@ export class DataGridComponent implements OnChanges {
 
     @Input() records: Iterable<any>;
     @Input() settings = new DataSettings();
-    
+
     rowButtons: rowButtonBase[] = [];
     keys: string[] = [];
     private addButton(b: rowButtonBase) {
@@ -184,12 +228,12 @@ export class DataGridComponent implements OnChanges {
         if (!this.records) {
             this.settings.getRecords().then(r => {
                 this.records = r;
-                
+
             });
 
         }
 
-        
+
     }
 
     _getRowClass(row: any) {
@@ -269,6 +313,34 @@ export class DataSettings<rowType> extends DataSettingsBase {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
+    columnSettingsTypeScript() {
+        let result = `columnSettings:[`;
+        for (var i = 0; i < this.columnMap.length; i++) {
+            let item = this.columnMap[i];
+            result += `
+    {key:"${item.key}"`
+
+            let addString = (k: string, v: string) => {
+                if (v) {
+                    result += `, ${k}:"${v.replace('"', '""')}"`;
+                }
+            }
+            let addBoolean= (k: string, v: boolean) => {
+                if (v) {
+                    result += `, ${k}:${v}`;
+                }
+            }
+            addString('caption', item.caption);
+            addString('inputType', item.inputType);
+            addBoolean('readonly', item.readonly);
+
+
+            result += ` },`
+        }
+        result += `
+]`;
+        return result;
+    }
     currentRow: rowType;
     private setCurrentRow(row: rowType) {
         this.currentRow = row;
@@ -288,6 +360,8 @@ export class DataSettings<rowType> extends DataSettingsBase {
                 this.allowDelete = true;
             if (settings.allowInsert)
                 this.allowInsert = true;
+            if (settings.numOfColumnsInGrid)
+                this.numOfColumnsInGrid;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
             if (settings.restUrl) {
@@ -301,27 +375,25 @@ export class DataSettings<rowType> extends DataSettingsBase {
         }
 
     }
-    moveCol(col: ColumnSettingBase,move:number)
-    {
+    designMode: false;
+    moveCol(col: ColumnSettingBase, move: number) {
         let currentIndex = this.columnMap.indexOf(col);
         let newIndex = currentIndex + move;
         if (newIndex < 0 || newIndex >= this.columnMap.length)
             return;
-        this.columnMap.splice(currentIndex,1);
+        this.columnMap.splice(currentIndex, 1);
         this.columnMap.splice(newIndex, 0, col);
         this._lastColumnCount = -1;
     }
-    deleteCol(col: ColumnSettingBase)
-    {
+    deleteCol(col: ColumnSettingBase) {
         this.columnMap.splice(this.columnMap.indexOf(col), 1);
         this._lastColumnCount = -1;
     }
     addCol(col: ColumnSettingBase) {
-        this.columnMap.splice(this.columnMap.indexOf(col), 0, { designMode:true });
+        this.columnMap.splice(this.columnMap.indexOf(col) + 1, 0, { designMode: true });
         this._lastColumnCount = -1;
     }
-    designColumn(col: ColumnSettingBase)
-    {
+    designColumn(col: ColumnSettingBase) {
         col.designMode = !col.designMode;
     }
     private gridColumns: ColumnSettingBase[];
@@ -345,8 +417,7 @@ export class DataSettings<rowType> extends DataSettingsBase {
             }
         }
     }
-    getGridColumns()
-    {
+    getGridColumns() {
         this._initColumnsArrays();
         return this.gridColumns;
     }
@@ -422,7 +493,7 @@ export class DataSettings<rowType> extends DataSettingsBase {
     private autoGenerateColumnsBasedOnData() {
         if (this.columnMap.length == 0)
             for (let r of this.items) {
-                
+
                 Object.keys(r).forEach(key => {
                     if (typeof (r[key]) != 'function')
 
@@ -434,8 +505,7 @@ export class DataSettings<rowType> extends DataSettingsBase {
                 break;
             }
     }
-    _optionalKeys()
-    {
+    _optionalKeys() {
         if (!this.items || this.items.length == 0)
             return [];
         return Object.keys(this.items[0]);
@@ -460,7 +530,7 @@ export class DataSettings<rowType> extends DataSettingsBase {
                 s = x;
             }
             else {
-                s = { key: c };
+                s = { key: c, caption: makeTitle(c) };
             }
             if (s.key) {
                 let existing: ColumnSetting<rowType> = this.settingsByKey[s.key];
@@ -504,6 +574,7 @@ interface IDataSettings<rowType> {
     rowButtons?: rowButton<rowType>[],
     get?: getOptions<rowType>,
     onSavingRow?: (s: ModelState<rowType>) => void;
+    numOfColumnsInGrid?: number;
 }
 class ModelState<rowType> {
     row: rowType;
@@ -781,7 +852,7 @@ export class AppHelper {
     ];
     menues: MenuEntry[] = [];
 
-    Components: Type<any>[] = [DataGridComponent, DataAreaCompnent, DataControlComponent];
+    Components: Type<any>[] = [DataGridComponent, DataAreaCompnent, DataControlComponent, ColumnDesigner];
 
     Register(component: Type<any>) {
         this.Components.push(component);

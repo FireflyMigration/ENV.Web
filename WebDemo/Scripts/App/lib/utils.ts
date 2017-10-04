@@ -57,7 +57,7 @@ export class ColumnCollection<rowType> {
     colListChanged() {
         this._lastNumOfColumnsInGrid = -1;
     };
-    moveCol(col: ColumnSettingBase, move: number) {
+    moveCol(col: ColumnSetting<any>, move: number) {
         let currentIndex = this.items.indexOf(col);
         let newIndex = currentIndex + move;
         if (newIndex < 0 || newIndex >= this.items.length)
@@ -66,36 +66,36 @@ export class ColumnCollection<rowType> {
         this.items.splice(newIndex, 0, col);
         this.colListChanged();
     }
-    deleteCol(col: ColumnSettingBase) {
+    deleteCol(col: ColumnSetting<any>) {
         this.items.splice(this.items.indexOf(col), 1);
         this.colListChanged();
     }
-    addCol(col: ColumnSettingBase) {
+    addCol(col: ColumnSetting<any>) {
         this.items.splice(this.items.indexOf(col) + 1, 0, { designMode: true });
         this.colListChanged();
     }
-    designColumn(col: ColumnSettingBase) {
+    designColumn(col: ColumnSetting<any>) {
         col.designMode = !col.designMode;
     }
 
-    _getEditable(col: ColumnSettingBase) {
+    _getEditable(col: ColumnSetting<any>) {
         if (!this.allowUpdate())
             return false;
         if (!col.key)
             return false
         return !col.readonly;
     }
-    _getColValue(col: ColumnSettingBase, row: any) {
+    _getColValue(col: ColumnSetting<any>, row: any) {
         if (col.getValue)
             return col.getValue(row);
         return row[col.key];
     }
-    _getColDataType(col: ColumnSettingBase, row: any) {
+    _getColDataType(col: ColumnSetting<any>, row: any) {
         if (col.inputType)
             return col.inputType;
         return "text";
     }
-    _getColumnClass(col: ColumnSettingBase, row: any) {
+    _getColumnClass(col: ColumnSetting<any>, row: any) {
 
         if (col.cssClass)
             if (isFunction(col.cssClass)) {
@@ -106,7 +106,7 @@ export class ColumnCollection<rowType> {
         return '';
 
     }
-    _getError(col: ColumnSettingBase, r: any) {
+    _getError(col: ColumnSetting<any>, r: any) {
         if (r.__modelState) {
             let m = <ModelState<any>>r.__modelState();
             if (m.modelState) {
@@ -165,15 +165,15 @@ export class ColumnCollection<rowType> {
 ]`;
         return result;
     }
-    _colValueChanged(col: ColumnSettingBase, r: any) {
+    _colValueChanged(col: ColumnSetting<any>, r: any) {
         if (r.__modelState) {
             let m = <ModelState<any>>r.__modelState();
             m.modelState[col.key] = undefined;
         }
     }
-    items: ColumnSettingBase[] = [];
-    private gridColumns: ColumnSettingBase[];
-    private nonGridColumns: ColumnSettingBase[];
+    items: ColumnSetting<any>[] = [];
+    private gridColumns: ColumnSetting<any>[];
+    private nonGridColumns: ColumnSetting<any>[];
     numOfColumnsInGrid = 5;
 
     private _lastColumnCount;
@@ -235,15 +235,15 @@ export class DataAreaCompnent implements OnChanges {
        
     }
     lastAllCols: string;
-    lastCols: Array<ColumnSettingBase[]>;
+    lastCols: Array<ColumnSetting<any>[]>;
     
-    theColumns(): Array<ColumnSettingBase[]>{
+    theColumns(): Array<ColumnSetting<any>[]>{
         let cols = this.settings.columns.getNonGridColumns();
         let comp = JSON.stringify(cols);
         if (comp == this.lastAllCols)
             return this.lastCols;
 
-        let r: Array<ColumnSettingBase[]> = [];
+        let r: Array<ColumnSetting<any>[]> = [];
         this.lastCols = r;
         this.lastAllCols = comp;
         for (var i = 0; i < this.columns; i++) {
@@ -281,7 +281,7 @@ export class DataAreaCompnent implements OnChanges {
 </div>`
 })
 export class DataControlComponent {
-    @Input() map: ColumnSettingBase;
+    @Input() map: ColumnSetting<any>;
     @Input() record: any;
 
     showDescription() {
@@ -331,7 +331,7 @@ export class DataControlComponent {
 `
 })
 class ColumnDesigner {
-    @Input() map: ColumnSettingBase;
+    @Input() map: ColumnSetting<any>;
     @Input() settings: ColumnCollection<any>;
 }
 
@@ -635,7 +635,7 @@ interface IDataSettings<rowType> {
     allowDelete?: boolean,
     hideDataArea?:boolean,
     columnSettings?: ColumnSetting<rowType>[],
-    areas?: { [areaKey: string]: ColumnSettingBase[] },
+    areas?: { [areaKey: string]: ColumnSetting<any>[] },
     columnKeys?: string[],
     restUrl?: string,
     rowCssClass?: (row: rowType) => string;
@@ -673,17 +673,12 @@ class ModelState<rowType> {
     modelState = {};
 }
 
-interface ColumnSettingBase {
+interface ColumnSetting<rowType>{
     key?: string;
     caption?: string;
     readonly?: boolean;
-    getValue?: (row: any) => any;
-    cssClass?: (string | ((row: any) => string));
     inputType?: string;
-    click?: (row: any) => void;
     designMode?: boolean;
-}
-interface ColumnSetting<rowType> extends ColumnSettingBase {
     getValue?: (row: rowType) => any;
     cssClass?: (string | ((row: rowType) => string));
     click?: (row: rowType) => void;

@@ -56,7 +56,12 @@ export class ColumnCollection<rowType> {
     designMode: false;
     colListChanged() {
         this._lastNumOfColumnsInGrid = -1;
+        this._colListChangeListeners.forEach(x => x());
     };
+    _colListChangeListeners: (() => void)[] = [];
+    onColListChange(action: (() => void)) {
+        this._colListChangeListeners.push(action);
+    }
     moveCol(col: ColumnSetting<any>, move: number) {
         let currentIndex = this.items.indexOf(col);
         let newIndex = currentIndex + move;
@@ -204,6 +209,10 @@ export class ColumnCollection<rowType> {
 }
 
 
+interface dataAreaSettings {
+    columns: ColumnCollection<any>;
+}
+
 
 @Component({
     selector: 'data-area',
@@ -227,35 +236,36 @@ export class ColumnCollection<rowType> {
 
 
 `
-
 })
 export class DataAreaCompnent implements OnChanges {
 
     ngOnChanges(): void {
-       
+        if (this.settings && this.settings.columns)
+            this.settings.columns.onColListChange(() => this.lastCols = undefined);
     }
-    lastAllCols: string;
-    lastCols: Array<ColumnSetting<any>[]>;
-    
-    theColumns(): Array<ColumnSetting<any>[]>{
-        let cols = this.settings.columns.getNonGridColumns();
-        let comp = JSON.stringify(cols);
-        if (comp == this.lastAllCols)
-            return this.lastCols;
 
-        let r: Array<ColumnSetting<any>[]> = [];
-        this.lastCols = r;
-        this.lastAllCols = comp;
-        for (var i = 0; i < this.columns; i++) {
-            r.push([]);
+
+    lastCols: Array<ColumnSetting<any>[]>;
+
+    theColumns(): Array<ColumnSetting<any>[]> {
+
+        if (!this.lastCols) {
+
+            let cols = this.settings.columns.getNonGridColumns();
+
+            let r: Array<ColumnSetting<any>[]> = [];
+            this.lastCols = r;
+            for (var i = 0; i < this.columns; i++) {
+                r.push([]);
+            }
+            let itemsPerCol = Math.round(cols.length / this.columns);
+            for (var i = 0; i < cols.length; i++) {
+                r[Math.floor(i / itemsPerCol)].push(cols[i]);
+            }
         }
-        let itemsPerCol = Math.round(cols.length / this.columns);
-        for (var i = 0; i < cols.length; i++) {
-            r[Math.floor(i / itemsPerCol)].push(cols[i]);
-        }
-        return r;
+        return this.lastCols;
     }
-    @Input() settings = new DataSettings();
+    @Input() settings: dataAreaSettings = { columns: new ColumnCollection(() => undefined, () => false) };
     @Input() labelWidth = 4;
     @Input() columns = 1;
 }
@@ -491,7 +501,7 @@ export class DataSettings<rowType>  {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
-    
+
     addArea() {
         return new DataAreaSettings<rowType>();
     }
@@ -507,14 +517,14 @@ export class DataSettings<rowType>  {
 
 
     buttons: rowButtonBase[] = [];
-    
+
     rowClass?: (row: any) => string;
     onSavingRow?: (s: ModelState<any>) => void;
-    
+
     currentRowChanged: (r: any) => void;
-    
+
     constructor(settings?: IDataSettings<rowType>) {
-        
+
         if (settings) {
             if (settings.columnKeys)
                 this.columns.add(...settings.columnKeys);
@@ -542,12 +552,12 @@ export class DataSettings<rowType>  {
             this.getOptions = settings.get;
 
         }
-        
+
 
     }
-    columns = new ColumnCollection<rowType>(() => this.currentRow, ()=>this.allowUpdate);
-    
-  
+    columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate);
+
+
 
 
     page = 1;
@@ -591,7 +601,7 @@ export class DataSettings<rowType>  {
 
 
     private getOptions: getOptions<rowType>;
-    getRecords ()  {
+    getRecords() {
 
         let opt: getOptions<rowType> = {};
         if (this.getOptions)
@@ -607,15 +617,15 @@ export class DataSettings<rowType>  {
                 this.currentRow = undefined;
             else {
 
-                
+
                 this.currentRow = this.restList.items[0];
                 this.columns.autoGenerateColumnsBasedOnData();
             }
             return this.restList;
         });
     };
-  
-    
+
+
 
     restList: RestList<rowType>;
     get items(): rowType[] {
@@ -624,16 +634,16 @@ export class DataSettings<rowType>  {
         return undefined;
     }
 
-    
 
-   
+
+
 
 }
 interface IDataSettings<rowType> {
     allowUpdate?: boolean,
     allowInsert?: boolean,
     allowDelete?: boolean,
-    hideDataArea?:boolean,
+    hideDataArea?: boolean,
     columnSettings?: ColumnSetting<rowType>[],
     areas?: { [areaKey: string]: ColumnSetting<any>[] },
     columnKeys?: string[],
@@ -649,7 +659,7 @@ class ModelState<rowType> {
     constructor(private _row: any) {
         this.row = _row;
     }
-    
+
 
     isValid = true;
     message: string;
@@ -673,7 +683,7 @@ class ModelState<rowType> {
     modelState = {};
 }
 
-interface ColumnSetting<rowType>{
+interface ColumnSetting<rowType> {
     key?: string;
     caption?: string;
     readonly?: boolean;

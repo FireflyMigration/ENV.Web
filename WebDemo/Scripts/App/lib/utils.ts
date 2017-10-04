@@ -179,7 +179,7 @@ export class ColumnCollection<rowType> {
     items: ColumnSetting<any>[] = [];
     private gridColumns: ColumnSetting<any>[];
     private nonGridColumns: ColumnSetting<any>[];
-    numOfColumnsInGrid = 5;
+    numOfColumnsInGrid = 0;
 
     private _lastColumnCount;
     private _lastNumOfColumnsInGrid;
@@ -240,8 +240,18 @@ interface dataAreaSettings {
 export class DataAreaCompnent implements OnChanges {
 
     ngOnChanges(): void {
-        if (this.settings && this.settings.columns)
+        if (this.settings && this.settings.columns) {
             this.settings.columns.onColListChange(() => this.lastCols = undefined);
+            let areaSettings = this.settings as DataAreaSettings<any>;
+            if (areaSettings.settings)
+            {
+                if (areaSettings.settings.labelWidth)
+                    this.labelWidth = areaSettings.settings.labelWidth;
+                if (areaSettings.settings.numberOfColumnAreas)
+                    this.columns = areaSettings.settings.numberOfColumnAreas;
+            }
+        }
+        
     }
 
 
@@ -492,18 +502,33 @@ function makeTitle(key: string) {
 }
 
 
-
+interface IDataAreaSettings<rowType>
+{
+    columnSettings?: ColumnSetting<rowType>[];
+    numberOfColumnAreas?: number;
+    labelWidth?: number;
+}
 
 class DataAreaSettings<rowType>
 {
+
+    constructor(public columns: ColumnCollection<rowType>, public settings: IDataAreaSettings<rowType>)
+    {
+        if (settings.columnSettings)
+            columns.add(...settings.columnSettings);
+
+    }
 }
+
 export class DataSettings<rowType>  {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
 
-    addArea() {
-        return new DataAreaSettings<rowType>();
+    addArea(settings: IDataAreaSettings<rowType>) {
+        let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate);
+        
+        return new DataAreaSettings<rowType>( col,settings);
     }
     currentRow: rowType;
     private setCurrentRow(row: rowType) {
@@ -541,6 +566,7 @@ export class DataSettings<rowType>  {
                 this.hideDataArea = settings.hideDataArea;
             if (settings.numOfColumnsInGrid)
                 this.columns.numOfColumnsInGrid;
+            else this.columns.numOfColumnsInGrid = 5;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
             if (settings.restUrl) {

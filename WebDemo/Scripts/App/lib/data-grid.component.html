@@ -8,7 +8,7 @@
 <div *ngIf="designMode">
 
 <pre>
-{{settings.columnSettingsTypeScript()}}
+{{settings.columns.columnSettingsTypeScript()}}
 </pre>
 
 
@@ -17,14 +17,14 @@
 
     <thead>
         <tr>
-            <th *ngFor="let map of settings.getGridColumns()">
+            <th *ngFor="let map of settings.columns.getGridColumns()">
                 <span *ngIf="!map.designMode" (click)="settings.sort(map.key)">{{map.caption}}</span>
 
 
 
                 <span class="glyphicon glyphicon-chevron-down pull-right" *ngIf="settings.sortedAscending(map.key)"></span>
                 <span class="glyphicon glyphicon-chevron-up pull-right" *ngIf="settings.sortedDescending(map.key)"></span>
-                <column-designer [settings]="settings" [map]="map"></column-designer>
+                <column-designer [settings]="settings.columns" [map]="map"></column-designer>
 
 
 
@@ -37,8 +37,8 @@
     <tbody>
         <tr *ngFor="let record of records" [className]="_getRowClass(record)" (click)="rowClicked(record)">
 
-            <td *ngFor="let map of settings.getGridColumns()" [className]="settings._getColumnClass(map,record)">
-                <data-control [settings]="settings" [map]="map" [record]="record"></data-control>
+            <td *ngFor="let map of settings.columns.getGridColumns()" [className]="settings.columns._getColumnClass(map,record)">
+                <data-control [settings]="settings.columns" [map]="map" [record]="record"></data-control>
             </td>
             <td *ngIf="rowButtons.length>0">
                 <span *ngFor="let b of rowButtons">
@@ -49,4 +49,4 @@
 
     </tbody>
 </table>
-<data-area [settings]="settings"></data-area>
+<data-area *ngIf="!settings.hideDataArea" [settings]="settings"></data-area>

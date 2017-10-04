@@ -6,6 +6,8 @@ import * as models from './models';
     template:`
 <h1>Orders</h1>
 <data-grid [settings]="orders"></data-grid>
+    <data-area [settings]="orders" [columns]="2" ></data-area>
+    <data-area [settings]="area1" [columns]="2" ></data-area>
 `
 })
 
@@ -16,15 +18,11 @@ export class Orders  {
     orders = new utils.DataSettings<models.order>({
         restUrl: apiUrl + "orders",
         allowUpdate: true,
-        columnSettings: [
-            { key: "id", caption: "Order ID" },
-            { key: "customerID", caption: "CustomerID" },
-            { key: "orderDate", caption: "OrderDate", inputType: "date" },
-            { key: "shipVia", caption: "ShipVia" },
-        ]
-        
-   
+        hideDataArea:true
     });
+    area1 = this.orders.addArea();
+
+    
    
 
 }

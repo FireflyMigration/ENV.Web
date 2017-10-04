@@ -4,21 +4,227 @@ import { Routes } from '@angular/router';
 
 
 
+export class ColumnCollection<rowType> {
+    constructor(public currentRow: () => any, private allowUpdate: () => boolean) { }
+    private settingsByKey = {};
+    _optionalKeys() {
+        if (!this.currentRow())
+            return [];
+        return Object.keys(this.currentRow());
+    }
+    add(...columns: ColumnSetting<rowType>[]);
+    add(...columns: string[]);
+    add(...columns: any[]) {
+        for (let c of columns) {
+            let s: ColumnSetting<rowType>;
+            let x = c as ColumnSetting<rowType>;
+            if (x.key || x.getValue) {
+                s = x;
+            }
+            else {
+                s = { key: c, caption: makeTitle(c) };
+            }
+            if (s.key) {
+                let existing: ColumnSetting<rowType> = this.settingsByKey[s.key];
+                if (existing) {
+                    if (s.caption)
+                        existing.caption = s.caption;
+                    if (s.cssClass)
+                        existing.cssClass = s.cssClass;
+                    if (s.getValue)
+                        existing.getValue = s.getValue;
+                    if (s.readonly)
+                        existing.readonly = s.readonly;
+                    if (s.inputType)
+                        existing.inputType = s.inputType;
+                    if (s.click)
+                        existing.click = s.click;
+
+                }
+                else {
+                    this.items.push(s);
+                    this.settingsByKey[s.key] = s;
+                }
+
+            }
+            else
+                this.items.push(s);
+
+
+        }
+    }
+    designMode: false;
+    colListChanged() {
+        this._lastNumOfColumnsInGrid = -1;
+    };
+    moveCol(col: ColumnSettingBase, move: number) {
+        let currentIndex = this.items.indexOf(col);
+        let newIndex = currentIndex + move;
+        if (newIndex < 0 || newIndex >= this.items.length)
+            return;
+        this.items.splice(currentIndex, 1);
+        this.items.splice(newIndex, 0, col);
+        this.colListChanged();
+    }
+    deleteCol(col: ColumnSettingBase) {
+        this.items.splice(this.items.indexOf(col), 1);
+        this.colListChanged();
+    }
+    addCol(col: ColumnSettingBase) {
+        this.items.splice(this.items.indexOf(col) + 1, 0, { designMode: true });
+        this.colListChanged();
+    }
+    designColumn(col: ColumnSettingBase) {
+        col.designMode = !col.designMode;
+    }
+
+    _getEditable(col: ColumnSettingBase) {
+        if (!this.allowUpdate())
+            return false;
+        if (!col.key)
+            return false
+        return !col.readonly;
+    }
+    _getColValue(col: ColumnSettingBase, row: any) {
+        if (col.getValue)
+            return col.getValue(row);
+        return row[col.key];
+    }
+    _getColDataType(col: ColumnSettingBase, row: any) {
+        if (col.inputType)
+            return col.inputType;
+        return "text";
+    }
+    _getColumnClass(col: ColumnSettingBase, row: any) {
+
+        if (col.cssClass)
+            if (isFunction(col.cssClass)) {
+                let anyFunc: any = col.cssClass;
+                return anyFunc(row);
+            }
+            else return col.cssClass;
+        return '';
+
+    }
+    _getError(col: ColumnSettingBase, r: any) {
+        if (r.__modelState) {
+            let m = <ModelState<any>>r.__modelState();
+            if (m.modelState) {
+                let errors = m.modelState[col.key];
+                if (errors && errors.length > 0)
+                    return errors[0];
+            }
+
+        }
+        return undefined;
+    }
+    autoGenerateColumnsBasedOnData() {
+        if (this.items.length == 0) {
+            let r = this.currentRow();
+            if (r) {
+                Object.keys(r).forEach(key => {
+                    if (typeof (r[key]) != 'function')
+
+                        this.items.push({
+                            key: key,
+                            caption: makeTitle(key)
+                        });
+                });
+
+            }
+        }
+
+
+
+    }
+    columnSettingsTypeScript() {
+        let result = `columnSettings:[`;
+        for (var i = 0; i < this.items.length; i++) {
+            let item = this.items[i];
+            result += `
+    {key:"${item.key}"`
+
+            let addString = (k: string, v: string) => {
+                if (v) {
+                    result += `, ${k}:"${v.replace('"', '""')}"`;
+                }
+            }
+            let addBoolean = (k: string, v: boolean) => {
+                if (v) {
+                    result += `, ${k}:${v}`;
+                }
+            }
+            addString('caption', item.caption);
+            addString('inputType', item.inputType);
+            addBoolean('readonly', item.readonly);
+
+
+            result += ` },`
+        }
+        result += `
+]`;
+        return result;
+    }
+    _colValueChanged(col: ColumnSettingBase, r: any) {
+        if (r.__modelState) {
+            let m = <ModelState<any>>r.__modelState();
+            m.modelState[col.key] = undefined;
+        }
+    }
+    items: ColumnSettingBase[] = [];
+    private gridColumns: ColumnSettingBase[];
+    private nonGridColumns: ColumnSettingBase[];
+    numOfColumnsInGrid = 5;
+
+    private _lastColumnCount;
+    private _lastNumOfColumnsInGrid;
+    private _initColumnsArrays() {
+        if (this._lastColumnCount != this.items.length || this._lastNumOfColumnsInGrid != this.numOfColumnsInGrid) {
+            this._lastNumOfColumnsInGrid = this.numOfColumnsInGrid;
+            this._lastColumnCount = this.items.length;
+            this.gridColumns = [];
+            this.nonGridColumns = [];
+            let i = 0;
+            for (let c of this.items) {
+                if (i++ < this._lastNumOfColumnsInGrid)
+                    this.gridColumns.push(c);
+                else
+                    this.nonGridColumns.push(c);
+            }
+        }
+    }
+    getGridColumns() {
+        this._initColumnsArrays();
+        return this.gridColumns;
+    }
+    getNonGridColumns() {
+        this._initColumnsArrays();
+        return this.nonGridColumns;
+    }
+}
+
+
+
 @Component({
     selector: 'data-area',
     template: `
-<div class="form-horizontal" *ngIf="settings.currentRow" >
-    <div class="form-group {{settings._getColumnClass(map,settings.currentRow)}}" *ngFor="let map of settings.getNonGridColumns()" >
-    <div class="col-sm-2">
-        <label for="inputEmail3" class="control-label" *ngIf="!map.designMode">{{map.caption}}</label>
-        <column-designer [settings]="settings" [map]="map"></column-designer>
-    </div>
-        
-        <div class="col-sm-10">
-            <data-control [settings]="settings" [map]="map" [record]="settings.currentRow"></data-control>
+
+<div class="form-horizontal" *ngIf="settings.columns&&settings.columns.currentRow()" >
+    <div class="row">
+        <div class="col-sm-{{12/columns}}"*ngFor="let col of theColumns()">
+            <div class="form-group {{settings.columns._getColumnClass(map,settings.columns.currentRow())}}" *ngFor="let map of col" >
+                <div class="col-sm-{{labelWidth}}">
+                    <label for="inputEmail3" class="control-label" *ngIf="!map.designMode">{{map.caption}}</label>
+                    <column-designer [settings]="settings.columns" [map]="map"></column-designer>
+                </div>
+                <div class="col-sm-{{12-labelWidth}}">
+                    <data-control [settings]="settings.columns" [map]="map" [record]="settings.columns.currentRow()"></data-control>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
 
 `
 
@@ -26,10 +232,35 @@ import { Routes } from '@angular/router';
 export class DataAreaCompnent implements OnChanges {
 
     ngOnChanges(): void {
+       
+    }
+    lastAllCols: string;
+    lastCols: Array<ColumnSettingBase[]>;
+    
+    theColumns(): Array<ColumnSettingBase[]>{
+        let cols = this.settings.columns.getNonGridColumns();
+        let comp = JSON.stringify(cols);
+        if (comp == this.lastAllCols)
+            return this.lastCols;
 
+        let r: Array<ColumnSettingBase[]> = [];
+        this.lastCols = r;
+        this.lastAllCols = comp;
+        for (var i = 0; i < this.columns; i++) {
+            r.push([]);
+        }
+        let itemsPerCol = Math.round(cols.length / this.columns);
+        for (var i = 0; i < cols.length; i++) {
+            r[Math.floor(i / itemsPerCol)].push(cols[i]);
+        }
+        return r;
     }
     @Input() settings = new DataSettings();
+    @Input() labelWidth = 4;
+    @Input() columns = 1;
 }
+
+
 
 
 @Component({
@@ -60,7 +291,7 @@ export class DataControlComponent {
     ngOnChanges(): void {
 
     }
-    @Input() settings = new DataSettings();
+    @Input() settings: ColumnSetting<any>;
 }
 
 
@@ -96,12 +327,12 @@ export class DataControlComponent {
         <button class="glyphicon glyphicon-plus pull-right" (click)="settings.addCol(map)"></button>
     </div>
 </div>
-<span class="pull-right glyphicon glyphicon-pencil" (click)="settings.designColumn(map,$event)"></span>
+<span class="pull-right glyphicon glyphicon-pencil" (click)="settings.designColumn(map)"></span>
 `
 })
 class ColumnDesigner {
     @Input() map: ColumnSettingBase;
-    @Input() settings = new DataSettings();
+    @Input() settings: ColumnCollection<any>;
 }
 
 
@@ -249,110 +480,46 @@ export class DataGridComponent implements OnChanges {
 function makeTitle(key: string) {
     return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
 }
-class DataSettingsBase {
-    allowUpdate = false;
-    allowInsert = false;
-    allowDelete = false;
-    columnMap: ColumnSettingBase[] = [];
-    buttons: rowButtonBase[] = [];
-    getRecords: () => Promise<Iterable<any>>;
-    rowClass?: (row: any) => string;
-    onSavingRow?: (s: ModelState<any>) => void;
-    currentRow: any;
-    currentRowChanged: (r: any) => void;
-    _getEditable(col: ColumnSettingBase) {
-        if (!this.allowUpdate)
-            return false;
-        if (!col.key)
-            return false
-        return !col.readonly;
 
 
-    }
-    _getColValue(col: ColumnSettingBase, row: any) {
-        if (col.getValue)
-            return col.getValue(row);
-        return row[col.key];
-    }
-    _getColDataType(col: ColumnSettingBase, row: any) {
-        if (col.inputType)
-            return col.inputType;
-        return "text";
-    }
-    _getColumnClass(col: ColumnSettingBase, row: any) {
 
-        if (col.cssClass)
-            if (isFunction(col.cssClass)) {
-                let anyFunc: any = col.cssClass;
-                return anyFunc(row);
-            }
-            else return col.cssClass;
-        return '';
 
-    }
-    _getError(col: ColumnSettingBase, r: any) {
-        if (r.__modelState) {
-            let m = <ModelState<any>>r.__modelState();
-            if (m.modelState) {
-                let errors = m.modelState[col.key];
-                if (errors && errors.length > 0)
-                    return errors[0];
-            }
-
-        }
-        return undefined;
-    }
-    _colValueChanged(col: ColumnSettingBase, r: any) {
-        if (r.__modelState) {
-            let m = <ModelState<any>>r.__modelState();
-            m.modelState[col.key] = undefined;
-        }
-    }
+class DataAreaSettings<rowType>
+{
 }
-export class DataSettings<rowType> extends DataSettingsBase {
+export class DataSettings<rowType>  {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
-    columnSettingsTypeScript() {
-        let result = `columnSettings:[`;
-        for (var i = 0; i < this.columnMap.length; i++) {
-            let item = this.columnMap[i];
-            result += `
-    {key:"${item.key}"`
-
-            let addString = (k: string, v: string) => {
-                if (v) {
-                    result += `, ${k}:"${v.replace('"', '""')}"`;
-                }
-            }
-            let addBoolean= (k: string, v: boolean) => {
-                if (v) {
-                    result += `, ${k}:${v}`;
-                }
-            }
-            addString('caption', item.caption);
-            addString('inputType', item.inputType);
-            addBoolean('readonly', item.readonly);
-
-
-            result += ` },`
-        }
-        result += `
-]`;
-        return result;
+    
+    addArea() {
+        return new DataAreaSettings<rowType>();
     }
     currentRow: rowType;
     private setCurrentRow(row: rowType) {
         this.currentRow = row;
         this.currentRowChanged(row);
     }
+    allowUpdate = false;
+    allowInsert = false;
+    allowDelete = false;
+    hideDataArea = false;
+
+
+    buttons: rowButtonBase[] = [];
+    
+    rowClass?: (row: any) => string;
+    onSavingRow?: (s: ModelState<any>) => void;
+    
+    currentRowChanged: (r: any) => void;
+    
     constructor(settings?: IDataSettings<rowType>) {
-        super();
+        
         if (settings) {
             if (settings.columnKeys)
-                this.add(...settings.columnKeys);
+                this.columns.add(...settings.columnKeys);
             if (settings.columnSettings)
-                this.add(...settings.columnSettings);
+                this.columns.add(...settings.columnSettings);
 
             if (settings.allowUpdate)
                 this.allowUpdate = true;
@@ -360,8 +527,10 @@ export class DataSettings<rowType> extends DataSettingsBase {
                 this.allowDelete = true;
             if (settings.allowInsert)
                 this.allowInsert = true;
+            if (settings.hideDataArea)
+                this.hideDataArea = settings.hideDataArea;
             if (settings.numOfColumnsInGrid)
-                this.numOfColumnsInGrid;
+                this.columns.numOfColumnsInGrid;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
             if (settings.restUrl) {
@@ -373,58 +542,12 @@ export class DataSettings<rowType> extends DataSettingsBase {
             this.getOptions = settings.get;
 
         }
+        
 
     }
-    designMode: false;
-    moveCol(col: ColumnSettingBase, move: number) {
-        let currentIndex = this.columnMap.indexOf(col);
-        let newIndex = currentIndex + move;
-        if (newIndex < 0 || newIndex >= this.columnMap.length)
-            return;
-        this.columnMap.splice(currentIndex, 1);
-        this.columnMap.splice(newIndex, 0, col);
-        this._lastColumnCount = -1;
-    }
-    deleteCol(col: ColumnSettingBase) {
-        this.columnMap.splice(this.columnMap.indexOf(col), 1);
-        this._lastColumnCount = -1;
-    }
-    addCol(col: ColumnSettingBase) {
-        this.columnMap.splice(this.columnMap.indexOf(col) + 1, 0, { designMode: true });
-        this._lastColumnCount = -1;
-    }
-    designColumn(col: ColumnSettingBase) {
-        col.designMode = !col.designMode;
-    }
-    private gridColumns: ColumnSettingBase[];
-    private nonGridColumns: ColumnSettingBase[];
-    private numOfColumnsInGrid = 5;
-
-    private _lastColumnCount;
-    private _lastNumOfColumnsInGrid;
-    private _initColumnsArrays() {
-        if (this._lastColumnCount != this.columnMap.length || this._lastNumOfColumnsInGrid != this.numOfColumnsInGrid) {
-            this._lastNumOfColumnsInGrid = this.numOfColumnsInGrid;
-            this._lastColumnCount = this.columnMap.length;
-            this.gridColumns = [];
-            this.nonGridColumns = [];
-            let i = 0;
-            for (let c of this.columnMap) {
-                if (i++ < this._lastNumOfColumnsInGrid)
-                    this.gridColumns.push(c);
-                else
-                    this.nonGridColumns.push(c);
-            }
-        }
-    }
-    getGridColumns() {
-        this._initColumnsArrays();
-        return this.gridColumns;
-    }
-    getNonGridColumns() {
-        this._initColumnsArrays();
-        return this.nonGridColumns;
-    }
+    columns = new ColumnCollection<rowType>(() => this.currentRow, ()=>this.allowUpdate);
+    
+  
 
 
     page = 1;
@@ -468,7 +591,7 @@ export class DataSettings<rowType> extends DataSettingsBase {
 
 
     private getOptions: getOptions<rowType>;
-    getRecords: () => Promise<Iterable<any>> = () => {
+    getRecords ()  {
 
         let opt: getOptions<rowType> = {};
         if (this.getOptions)
@@ -484,32 +607,15 @@ export class DataSettings<rowType> extends DataSettingsBase {
                 this.currentRow = undefined;
             else {
 
-                this.autoGenerateColumnsBasedOnData();
+                
                 this.currentRow = this.restList.items[0];
+                this.columns.autoGenerateColumnsBasedOnData();
             }
             return this.restList;
         });
     };
-    private autoGenerateColumnsBasedOnData() {
-        if (this.columnMap.length == 0)
-            for (let r of this.items) {
-
-                Object.keys(r).forEach(key => {
-                    if (typeof (r[key]) != 'function')
-
-                        this.columnMap.push({
-                            key: key,
-                            caption: makeTitle(key)
-                        });
-                });
-                break;
-            }
-    }
-    _optionalKeys() {
-        if (!this.items || this.items.length == 0)
-            return [];
-        return Object.keys(this.items[0]);
-    }
+  
+    
 
     restList: RestList<rowType>;
     get items(): rowType[] {
@@ -518,56 +624,18 @@ export class DataSettings<rowType> extends DataSettingsBase {
         return undefined;
     }
 
-    private settingsByKey = {};
+    
 
-    add(...columns: ColumnSetting<rowType>[]);
-    add(...columns: string[]);
-    add(...columns: any[]) {
-        for (let c of columns) {
-            let s: ColumnSetting<rowType>;
-            let x = c as ColumnSetting<rowType>;
-            if (x.key || x.getValue) {
-                s = x;
-            }
-            else {
-                s = { key: c, caption: makeTitle(c) };
-            }
-            if (s.key) {
-                let existing: ColumnSetting<rowType> = this.settingsByKey[s.key];
-                if (existing) {
-                    if (s.caption)
-                        existing.caption = s.caption;
-                    if (s.cssClass)
-                        existing.cssClass = s.cssClass;
-                    if (s.getValue)
-                        existing.getValue = s.getValue;
-                    if (s.readonly)
-                        existing.readonly = s.readonly;
-                    if (s.inputType)
-                        existing.inputType = s.inputType;
-                    if (s.click)
-                        existing.click = s.click;
-
-                }
-                else {
-                    this.columnMap.push(s);
-                    this.settingsByKey[s.key] = s;
-                }
-
-            }
-            else
-                this.columnMap.push(s);
-
-
-        }
-    }
+   
 
 }
 interface IDataSettings<rowType> {
     allowUpdate?: boolean,
     allowInsert?: boolean,
     allowDelete?: boolean,
+    hideDataArea?:boolean,
     columnSettings?: ColumnSetting<rowType>[],
+    areas?: { [areaKey: string]: ColumnSettingBase[] },
     columnKeys?: string[],
     restUrl?: string,
     rowCssClass?: (row: rowType) => string;
@@ -581,6 +649,7 @@ class ModelState<rowType> {
     constructor(private _row: any) {
         this.row = _row;
     }
+    
 
     isValid = true;
     message: string;

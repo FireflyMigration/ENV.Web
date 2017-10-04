@@ -6,8 +6,8 @@ import * as models from './models';
 
     template: `
 <h1>Categories</h1>
-<data-grid [settings]="dataSettings"></data-grid>
-<data-area [settings]="dataSettings"></data-area>
+<data-grid [settings]="dataSettings"> </data-grid>
+<data-area [settings]="dataSettings" ></data-area>
 
 `
 })

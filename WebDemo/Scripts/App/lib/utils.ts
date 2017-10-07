@@ -147,7 +147,7 @@ export class ColumnCollection<rowType> {
         for (var i = 0; i < this.items.length; i++) {
             let item = this.items[i];
             result += `
-    {key:"${item.key}"`
+    { key:"${item.key}"`
 
             let addString = (k: string, v: string) => {
                 if (v) {
@@ -159,7 +159,8 @@ export class ColumnCollection<rowType> {
                     result += `, ${k}:${v}`;
                 }
             }
-            addString('caption', item.caption);
+            if (item.caption != makeTitle(item.key))
+                addString('caption', item.caption);
             addString('inputType', item.inputType);
             addBoolean('readonly', item.readonly);
 

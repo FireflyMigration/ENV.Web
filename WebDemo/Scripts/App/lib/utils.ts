@@ -244,11 +244,11 @@ interface dataAreaSettings {
     template: `
 
 <div class="form-horizontal" *ngIf="settings.columns&&settings.columns.currentRow()" >
-    <div class="row">
-        <div class="col-sm-{{12/columns}}"*ngFor="let col of theColumns()">
+    
+        <div class="{{getColumnsClass()}}" *ngFor="let col of theColumns()">
             <div class="form-group {{settings.columns._getColumnClass(map,settings.columns.currentRow())}}" *ngFor="let map of col" >
                 <div class="col-sm-{{labelWidth}}">
-                    <label for="inputEmail3" class="control-label" *ngIf="!map.designMode">{{map.caption}}</label>
+                    <label class="control-label" *ngIf="!map.designMode">{{map.caption}}</label>
                     <column-designer [settings]="settings.columns" [map]="map"></column-designer>
                 </div>
                 <div class="col-sm-{{12-labelWidth}}">
@@ -256,7 +256,6 @@ interface dataAreaSettings {
                 </div>
             </div>
         </div>
-    </div>
 </div>
 
 
@@ -276,6 +275,11 @@ export class DataAreaCompnent implements OnChanges {
             }
         }
 
+
+    }
+    getColumnsClass() {
+        if (this.columns > 1)
+            return "col-sm-" + 12 / this.columns;
     }
 
 
@@ -311,7 +315,7 @@ export class DataAreaCompnent implements OnChanges {
     selector: 'data-control',
     template: `
 <span *ngIf="!settings._getEditable(map)" >{{settings._getColValue(map,record)}}</span>
-<div *ngIf="settings._getEditable(map)" class="form-group " [class.has-error]="settings._getError(map,record)">
+<div *ngIf="settings._getEditable(map)" class="" [class.has-error]="settings._getError(map,record)">
     <div >
         <div [class.input-group]="showDescription()||map.click">
             <div class="input-group-btn" *ngIf="map.click">
@@ -319,7 +323,7 @@ export class DataAreaCompnent implements OnChanges {
             </div>
             <input class="form-control"  [(ngModel)]="record[map.key]" type="{{settings._getColDataType(map)}}" (ngModelChange)="settings._colValueChanged(map,record)" />
             <div class="input-group-addon" *ngIf="showDescription()">{{map.getValue(record)}}</div>
-            </div>
+            
         </div>
     <span class="help-block" *ngIf="settings._getError(map,record)">{{settings._getError(map,record)}}</span>
 </div>`

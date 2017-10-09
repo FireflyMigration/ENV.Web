@@ -54,3 +54,6 @@
 
 .filterButton {
 }
+table input {
+    min-width:75px;
+}

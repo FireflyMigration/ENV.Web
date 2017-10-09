@@ -5,8 +5,8 @@ import * as models from './models';
 @Component({
     template: `
 <h1>Orders</h1>
-<data-grid [settings]="orders"></data-grid>
     
+    <data-grid [settings]="orders"></data-grid>
     
 `
 })
@@ -16,7 +16,7 @@ export class Orders {
 
     customers = new utils.Lookup<models.customer, string>(apiUrl + 'customers');
     orders = new utils.DataSettings<models.order>(apiUrl + "orders", {
-        allowUpdate: false,
+        allowUpdate: true,
         columnSettings: [
             { key: "id" },
             { key: "customerID" },

@@ -15,8 +15,7 @@ import * as models from './models';
 export class Orders {
 
     customers = new utils.Lookup<models.customer, string>(apiUrl + 'customers');
-    orders = new utils.DataSettings<models.order>({
-        restUrl: apiUrl + "orders",
+    orders = new utils.DataSettings<models.order>(apiUrl + "orders", {
         allowUpdate: false,
         columnSettings: [
             { key: "id" },
@@ -35,7 +34,7 @@ export class Orders {
             { key: "shipCountry" },
         ]
     });
-    
+
 
 
 

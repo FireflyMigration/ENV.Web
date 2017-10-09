@@ -574,7 +574,7 @@ export class DataSettings<rowType>  {
 
     currentRowChanged: (r: any) => void;
 
-    constructor(settings?: IDataSettings<rowType>) {
+    constructor(restUrl?:string,settings?: IDataSettings<rowType>) {
 
         if (settings) {
             if (settings.columnKeys)
@@ -595,9 +595,8 @@ export class DataSettings<rowType>  {
             else this.columns.numOfColumnsInGrid = 5;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
-            if (settings.restUrl) {
-                this.restList = new RestList<rowType>(settings.restUrl);
-            } if (settings.rowCssClass)
+            this.restList = new RestList<rowType>(restUrl);
+             if (settings.rowCssClass)
                 this.rowClass = settings.rowCssClass;
             if (settings.onSavingRow)
                 this.onSavingRow = settings.onSavingRow;
@@ -709,7 +708,6 @@ interface IDataSettings<rowType> {
     columnSettings?: ColumnSetting<rowType>[],
     areas?: { [areaKey: string]: ColumnSetting<any>[] },
     columnKeys?: string[],
-    restUrl?: string,
     rowCssClass?: (row: rowType) => string;
     rowButtons?: rowButton<rowType>[],
     get?: getOptions<rowType>,

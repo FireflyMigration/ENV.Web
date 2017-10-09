@@ -17,11 +17,19 @@
 
     <thead>
         <tr>
-            <th *ngFor="let map of settings.columns.getGridColumns()">
+            <th *ngFor="let map of settings.columns.getGridColumns()" class="headerWithFilter">
                 <span *ngIf="!map.designMode" (click)="settings.sort(map.key)">{{map.caption}}</span>
 
 
-
+                <span class="glyphicon glyphicon-filter filterButton" [class.filteredFilterButton]="map._filterData" (click)="settings.columns.showFilterDialog(map)"></span>
+                <div class="filterDialog" *ngIf="settings.columns._shouldShowFilterDialog(map)">
+                    <div class="form-group">
+                        <input type="{{settings.columns._getColDataType(map)}}" class="form-control" [(ngModel)]="map._filterData">
+                    </div>
+                    <button class="btn glyphicon glyphicon-ok btn-success" (click)="settings.columns.filterRows(map)"></button>
+                    <button class="btn glyphicon glyphicon-remove btn-primary" (click)="settings.columns.clearFilter(map)"></button>
+                    
+                </div>
                 <span class="glyphicon glyphicon-chevron-down pull-right" *ngIf="settings.sortedAscending(map.key)"></span>
                 <span class="glyphicon glyphicon-chevron-up pull-right" *ngIf="settings.sortedDescending(map.key)"></span>
                 <column-designer [settings]="settings.columns" [map]="map"></column-designer>

@@ -5,7 +5,7 @@ import { Routes } from '@angular/router';
 
 
 export class ColumnCollection<rowType> {
-    constructor(public currentRow: () => any, private allowUpdate: () => boolean) { }
+    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private reloadRows: () => void) { }
     private settingsByKey = {};
     _optionalKeys() {
         if (!this.currentRow())
@@ -70,6 +70,23 @@ export class ColumnCollection<rowType> {
         this.items.splice(currentIndex, 1);
         this.items.splice(newIndex, 0, col);
         this.colListChanged();
+
+
+    }
+    filterRows(col: FilteredColumnSetting<any>) {
+        col._showFilter = false;
+        this.reloadRows();
+    }
+    clearFilter(col: FilteredColumnSetting<any>) {
+        col._showFilter = false;
+        col._filterData = undefined;
+        this.reloadRows();
+    }
+    _shouldShowFilterDialog(col: FilteredColumnSetting<any>) {
+        return col._showFilter;
+    }
+    showFilterDialog(col: FilteredColumnSetting<any>) {
+        col._showFilter = !col._showFilter;
     }
     deleteCol(col: ColumnSetting<any>) {
         this.items.splice(this.items.indexOf(col), 1);
@@ -210,6 +227,7 @@ export class ColumnCollection<rowType> {
 }
 
 
+
 interface dataAreaSettings {
     columns: ColumnCollection<any>;
 }
@@ -244,15 +262,14 @@ export class DataAreaCompnent implements OnChanges {
         if (this.settings && this.settings.columns) {
             this.settings.columns.onColListChange(() => this.lastCols = undefined);
             let areaSettings = this.settings as DataAreaSettings<any>;
-            if (areaSettings.settings)
-            {
+            if (areaSettings.settings) {
                 if (areaSettings.settings.labelWidth)
                     this.labelWidth = areaSettings.settings.labelWidth;
                 if (areaSettings.settings.numberOfColumnAreas)
                     this.columns = areaSettings.settings.numberOfColumnAreas;
             }
         }
-        
+
     }
 
 
@@ -276,7 +293,7 @@ export class DataAreaCompnent implements OnChanges {
         }
         return this.lastCols;
     }
-    @Input() settings: dataAreaSettings = { columns: new ColumnCollection(() => undefined, () => false) };
+    @Input() settings: dataAreaSettings = { columns: new ColumnCollection(() => undefined, () => false, null) };
     @Input() labelWidth = 4;
     @Input() columns = 1;
 }
@@ -509,8 +526,7 @@ function makeTitle(key: string) {
 }
 
 
-interface IDataAreaSettings<rowType>
-{
+interface IDataAreaSettings<rowType> {
     columnSettings?: ColumnSetting<rowType>[];
     numberOfColumnAreas?: number;
     labelWidth?: number;
@@ -519,8 +535,7 @@ interface IDataAreaSettings<rowType>
 class DataAreaSettings<rowType>
 {
 
-    constructor(public columns: ColumnCollection<rowType>, public settings: IDataAreaSettings<rowType>)
-    {
+    constructor(public columns: ColumnCollection<rowType>, public settings: IDataAreaSettings<rowType>) {
         if (settings.columnSettings)
             columns.add(...settings.columnSettings);
 
@@ -533,9 +548,9 @@ export class DataSettings<rowType>  {
     }
 
     addArea(settings: IDataAreaSettings<rowType>) {
-        let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate);
-        
-        return new DataAreaSettings<rowType>( col,settings);
+        let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => this.getRecords());
+
+        return new DataAreaSettings<rowType>(col, settings);
     }
     currentRow: rowType;
     private setCurrentRow(row: rowType) {
@@ -588,7 +603,7 @@ export class DataSettings<rowType>  {
 
 
     }
-    columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate);
+    columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => this.getRecords());
 
 
 
@@ -643,6 +658,18 @@ export class DataSettings<rowType>  {
             opt.limit = 7;
         if (this.page > 1)
             opt.page = this.page;
+        for (let x of this.columns.items) {
+            let c = <FilteredColumnSetting<any>>x;
+            if (c._filterData != undefined)
+            {
+                if (!opt.isEqualTo)
+                    opt.isEqualTo = <rowType>{};
+                if (opt.isEqualTo[c.key] == undefined)
+                {
+                    opt.isEqualTo[c.key] = c._filterData;
+                }
+            }
+        }
         return this.restList.get(opt).then(() => {
 
 
@@ -725,6 +752,10 @@ interface ColumnSetting<rowType> {
     getValue?: (row: rowType) => any;
     cssClass?: (string | ((row: rowType) => string));
     click?: (row: rowType) => void;
+}
+interface FilteredColumnSetting<rowType> extends ColumnSetting<rowType> {
+    _showFilter?: boolean;
+    _filterData?: any;
 }
 interface rowButtonBase {
 

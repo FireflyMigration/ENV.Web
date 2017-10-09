@@ -26,6 +26,8 @@ export class ColumnCollection<rowType> {
             }
             if (s.key) {
                 let existing: ColumnSetting<rowType> = this.settingsByKey[s.key];
+                if (!s.caption)
+                    s.caption = makeTitle(s.key);
                 if (existing) {
                     if (s.caption)
                         existing.caption = s.caption;

@@ -6,8 +6,8 @@ import * as models from './models';
     template: `
 <h1>Orders</h1>
 <data-grid [settings]="orders"></data-grid>
-    <data-area [settings]="orders" [columns]="2" ></data-area>
-    <data-area [settings]="area1" ></data-area>
+    
+    
 `
 })
 
@@ -17,21 +17,25 @@ export class Orders {
     customers = new utils.Lookup<models.customer, string>(apiUrl + 'customers');
     orders = new utils.DataSettings<models.order>({
         restUrl: apiUrl + "orders",
-        allowUpdate: true,
-        hideDataArea: true
+        allowUpdate: false,
+        columnSettings: [
+            { key: "id" },
+            { key: "customerID" },
+            { key: "employeeID" },
+            { key: "orderDate", inputType: "date" },
+            { key: "requiredDate" },
+            { key: "shippedDate" },
+            { key: "shipVia" },
+            { key: "freight" },
+            { key: "shipName" },
+            { key: "shipAddress" },
+            { key: "shipCity" },
+            { key: "shipRegion" },
+            { key: "shipPostalCode" },
+            { key: "shipCountry" },
+        ]
     });
-    area1 = this.orders.addArea(
-        {
-            labelWidth:2,
-            columnSettings:
-            [{ key: "shipName", caption: "ShipName" },
-            { key: "shipAddress", caption: "ShipAddress" },
-            { key: "shipCity", caption: "ShipCity" },
-            { key: "shipRegion", caption: "Ship Region" },
-            { key: "shipPostalCode", caption: "ShipPostalCode" },
-            { key: "shipCountry", caption: "ShipCountry" }]
-        });
-
+    
 
 
 

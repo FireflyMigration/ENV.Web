@@ -108,9 +108,13 @@ export class ColumnCollection<rowType> {
         return !col.readonly;
     }
     _getColValue(col: ColumnSetting<any>, row: any) {
+        let r;
         if (col.getValue)
-            return col.getValue(row);
-        return row[col.key];
+            r = col.getValue(row);
+        else r = row[col.key];
+        if (col.inputType == "date")
+            r = new Date(r).toLocaleDateString();
+        return r;
     }
     _getColDataType(col: ColumnSetting<any>, row: any) {
         if (col.inputType)
@@ -660,12 +664,10 @@ export class DataSettings<rowType>  {
             opt.page = this.page;
         for (let x of this.columns.items) {
             let c = <FilteredColumnSetting<any>>x;
-            if (c._filterData != undefined)
-            {
+            if (c._filterData != undefined) {
                 if (!opt.isEqualTo)
                     opt.isEqualTo = <rowType>{};
-                if (opt.isEqualTo[c.key] == undefined)
-                {
+                if (opt.isEqualTo[c.key] == undefined) {
                     opt.isEqualTo[c.key] = c._filterData;
                 }
             }

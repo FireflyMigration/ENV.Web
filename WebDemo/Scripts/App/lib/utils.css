@@ -1,0 +1,25 @@
+﻿.columnDesigner {
+    background-color: white;
+    position: absolute;
+    padding: 10px;
+    /* border: 1px; */
+    border-color: gray;
+    border-width: 2px;
+    border-style: solid;
+    z-index: 999999999999;
+    border-radius: 5px;
+    width: 300px;
+}
+
+    .columnDesigner .form-group {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+.designModeButton span {
+    visibility: hidden;
+}
+
+.designModeButton:hover span {
+    visibility: visible
+}

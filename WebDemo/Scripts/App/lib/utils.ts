@@ -319,7 +319,7 @@ export class DataControlComponent {
 @Component({
     selector: 'column-designer',
     template: `
-<div *ngIf="map.designMode">
+<div *ngIf="map.designMode" class="columnDesigner">
     <div class="form-group">
         <input type="text" class="form-control" [(ngModel)]="map.caption">
     </div>
@@ -342,13 +342,19 @@ export class DataControlComponent {
                     
                    
     <div class="form-group">
-        <button class="glyphicon glyphicon-chevron-right  pull-right" (click)="settings.moveCol(map,1)"></button>
-        <button class="glyphicon glyphicon-chevron-left pull-right" (click)="settings.moveCol(map,-1)"></button>
-        <button class="glyphicon glyphicon-trash pull-right" (click)="settings.deleteCol(map)"></button>
-        <button class="glyphicon glyphicon-plus pull-right" (click)="settings.addCol(map)"></button>
+
+        <button class="btn btn-success glyphicon glyphicon-ok pull-left" (click)="settings.designColumn(map)"></button>
+        <div class="btn-group pull-right">
+                <button class="btn btn-danger glyphicon glyphicon-trash " (click)="settings.deleteCol(map)"></button>
+                <button class="btn btn-primary glyphicon glyphicon-plus " (click)="settings.addCol(map)"></button>
+                <button class="btn btn-primary glyphicon glyphicon-chevron-left" (click)="settings.moveCol(map,-1)"></button>
+                <button class="btn btn-primary glyphicon glyphicon-chevron-right" (click)="settings.moveCol(map,1)"></button>
+        </div>
     </div>
 </div>
-<span class="pull-right glyphicon glyphicon-pencil" (click)="settings.designColumn(map)"></span>
+<span class="designModeButton pull-right">
+<span class="glyphicon glyphicon-pencil " (click)="settings.designColumn(map)"></span>
+</span>
 `
 })
 class ColumnDesigner {

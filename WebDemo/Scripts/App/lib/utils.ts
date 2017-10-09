@@ -10,7 +10,14 @@ export class ColumnCollection<rowType> {
     _optionalKeys() {
         if (!this.currentRow())
             return [];
-        return Object.keys(this.currentRow());
+        let r = this.currentRow();
+        let result = [];
+        Object.keys(r).forEach(key => {
+            if (typeof (r[key]) != 'function')
+
+                result.push(key);
+        });
+        return result;
     }
     add(...columns: ColumnSetting<rowType>[]);
     add(...columns: string[]);
@@ -150,13 +157,12 @@ export class ColumnCollection<rowType> {
         if (this.items.length == 0) {
             let r = this.currentRow();
             if (r) {
-                Object.keys(r).forEach(key => {
-                    if (typeof (r[key]) != 'function')
+                this._optionalKeys().forEach(key => {
 
-                        this.items.push({
-                            key: key,
-                            caption: makeTitle(key)
-                        });
+                    this.items.push({
+                        key: key,
+                        caption: makeTitle(key)
+                    });
                 });
 
             }
@@ -580,7 +586,7 @@ export class DataSettings<rowType>  {
 
     currentRowChanged: (r: any) => void;
 
-    constructor(restUrl?:string,settings?: IDataSettings<rowType>) {
+    constructor(restUrl?: string, settings?: IDataSettings<rowType>) {
 
         if (settings) {
             if (settings.columnKeys)
@@ -602,7 +608,7 @@ export class DataSettings<rowType>  {
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
             this.restList = new RestList<rowType>(restUrl);
-             if (settings.rowCssClass)
+            if (settings.rowCssClass)
                 this.rowClass = settings.rowCssClass;
             if (settings.onSavingRow)
                 this.onSavingRow = settings.onSavingRow;

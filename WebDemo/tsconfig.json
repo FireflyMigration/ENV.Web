@@ -1,15 +1,16 @@
 ﻿{
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES5",
     "module": "commonjs",
+    "lib": [ "es6", "dom", "es2015" ],
     "moduleResolution": "node",
     "sourceMap": true,
-    "emitDecoratorMetadata": true, 
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
-    "noImplicitAny": false, 
-  //  "noStrictGenericChecks": true,
+    "noImplicitAny": false,
+    //  "noStrictGenericChecks": true,
     "typeRoots": [
       "node_modules/@types"
     ],

@@ -1,4 +1,5 @@
-﻿export interface category {
+﻿import * as utils from './lib/utils';
+export interface category {
     id?: number;
     categoryName?: string;
     description?: string;
@@ -31,4 +32,16 @@ export interface customer {
     country?: string;
     phone?: string;
     fax?: string;
+}
+export interface shipper {
+    id?: number;
+    companyName?: string;
+    phone?: string;
+}
+
+class shipperSelect extends utils.SelectSettings<shipper,number>
+{ 
+    constructor() {
+        super('dataapi/shippers', s => s.id, s => s.companyName);
+    }
 }

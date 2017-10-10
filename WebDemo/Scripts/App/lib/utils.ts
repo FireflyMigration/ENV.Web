@@ -35,6 +35,59 @@ export class ColumnCollection<rowType> {
                 let existing: ColumnSetting<rowType> = this.settingsByKey[s.key];
                 if (!s.caption)
                     s.caption = makeTitle(s.key);
+                if (s.selectList) {
+                    let orig = s.selectList.items;
+                    let result: selectListItem[] = [];
+                    s.selectList.items = result;
+                    let populateBasedOnArray = (arr: Array<any>) => {
+                        for (let item of arr) {
+                            let type = typeof (item);
+                            if (type == "string" || type == "number")
+                                result.push({ id: item, caption: item });
+                            else {
+                                if (!s.selectList.idKey) {
+                                    if (item['id'])
+                                        s.selectList.idKey = 'id';
+                                    else {
+                                        for (let keyInItem of Object.keys(item)) {
+                                            s.selectList.idKey = keyInItem;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!s.selectList.captionKey) {
+                                    if (item['caption'])
+                                        s.selectList.captionKey = 'caption';
+                                    else {
+                                        for (let keyInItem of Object.keys(item)) {
+                                            if (keyInItem != s.selectList.idKey) {
+                                                s.selectList.captionKey = keyInItem;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                let p = { id: item[s.selectList.idKey], caption: item[s.selectList.captionKey] };
+                                if (!p.caption)
+                                    p.caption = p.id;
+                                result.push(p);
+                            }
+                        }
+                    };
+                    if (typeof (orig) == "string") {
+                        new RestList(orig).get({ limit:5000 }).then(arr => populateBasedOnArray(arr));
+                    }
+                    else if (orig instanceof Array) {
+                        populateBasedOnArray(orig);
+                    } if (orig instanceof RestList) {
+                        orig.get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
+                    } else {
+                        let x = orig as Promise<any>;
+                        if (x.then) {
+                            x.then(arr => populateBasedOnArray(arr));
+                        }
+                    }
+                }
                 if (existing) {
                     if (s.caption)
                         existing.caption = s.caption;
@@ -323,7 +376,7 @@ export class DataAreaCompnent implements OnChanges {
 <span *ngIf="!settings._getEditable(map)" >{{settings._getColValue(map,record)}}</span>
 <div *ngIf="settings._getEditable(map)" class="" [class.has-error]="settings._getError(map,record)">
     <div >
-        <div [class.input-group]="showDescription()||map.click">
+        <div [class.input-group]="showDescription()||map.click" *ngIf="!isSelect()">
             <div class="input-group-btn" *ngIf="map.click">
                 <button type="button" class="btn btn-default" (click)="map.click(record)" > <span class="glyphicon glyphicon-chevron-down"></span></button>
             </div>
@@ -331,7 +384,14 @@ export class DataAreaCompnent implements OnChanges {
             <div class="input-group-addon" *ngIf="showDescription()">{{map.getValue(record)}}</div>
             
         </div>
+        <div *ngIf="isSelect()">
+            <select  class="form-control" [(ngModel)]="record[map.key]" (ngModelChange)="settings._colValueChanged(map,record)" >
+                <option *ngFor="let v of map.selectList.items" value="{{v.id}}">{{v.caption}}</option>
+                
+            </select>
+        </div>
     <span class="help-block" *ngIf="settings._getError(map,record)">{{settings._getError(map,record)}}</span>
+    </div>
 </div>`
 })
 export class DataControlComponent {
@@ -345,7 +405,23 @@ export class DataControlComponent {
     ngOnChanges(): void {
 
     }
+    isSelect() {
+        return this.map.selectList;
+    }
     @Input() settings: ColumnSetting<any>;
+}
+
+
+export interface SelectListOptions {
+
+    items?: selectListItem[] | string[] | any[] | Promise<any> | RestList<any> | string;
+    idKey?: string;
+    captionKey?: string;
+}
+
+export interface selectListItem {
+    id?: any;
+    caption?: any;
 }
 
 
@@ -770,7 +846,9 @@ interface ColumnSetting<rowType> {
     getValue?: (row: rowType) => any;
     cssClass?: (string | ((row: rowType) => string));
     click?: (row: rowType) => void;
+    selectList?: SelectListOptions;
 }
+
 interface FilteredColumnSetting<rowType> extends ColumnSetting<rowType> {
     _showFilter?: boolean;
     _filterData?: any;
@@ -850,6 +928,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
         return myFetch(url.url).then(r => {
             let x: T[] = r;
             this.items = r.map(x => this.map(x));
+            return this.items;
         });
     }
     add(): T {
@@ -955,16 +1034,16 @@ export class Lookup<lookupType, idType_or_MainTableType> {
         if (!options) {
             this.options = (mt, o) => o.isEqualTo = <lookupType><any>{ id: mt };
         }
-        this.categories = new RestList<lookupType>(url);
+        this.restList = new RestList<lookupType>(url);
     }
 
-    categories: RestList<lookupType>;
+    private restList: RestList<lookupType>;
     private cache: {};
 
-    get(r: any): lookupType {
+    get(r: idType_or_MainTableType): lookupType {
         return this.getInternal(r).value;
     }
-    found(r: any): boolean {
+    found(r: idType_or_MainTableType): boolean {
         return this.getInternal(r).found;
     }
 
@@ -980,10 +1059,10 @@ export class Lookup<lookupType, idType_or_MainTableType> {
         } else {
             let res = new lookupRowInfo<lookupType>();
             this.cache[key] = res;
-            this.categories.get(find).then(() => {
+            this.restList.get(find).then(() => {
                 res.loading = false;
-                if (this.categories.items.length > 0) {
-                    res.value = this.categories.items[0];
+                if (this.restList.items.length > 0) {
+                    res.value = this.restList.items[0];
                     res.found = true;
                 }
             });

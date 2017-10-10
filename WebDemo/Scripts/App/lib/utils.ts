@@ -564,7 +564,10 @@ export class DataSettings<rowType>  {
     }
 
     addArea(settings: IDataAreaSettings<rowType>) {
-        let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => this.getRecords());
+        let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => {
+            this.page = 1;
+            this.getRecords();
+        });
 
         return new DataAreaSettings<rowType>(col, settings);
     }
@@ -618,7 +621,10 @@ export class DataSettings<rowType>  {
 
 
     }
-    columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => this.getRecords());
+    columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => {
+        this.page = 1;
+        this.getRecords();
+    });
 
 
 

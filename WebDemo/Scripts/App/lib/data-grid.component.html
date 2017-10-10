@@ -50,7 +50,7 @@
                     <td *ngFor="let map of settings.columns.getGridColumns()" [className]="settings.columns._getColumnClass(map,record)">
                         <data-control [settings]="settings.columns" [map]="map" [record]="record"></data-control>
                     </td>
-                    <td *ngIf="rowButtons.length>0">
+                    <td *ngIf="rowButtons.length>0" style="white-space:nowrap">
                         <span *ngFor="let b of rowButtons">
                             <button class="btn {{b.cssClass(record)}}" *ngIf="b.visible(record)" (click)="b.click(record)">{{b.name}}</button>
                         </span>

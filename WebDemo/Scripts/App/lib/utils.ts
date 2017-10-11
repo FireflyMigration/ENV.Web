@@ -413,8 +413,14 @@ export class DataControlComponent {
 declare var $;
 export class SelectPopup<rowType> {
     constructor(
-        private modalList: DataSettings<rowType>) {
+        private modalList: DataSettings<rowType>, settings?:SelectPopupSettings) {
         this.modalId = makeid();
+        if (settings) {
+            if (settings.title)
+                this.title = settings.title;
+            if (settings.searchColumnKey)
+                this.searchColumn = settings.searchColumnKey;
+        }
         if (!this.title)
             this.title = "Select "+modalList.caption;
     }
@@ -428,7 +434,7 @@ export class SelectPopup<rowType> {
         });
     }
     private searchText: string;
-    private searchColumn: string = 'companyName';
+    private searchColumn: string;
 
     private modalId: string = "myModal";
     private onSelect: (selected: rowType) => void;
@@ -437,6 +443,15 @@ export class SelectPopup<rowType> {
         $("#" + this.modalId).modal('hide');
     }
     show(onSelect: (selected: rowType) => void) {
+        if (!this.searchColumn) {
+            for (let col of this.modalList.columns.items) {
+                if (col.key != "id" && (!col.inputType || col.inputType=="text"))
+                {
+                    this.searchColumn = col.key;
+                    break;
+                }
+            }
+        }
         this.onSelect = onSelect;
         $("#" + this.modalId).modal('show');
     }
@@ -447,6 +462,10 @@ export class SelectPopup<rowType> {
         }
         return this.searchColumn;
     }
+}
+interface SelectPopupSettings {
+    title?: string;
+    searchColumnKey?: string;
 }
 
 function makeid() {

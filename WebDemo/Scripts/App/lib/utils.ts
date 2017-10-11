@@ -416,6 +416,16 @@ export class SelectPopup<rowType> {
         private modalList: DataSettings<rowType>) {
         this.modalId = makeid();
     }
+    private search() {
+        let s = {};
+        s[this.searchColumn] = this.searchText + "*";
+
+        this.modalList.get({
+            isEqualTo: <rowType>s
+        });
+    }
+    private searchText: string;
+    private searchColumn: string = 'companyName';
 
     private modalId: string = "myModal";
     private onSelect: (selected: rowType) => void;
@@ -426,6 +436,13 @@ export class SelectPopup<rowType> {
     show(onSelect: (selected: rowType) => void) {
         this.onSelect = onSelect;
         $("#" + this.modalId).modal('show');
+    }
+    searchColumnCaption() {
+        for (let item of this.modalList.columns.items) {
+            if (item.key == this.searchColumn)
+                return item.caption;
+        }
+        return this.searchColumn;
     }
 }
 
@@ -452,6 +469,12 @@ function makeid() {
       </div>
       <div class="modal-body">
 <div class="row">
+<div class="col-sm-10">
+        <div class="form-group">
+    <label >Search</label>
+    <input type="search" class="form-control" placeholder="{{settings.searchColumnCaption()}}"[(ngModel)]="settings.searchText" (ngModelChange)="settings.search()">
+  </div>
+</div>
         <data-grid [settings]="settings.modalList"></data-grid>
 </div>
       </div>
@@ -464,7 +487,7 @@ function makeid() {
 </div>`
 })
 export class SelectPopupComponent {
-    @Input() settings: ColumnSetting<any>;
+    @Input() settings: SelectPopup<any>;
 
     
 

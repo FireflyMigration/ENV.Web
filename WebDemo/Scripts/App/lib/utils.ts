@@ -5,7 +5,14 @@ import { Routes } from '@angular/router';
 
 
 export class ColumnCollection<rowType> {
-    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private _filterData: (f: rowType) => void) { }
+    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private _filterData: (f: rowType) => void) {
+
+        if (this.allowDesignMode == undefined) {
+            if (location.search)
+                if (location.search.toLowerCase().indexOf('design=y') >= 0)
+                    this.allowDesignMode = true;
+        }
+    }
     private settingsByKey = {};
     _optionalKeys() {
         if (!this.currentRow())
@@ -19,6 +26,7 @@ export class ColumnCollection<rowType> {
         });
         return result;
     }
+    private allowDesignMode: boolean;
     add(...columns: ColumnSetting<rowType>[]);
     add(...columns: string[]);
     add(...columns: any[]) {
@@ -580,7 +588,7 @@ export interface dropDownItem {
     </div>
 </div>
 <span class="designModeButton pull-right">
-<span class="glyphicon glyphicon-pencil " (click)="settings.designColumn(map)"></span>
+<span class="glyphicon glyphicon-pencil " (click)="settings.designColumn(map)" *ngIf="settings.allowDesignMode"></span>
 </span>
 `
 })

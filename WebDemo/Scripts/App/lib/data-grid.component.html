@@ -1,6 +1,6 @@
 ﻿
     <div class="pull-right" *ngIf="settings&&records">
-        <button class="btn glyphicon glyphicon-pencil btn-primary" (click)="designMode=!designMode"></button>
+        <button class="btn glyphicon glyphicon-pencil btn-primary" *ngIf="settings.columns.allowDesignMode" (click)="designMode=!designMode"></button>
         <button class="btn glyphicon glyphicon-chevron-left" *ngIf="settings.page>1" (click)="settings.previousPage()"></button>
         <button class="btn glyphicon glyphicon-chevron-right" *ngIf="records.items.length>0" (click)="settings.nextPage()"></button>
         <button class="btn btn-primary glyphicon glyphicon-plus" *ngIf="settings.allowUpdate &&settings.allowInsert" (click)="records.add()"></button>
@@ -8,9 +8,9 @@
 
     <div *ngIf="designMode">
 
-<pre>
-{{settings.columns.columnSettingsTypeScript()}}
-</pre>
+        <pre>
+        {{settings.columns.columnSettingsTypeScript()}}
+        </pre>
 
 
     </div>

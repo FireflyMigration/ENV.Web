@@ -5,7 +5,7 @@ import { Routes } from '@angular/router';
 
 
 export class ColumnCollection<rowType> {
-    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private reloadRows: () => void) { }
+    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private _filterData: (f: rowType) => void) { }
     private settingsByKey = {};
     _optionalKeys() {
         if (!this.currentRow())
@@ -75,7 +75,7 @@ export class ColumnCollection<rowType> {
                         }
                     };
                     if (typeof (orig) == "string") {
-                        new RestList(orig).get({ limit:5000 }).then(arr => populateBasedOnArray(arr));
+                        new RestList(orig).get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
                     }
                     else if (orig instanceof Array) {
                         populateBasedOnArray(orig);
@@ -135,14 +135,15 @@ export class ColumnCollection<rowType> {
 
 
     }
+    userFilter: rowType = {} as rowType;
     filterRows(col: FilteredColumnSetting<any>) {
         col._showFilter = false;
-        this.reloadRows();
+        this._filterData(this.userFilter);
     }
     clearFilter(col: FilteredColumnSetting<any>) {
         col._showFilter = false;
-        col._filterData = undefined;
-        this.reloadRows();
+        this.userFilter[col.key] = undefined;
+        this._filterData(this.userFilter);
     }
     _shouldShowFilterDialog(col: FilteredColumnSetting<any>) {
         return col._showFilter;
@@ -176,14 +177,13 @@ export class ColumnCollection<rowType> {
         else r = row[col.key];
         if (col.inputType == "date")
             r = new Date(r).toLocaleDateString();
-        if (col.dropDown)
-        {
+        if (col.dropDown) {
             if (col.dropDown.items instanceof Array)
                 for (let item of col.dropDown.items) {
                     let i: dropDownItem = item;
                     if (i.id == r)
                         return i.caption;
-            }
+                }
         }
         return r;
     }
@@ -382,8 +382,8 @@ export class DataAreaCompnent implements OnChanges {
 @Component({
     selector: 'data-control',
     template: `
-<span *ngIf="!settings._getEditable(map)" >{{settings._getColValue(map,record)}}</span>
-<div *ngIf="settings._getEditable(map)" class="" [class.has-error]="settings._getError(map,record)">
+<span *ngIf="!_getEditable()" >{{settings._getColValue(map,record)}}</span>
+<div *ngIf="_getEditable()" class="" [class.has-error]="settings._getError(map,record)">
     <div >
         <div [class.input-group]="showDescription()||map.click" *ngIf="!isSelect()">
             <div class="input-group-btn" *ngIf="map.click">
@@ -406,23 +406,27 @@ export class DataAreaCompnent implements OnChanges {
 export class DataControlComponent {
     @Input() map: ColumnSetting<any>;
     @Input() record: any;
-
+    @Input() notReadonly: false;
     showDescription() {
         return this.map.key && this.map.getValue;
     }
-
+    _getEditable() {
+        if (this.notReadonly)
+            return true;
+        return this.settings._getEditable(this.map);
+    }
     ngOnChanges(): void {
 
     }
     isSelect() {
         return this.map.dropDown;
     }
-    @Input() settings: ColumnSetting<any>;
+    @Input() settings: ColumnCollection<any>;
 }
 declare var $;
 export class SelectPopup<rowType> {
     constructor(
-        private modalList: DataSettings<rowType>, settings?:SelectPopupSettings) {
+        private modalList: DataSettings<rowType>, settings?: SelectPopupSettings) {
         this.modalId = makeid();
         if (settings) {
             if (settings.title)
@@ -431,9 +435,9 @@ export class SelectPopup<rowType> {
                 this.searchColumn = settings.searchColumnKey;
         }
         if (!this.title)
-            this.title = "Select "+modalList.caption;
+            this.title = "Select " + modalList.caption;
     }
-    private title:string;
+    private title: string;
     private search() {
         let s = {};
         s[this.searchColumn] = this.searchText + "*";
@@ -454,8 +458,7 @@ export class SelectPopup<rowType> {
     show(onSelect: (selected: rowType) => void) {
         if (!this.searchColumn) {
             for (let col of this.modalList.columns.items) {
-                if (col.key != "id" && (!col.inputType || col.inputType=="text"))
-                {
+                if (col.key != "id" && (!col.inputType || col.inputType == "text")) {
                     this.searchColumn = col.key;
                     break;
                 }
@@ -520,7 +523,7 @@ function makeid() {
 export class SelectPopupComponent {
     @Input() settings: SelectPopup<any>;
 
-    
+
 
 }
 
@@ -755,7 +758,8 @@ export class DataSettings<rowType>  {
     }
 
     addArea(settings: IDataAreaSettings<rowType>) {
-        let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => {
+        let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
+            this.extraFitler = userFilter;
             this.page = 1;
             this.getRecords();
         });
@@ -812,12 +816,13 @@ export class DataSettings<rowType>  {
 
         }
         if (!this.caption && restUrl) {
-            this.caption = makeTitle(restUrl.substring(restUrl.lastIndexOf('/')+1));
+            this.caption = makeTitle(restUrl.substring(restUrl.lastIndexOf('/') + 1));
         }
 
 
     }
-    columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, () => {
+    columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
+        this.extraFitler = userFilter;
         this.page = 1;
         this.getRecords();
     });
@@ -864,6 +869,7 @@ export class DataSettings<rowType>  {
         return this.getOptions.orderBy == key && this.getOptions.orderByDir && this.getOptions.orderByDir.toLowerCase().startsWith('d');
     }
 
+    private extraFitler: rowType;
 
     private getOptions: getOptions<rowType>;
     getRecords() {
@@ -875,16 +881,15 @@ export class DataSettings<rowType>  {
             opt.limit = 7;
         if (this.page > 1)
             opt.page = this.page;
-        for (let x of this.columns.items) {
-            let c = <FilteredColumnSetting<any>>x;
-            if (c._filterData != undefined) {
-                if (!opt.isEqualTo)
-                    opt.isEqualTo = <rowType>{};
-                if (opt.isEqualTo[c.key] == undefined) {
-                    opt.isEqualTo[c.key] = c._filterData;
-                }
+        if (this.extraFitler) {
+            if (!opt.isEqualTo)
+                opt.isEqualTo = <rowType>{};
+            for (let val in this.extraFitler) {
+                if (opt.isEqualTo[val] == undefined)
+                    opt.isEqualTo[val] = this.extraFitler[val];
             }
         }
+
         return this.restList.get(opt).then(() => {
 
 
@@ -972,7 +977,6 @@ interface ColumnSetting<rowType> {
 
 interface FilteredColumnSetting<rowType> extends ColumnSetting<rowType> {
     _showFilter?: boolean;
-    _filterData?: any;
 }
 interface rowButtonBase {
 
@@ -1170,6 +1174,7 @@ export class Lookup<lookupType, idType_or_MainTableType> {
 
     private getInternal(r: any): lookupRowInfo<lookupType> {
 
+
         let find: getOptions<lookupType> = {};
         this.options(<idType_or_MainTableType>r, find);
         let key = JSON.stringify(find);
@@ -1180,13 +1185,18 @@ export class Lookup<lookupType, idType_or_MainTableType> {
         } else {
             let res = new lookupRowInfo<lookupType>();
             this.cache[key] = res;
-            this.restList.get(find).then(() => {
+            if (r == undefined) {
                 res.loading = false;
-                if (this.restList.items.length > 0) {
-                    res.value = this.restList.items[0];
-                    res.found = true;
-                }
-            });
+                res.found = false;
+                return res;
+            } else
+                this.restList.get(find).then(() => {
+                    res.loading = false;
+                    if (this.restList.items.length > 0) {
+                        res.value = this.restList.items[0];
+                        res.found = true;
+                    }
+                });
             return res;
         }
 

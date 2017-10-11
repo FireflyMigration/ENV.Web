@@ -24,9 +24,9 @@
 
 
                         <span class="glyphicon glyphicon-filter filterButton" [class.filteredFilterButton]="map._filterData" (click)="settings.columns.showFilterDialog(map)"></span>
-                        <div class="filterDialog" *ngIf="settings.columns._shouldShowFilterDialog(map)">
+                        <div class="filterDialog col-sm-4" *ngIf="settings.columns._shouldShowFilterDialog(map)">
                             <div class="form-group">
-                                <input type="{{settings.columns._getColDataType(map)}}" class="form-control" [(ngModel)]="map._filterData">
+                                <data-control [settings]="settings.columns" [map]="map" [record]="settings.columns.userFilter" [notReadonly]="true"></data-control>
                             </div>
                             <button class="btn glyphicon glyphicon-ok btn-success" (click)="settings.columns.filterRows(map)"></button>
                             <button class="btn glyphicon glyphicon-remove btn-primary" (click)="settings.columns.clearFilter(map)"></button>

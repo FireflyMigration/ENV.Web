@@ -37,7 +37,7 @@ export class ColumnCollection<rowType> {
                     s.caption = makeTitle(s.key);
                 if (s.dropDown) {
                     let orig = s.dropDown.items;
-                    let result: selectListItem[] = [];
+                    let result: dropDownItem[] = [];
                     s.dropDown.items = result;
                     let populateBasedOnArray = (arr: Array<any>) => {
                         for (let item of arr) {
@@ -176,6 +176,15 @@ export class ColumnCollection<rowType> {
         else r = row[col.key];
         if (col.inputType == "date")
             r = new Date(r).toLocaleDateString();
+        if (col.dropDown)
+        {
+            if (col.dropDown.items instanceof Array)
+                for (let item of col.dropDown.items) {
+                    let i: dropDownItem = item;
+                    if (i.id == r)
+                        return i.caption;
+            }
+        }
         return r;
     }
     _getColDataType(col: ColumnSetting<any>, row: any) {
@@ -386,7 +395,7 @@ export class DataAreaCompnent implements OnChanges {
         </div>
         <div *ngIf="isSelect()">
             <select  class="form-control" [(ngModel)]="record[map.key]" (ngModelChange)="settings._colValueChanged(map,record)" >
-                <option *ngFor="let v of map.selectList.items" value="{{v.id}}">{{v.caption}}</option>
+                <option *ngFor="let v of map.dropDown.items" value="{{v.id}}">{{v.caption}}</option>
                 
             </select>
         </div>
@@ -520,12 +529,12 @@ export class SelectPopupComponent {
 
 export interface dropDownOptions {
 
-    items?: selectListItem[] | string[] | any[] | Promise<any> | RestList<any> | string;
+    items?: dropDownItem[] | string[] | any[] | Promise<any> | RestList<any> | string;
     idKey?: string;
     captionKey?: string;
 }
 
-export interface selectListItem {
+export interface dropDownItem {
     id?: any;
     caption?: any;
 }

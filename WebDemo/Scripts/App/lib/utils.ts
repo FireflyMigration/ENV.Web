@@ -35,39 +35,39 @@ export class ColumnCollection<rowType> {
                 let existing: ColumnSetting<rowType> = this.settingsByKey[s.key];
                 if (!s.caption)
                     s.caption = makeTitle(s.key);
-                if (s.selectList) {
-                    let orig = s.selectList.items;
+                if (s.dropDown) {
+                    let orig = s.dropDown.items;
                     let result: selectListItem[] = [];
-                    s.selectList.items = result;
+                    s.dropDown.items = result;
                     let populateBasedOnArray = (arr: Array<any>) => {
                         for (let item of arr) {
                             let type = typeof (item);
                             if (type == "string" || type == "number")
                                 result.push({ id: item, caption: item });
                             else {
-                                if (!s.selectList.idKey) {
+                                if (!s.dropDown.idKey) {
                                     if (item['id'])
-                                        s.selectList.idKey = 'id';
+                                        s.dropDown.idKey = 'id';
                                     else {
                                         for (let keyInItem of Object.keys(item)) {
-                                            s.selectList.idKey = keyInItem;
+                                            s.dropDown.idKey = keyInItem;
                                             break;
                                         }
                                     }
                                 }
-                                if (!s.selectList.captionKey) {
+                                if (!s.dropDown.captionKey) {
                                     if (item['caption'])
-                                        s.selectList.captionKey = 'caption';
+                                        s.dropDown.captionKey = 'caption';
                                     else {
                                         for (let keyInItem of Object.keys(item)) {
-                                            if (keyInItem != s.selectList.idKey) {
-                                                s.selectList.captionKey = keyInItem;
+                                            if (keyInItem != s.dropDown.idKey) {
+                                                s.dropDown.captionKey = keyInItem;
                                                 break;
                                             }
                                         }
                                     }
                                 }
-                                let p = { id: item[s.selectList.idKey], caption: item[s.selectList.captionKey] };
+                                let p = { id: item[s.dropDown.idKey], caption: item[s.dropDown.captionKey] };
                                 if (!p.caption)
                                     p.caption = p.id;
                                 result.push(p);
@@ -406,13 +406,74 @@ export class DataControlComponent {
 
     }
     isSelect() {
-        return this.map.selectList;
+        return this.map.dropDown;
     }
     @Input() settings: ColumnSetting<any>;
 }
+declare var $;
+export class SelectPopup<rowType> {
+    constructor(
+        private modalList: DataSettings<rowType>) {
+        this.modalId = makeid();
+    }
+
+    private modalId: string = "myModal";
+    private onSelect: (selected: rowType) => void;
+    modalSelect() {
+        this.onSelect(this.modalList.currentRow);
+        $("#" + this.modalId).modal('hide');
+    }
+    show(onSelect: (selected: rowType) => void) {
+        this.onSelect = onSelect;
+        $("#" + this.modalId).modal('show');
+    }
+}
+
+function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < 5; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+
+@Component({
+    selector: 'select-popup',
+    template: `
+<!-- Modal -->
+<div class="modal fade" id="{{settings.modalId}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Select</h4>
+      </div>
+      <div class="modal-body">
+<div class="row">
+        <data-grid [settings]="settings.modalList"></data-grid>
+</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" (click)="settings.modalSelect()">Select</button>
+      </div>
+    </div>
+  </div>
+</div>`
+})
+export class SelectPopupComponent {
+    @Input() settings: ColumnSetting<any>;
+
+    
+
+}
 
 
-export interface SelectListOptions {
+
+
+export interface dropDownOptions {
 
     items?: selectListItem[] | string[] | any[] | Promise<any> | RestList<any> | string;
     idKey?: string;
@@ -846,7 +907,7 @@ interface ColumnSetting<rowType> {
     getValue?: (row: rowType) => any;
     cssClass?: (string | ((row: rowType) => string));
     click?: (row: rowType) => void;
-    selectList?: SelectListOptions;
+    dropDown?: dropDownOptions;
 }
 
 interface FilteredColumnSetting<rowType> extends ColumnSetting<rowType> {
@@ -1087,7 +1148,7 @@ export class AppHelper {
     ];
     menues: MenuEntry[] = [];
 
-    Components: Type<any>[] = [DataGridComponent, DataAreaCompnent, DataControlComponent, ColumnDesigner];
+    Components: Type<any>[] = [DataGridComponent, DataAreaCompnent, DataControlComponent, ColumnDesigner, SelectPopupComponent];
 
     Register(component: Type<any>) {
         this.Components.push(component);

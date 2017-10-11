@@ -39,9 +39,3 @@ export interface shipper {
     phone?: string;
 }
 
-class shipperSelect extends utils.SelectSettings<shipper,number>
-{ 
-    constructor() {
-        super('dataapi/shippers', s => s.id, s => s.companyName);
-    }
-}

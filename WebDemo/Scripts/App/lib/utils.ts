@@ -622,7 +622,7 @@ export class DataGridComponent implements OnChanges {
 
     }
     rowClicked(row) {
-        this.settings.currentRow = row;
+        this.settings.setCurrentRow(row);
     }
 
     page = 1;
@@ -767,9 +767,9 @@ export class DataSettings<rowType>  {
         return new DataAreaSettings<rowType>(col, settings);
     }
     currentRow: rowType;
-    private setCurrentRow(row: rowType) {
+    setCurrentRow(row: rowType) {
         this.currentRow = row;
-        this.currentRowChanged(row);
+        
     }
     allowUpdate = false;
     allowInsert = false;
@@ -782,7 +782,6 @@ export class DataSettings<rowType>  {
     rowClass?: (row: any) => string;
     onSavingRow?: (s: ModelState<any>) => void;
 
-    currentRowChanged: (r: any) => void;
     caption: string;
     constructor(restUrl?: string, settings?: IDataSettings<rowType>) {
 
@@ -806,6 +805,11 @@ export class DataSettings<rowType>  {
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
             this.restList = new RestList<rowType>(restUrl);
+            this.restList._rowReplacedListeners.push((old, curr)=>{
+                if (old == this.currentRow)
+                    this.setCurrentRow(curr);
+            });
+
             if (settings.rowCssClass)
                 this.rowClass = settings.rowCssClass;
             if (settings.onSavingRow)
@@ -1008,6 +1012,8 @@ export class RestList<T extends hasId> implements Iterable<T>{
     constructor(private url: string) {
 
     }
+    _rowReplacedListeners: ((oldRow: T, newRow: T) => void)[] = [];
+    
     private map(item: T): restListItem & T {
 
         let x = <any>item;
@@ -1018,7 +1024,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
             if ((<any>item).newRow)
                 this.items.splice(this.items.indexOf(x), 1);
             else
-                this.items[this.items.indexOf(<any>item)] = this.map(JSON.parse(orig));
+                this.replaceRow(item, JSON.parse(orig));
         }
 
         x.save = () => this.save(id, x);
@@ -1061,6 +1067,11 @@ export class RestList<T extends hasId> implements Iterable<T>{
         this.items.push(this.map(x as any as T));
         return x as any as T;
     }
+    replaceRow(originalRow, newRow) {
+        newRow = this.map(newRow);
+        this.items[this.items.indexOf(originalRow)] = newRow;
+        this._rowReplacedListeners.forEach(x => x(originalRow, newRow));
+    }
     private save(id: any, c: restListItem & T) {
 
         let nr: newItemInList = c as any as newItemInList;
@@ -1072,8 +1083,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
                 },
                 body: JSON.stringify(c)
             }).then(response => {
-
-                this.items[this.items.indexOf(c)] = this.map(response);
+                this.replaceRow(c, response);
             });
         else {
 
@@ -1085,7 +1095,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
                 body: JSON.stringify(c)
             }).then(response => {
 
-                this.items[this.items.indexOf(c)] = this.map(response);
+                this.replaceRow(c, response);
             });
         }
     }

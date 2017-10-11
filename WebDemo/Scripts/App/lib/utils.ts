@@ -415,7 +415,10 @@ export class SelectPopup<rowType> {
     constructor(
         private modalList: DataSettings<rowType>) {
         this.modalId = makeid();
+        if (!this.title)
+            this.title = "Select "+modalList.caption;
     }
+    private title:string;
     private search() {
         let s = {};
         s[this.searchColumn] = this.searchText + "*";
@@ -465,7 +468,7 @@ function makeid() {
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Select</h4>
+        <h4 class="modal-title" id="myModalLabel">{{settings.title}}</h4>
       </div>
       <div class="modal-body">
 <div class="row">
@@ -748,7 +751,7 @@ export class DataSettings<rowType>  {
     onSavingRow?: (s: ModelState<any>) => void;
 
     currentRowChanged: (r: any) => void;
-
+    caption: string;
     constructor(restUrl?: string, settings?: IDataSettings<rowType>) {
 
         if (settings) {
@@ -775,8 +778,13 @@ export class DataSettings<rowType>  {
                 this.rowClass = settings.rowCssClass;
             if (settings.onSavingRow)
                 this.onSavingRow = settings.onSavingRow;
+            if (settings.caption)
+                this.caption = settings.caption;
             this.getOptions = settings.get;
 
+        }
+        if (!this.caption && restUrl) {
+            this.caption = makeTitle(restUrl.substring(restUrl.lastIndexOf('/')+1));
         }
 
 
@@ -891,6 +899,7 @@ interface IDataSettings<rowType> {
     get?: getOptions<rowType>,
     onSavingRow?: (s: ModelState<rowType>) => void;
     numOfColumnsInGrid?: number;
+    caption?: string;
 }
 class ModelState<rowType> {
     row: rowType;

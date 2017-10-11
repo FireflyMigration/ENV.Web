@@ -543,10 +543,10 @@ namespace ENV.Web
                             x.Add(DataItem.FixValueTypes(item.Value));
                         }
                         return x.ToString();
-
                     });
                     Columns.Add(_bp.From.PrimaryKeyColumns);
                     Columns.Add(_idColumn);
+                    DenyUpdate(_idColumn);
 
 
                 }

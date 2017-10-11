@@ -38,4 +38,3 @@ export interface shipper {
     companyName?: string;
     phone?: string;
 }
-

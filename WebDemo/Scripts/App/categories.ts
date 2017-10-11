@@ -7,7 +7,7 @@ import * as models from './models';
     template: `
 <h1>Categories</h1>
 <data-grid [settings]="dataSettings"> </data-grid>
-<data-area [settings]="dataSettings" ></data-area>
+
 
 `
 })
@@ -18,16 +18,9 @@ export class Categories {
     dataSettings = new utils.DataSettings<models.category>(apiUrl + 'categories',{
         allowDelete:true,
         columnKeys: ["id", "categoryName", "categoryDescription"],
-        columnSettings: [{
-            key: "categoryName",
-            getValue: c => c.categoryName + c.categoryName,
-            click: c => c.categoryName += " 1"
-        }, {
-                key: "id",
-                click: o => alert(o.id)
-        }],
-
-        allowUpdate:true
+        allowUpdate: true,
+        allowInsert: true,
+        numOfColumnsInGrid:2
     });
 
 }

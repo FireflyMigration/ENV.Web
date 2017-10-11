@@ -12,7 +12,7 @@ namespace WebDemo.Controllers
         static DataApiHelper _dataApi = new DataApiHelper();
         static DataApiController()
         {
-            _dataApi.Register(typeof(Northwind.Models.Categories));
+            _dataApi.Register(typeof(Northwind.Models.Categories),true);
             _dataApi.Register(typeof(Northwind.Models.Orders));
             _dataApi.Register(typeof(Northwind.Models.Customers));
             _dataApi.Register(typeof(Northwind.Models.Shippers));

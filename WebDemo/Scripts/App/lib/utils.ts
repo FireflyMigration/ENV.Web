@@ -800,7 +800,7 @@ export class DataSettings<rowType>  {
             if (settings.hideDataArea)
                 this.hideDataArea = settings.hideDataArea;
             if (settings.numOfColumnsInGrid)
-                this.columns.numOfColumnsInGrid;
+                this.columns.numOfColumnsInGrid = settings.numOfColumnsInGrid;
             else this.columns.numOfColumnsInGrid = 5;
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;

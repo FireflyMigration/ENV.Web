@@ -1022,15 +1022,19 @@ export class RestList<T extends hasId> implements Iterable<T>{
         x.__wasChanged = () => orig != JSON.stringify(item) || (<any>item).newRow;
         x.reset = () => {
             if ((<any>item).newRow)
+            {
                 this.items.splice(this.items.indexOf(x), 1);
+                this._rowReplacedListeners.forEach(y => y(x, undefined));
+            }
             else
                 this.replaceRow(item, JSON.parse(orig));
         }
 
         x.save = () => this.save(id, x);
         x.delete = () => {
-            return fetch(this.url + '/' + id, { method: 'delete' }).then(onSuccess, onError).then(() => {
+            return fetch(this.url + '/' + id, { method: 'delete' }).then(() => { }, onError).then(() => {
                 this.items.splice(this.items.indexOf(x), 1);
+                this._rowReplacedListeners.forEach(y => y(x, undefined));
             });
 
         }

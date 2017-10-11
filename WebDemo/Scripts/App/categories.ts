@@ -17,9 +17,10 @@ export class Categories {
 
     dataSettings = new utils.DataSettings<models.category>(apiUrl + 'categories',{
         allowDelete:true,
-        columnKeys: ["id", "categoryName", "categoryDescription"],
+        columnKeys: ["id", "categoryName", "description"],
         allowUpdate: true,
         allowInsert: true,
+        get: { limit:100 },
         numOfColumnsInGrid:2
     });
 

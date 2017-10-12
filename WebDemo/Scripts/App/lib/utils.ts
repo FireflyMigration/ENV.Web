@@ -587,6 +587,11 @@ export interface dropDownItem {
             <option value="checkbox">checkbox</option>
         </select>
     </div>
+    
+    <div class="checkbox">
+
+        Readonly <input type="checkbox"  [(ngModel)]="map.readonly">
+    </div>
                     
                    
     <div class="form-group">
@@ -773,7 +778,7 @@ class DataAreaSettings<rowType>
     }
 }
 
-export class Lookup<lookupType > {
+export class Lookup<lookupType> {
 
     constructor(url: string) {
         this.restList = new RestList<lookupType>(url);
@@ -826,12 +831,12 @@ export class Lookup<lookupType > {
 
 export class DataSettings<rowType>  {
 
-    
+
 
     private popupSettings: SelectPopup<rowType>;
     show(onSelect: (selected: rowType) => void) {
-        
-            
+
+
         this.popupSettings.show(onSelect);
     }
 

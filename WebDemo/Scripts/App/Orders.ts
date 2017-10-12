@@ -20,11 +20,11 @@ export class Orders {
     shippers = new models.shippers();
 
     orders = new models.orders({
-     //   allowUpdate: true,
+           allowUpdate: true,
         allowInsert: true,
         allowDelete: true,
         hideDataArea: false,
-        get: { limit: 3 },
+        
         onEnterRow: (r) => {
             this.orderDetails.get({ isEqualTo: { orderID: r.id } });
         },
@@ -39,14 +39,8 @@ export class Orders {
                 getValue: r => this.customers.lookup.get({ id: r.customerID }).companyName
             },
             { key: "orderDate", inputType: "date", defaultValue: r => utils.dateToDataString(new Date()) },
-
             {
-                key: "shipVia",
-                dropDown: {
-                    source: this.shippers
-                },
-                cssClass: 'col-sm-3'
-
+                key: "shipVia", dropDown: { source: this.shippers }, cssClass: 'col-sm-3'
             },
             { key: "requiredDate", inputType: "date" },
             { key: "shippedDate", inputType: "date" },
@@ -82,9 +76,8 @@ export class Orders {
 
         ]
     });
-    constructor()
-    {
-        
+    constructor() {
+
     }
 }
 

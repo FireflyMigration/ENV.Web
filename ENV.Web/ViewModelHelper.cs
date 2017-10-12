@@ -244,7 +244,7 @@ namespace ENV.Web
                 else
                     tw.WriteLine(",");
                 tw.Write("   {key:\"" + item.Key + "\", caption:\"" + item.Caption.Replace("\"", "\"\"") + "\"");
-                if (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf))
+                if (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf,_ignoreUpdateOf,_bp.From))
                     tw.Write(", readonly:true");
                 if (item.getInputType() != "text")
                     tw.Write(", inputType:\"" + item.getInputType() + "\"");
@@ -316,7 +316,7 @@ namespace ENV.Web
                 i.Set("Caption", item.Caption);
                 i.Set("Type", item.getJsonType());
                 i.Set("Input Type", item.getInputType());
-                i.Set("Readonly", item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf) ? "true" : "");
+                i.Set("Readonly", item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf,_ignoreUpdateOf,_bp.From) ? "true" : "");
 
             }
         }
@@ -361,7 +361,7 @@ namespace ENV.Web
         {
             foreach (var c in _columns)
             {
-                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState,_bp.From);
+                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState,_bp.From,_ignoreUpdateOf);
             }
             try
             {
@@ -447,23 +447,23 @@ namespace ENV.Web
                 x.Set(_key, _getValueFromRow());
             }
 
-            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state,Firefly.Box.Data.Entity updatebleEntity)
+            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state,Firefly.Box.Data.Entity updatebleEntity, HashSet<ColumnBase> ignoreUpdateOf)
             {
-                if (_col.Entity == null || _col.Entity == updatebleEntity)
+                if ((_col.Entity == null || _col.Entity == updatebleEntity)&&!ignoreUpdateOf.Contains(_col))
                 {
                     _setValueBasedOnDataItem(item[_key]);
 
                     if (!Comparer.Equal(_col.OriginalValue, _col.Value))
                     {
-                        if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf))
+                        if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf,ignoreUpdateOf,updatebleEntity))
                             state.AddError(_col, "cannot be updated");
                     }
                 }
             }
 
-            internal bool IsReadOnly(HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf)
+            internal bool IsReadOnly(HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf,HashSet<ColumnBase> ignoreUpdateOf, Firefly.Box.Data.Entity updatebleEntity)
             {
-                return denyUpdateOf.Contains(_col) || onlyAllowUpdateOf.Count > 0 && !onlyAllowUpdateOf.Contains(_col) || _col.DbReadOnly;
+                return denyUpdateOf.Contains(_col) || onlyAllowUpdateOf.Count > 0 && !onlyAllowUpdateOf.Contains(_col) || _col.DbReadOnly||ignoreUpdateOf.Contains(_col)||(_col.Entity!=null&&_col.Entity!=updatebleEntity);
             }
 
             internal string getJsonType()
@@ -501,12 +501,20 @@ namespace ENV.Web
             MapColumns(columns);
         }
         HashSet<ColumnBase> _denyUpdateColumns = new HashSet<ColumnBase>(),
-            _onlyAllowUpdateOf = new HashSet<ColumnBase>();
+            _onlyAllowUpdateOf = new HashSet<ColumnBase>(),
+            _ignoreUpdateOf = new HashSet<ColumnBase>();
         internal protected void DenyUpdate(params ColumnBase[] columns)
         {
             foreach (var item in columns)
             {
                 _denyUpdateColumns.Add(item);
+            }
+        }
+        internal protected void IgnoreUpdateOf(params ColumnBase[] columns)
+        {
+            foreach (var item in columns)
+            {
+                _ignoreUpdateOf.Add(item);
             }
         }
         internal protected void OnlyAllowUpdateOf(params ColumnBase[] columns)
@@ -546,7 +554,7 @@ namespace ENV.Web
                     });
                     Columns.Add(_bp.From.PrimaryKeyColumns);
                     Columns.Add(_idColumn);
-                    DenyUpdate(_idColumn);
+                    IgnoreUpdateOf(_idColumn);
 
 
                 }

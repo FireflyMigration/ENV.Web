@@ -20,7 +20,7 @@ namespace WebDemo.ViewModels
         protected override void OnSavingRow()
         {
             if (Activity == Activities.Insert)
-                Orders.OrderID.Value = Orders.Max(Orders.OrderID);
+                Orders.OrderID.Value = Orders.Max(Orders.OrderID)+1;
         }
 
     }

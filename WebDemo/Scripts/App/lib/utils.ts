@@ -82,17 +82,20 @@ export class ColumnCollection<rowType> {
                             }
                         }
                     };
-                    if (typeof (orig) == "string") {
-                        new RestList(orig).get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
-                    }
-                    else if (orig instanceof Array) {
+                    if (orig instanceof Array) {
                         populateBasedOnArray(orig);
-                    } if (orig instanceof RestList) {
-                        orig.get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
-                    } else {
-                        let x = orig as Promise<any>;
-                        if (x.then) {
-                            x.then(arr => populateBasedOnArray(arr));
+                    }
+                    if (s.dropDown.source) {
+                        if (typeof (s.dropDown.source) == "string") {
+                            new RestList(s.dropDown.source).get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
+                        }
+                        else if (s.dropDown.source instanceof RestList) {
+                            s.dropDown.source.get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
+                        } else {
+                            let x = s.dropDown.source as Promise<any>;
+                            if (x.then) {
+                                x.then(arr => populateBasedOnArray(arr));
+                            }
                         }
                     }
                 }
@@ -279,7 +282,7 @@ export class ColumnCollection<rowType> {
     items: ColumnSetting<any>[] = [];
     private gridColumns: ColumnSetting<any>[];
     private nonGridColumns: ColumnSetting<any>[];
-    numOfColumnsInGrid = 0;
+    numOfColumnsInGrid = 5;
 
     private _lastColumnCount;
     private _lastNumOfColumnsInGrid;
@@ -540,7 +543,8 @@ export class SelectPopupComponent {
 
 export interface dropDownOptions {
 
-    items?: dropDownItem[] | string[] | any[] | Promise<any> | RestList<any> | string;
+    items?: dropDownItem[] | string[] | any[];
+    source?: Promise<any> | RestList<any> | string;
     idKey?: string;
     captionKey?: string;
 }
@@ -642,7 +646,7 @@ export class DataGridComponent implements OnChanges {
             return;
         this.page--;
     }
-
+    
     catchErrors(what: any, r: any) {
         what.catch(e => e.json().then(e => {
             console.log(e);
@@ -711,7 +715,7 @@ export class DataGridComponent implements OnChanges {
         if (this.settings.allowDelete)
             this.addButton({
                 name: '',
-                visible: (r) => r.newRow == undefined,
+                visible: (r) => !isNewRow(r),
                 click: r => this.catchErrors(r.delete(), r),
                 cssClass: "btn-danger glyphicon glyphicon-trash"
             });
@@ -764,6 +768,12 @@ export class DataSettings<rowType>  {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
+    addNewRow() {
+        let r = this.restList.add();
+        if (this.onNewRow(r))
+            this.onNewRow(r);
+        this.setCurrentRow(r);
+    }
 
     addArea(settings: IDataAreaSettings<rowType>) {
         let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
@@ -777,6 +787,9 @@ export class DataSettings<rowType>  {
     currentRow: rowType;
     setCurrentRow(row: rowType) {
         this.currentRow = row;
+        if (this.onEnterRow&&row) {
+            this.onEnterRow(row);
+        }
         
     }
     allowUpdate = false;
@@ -789,10 +802,16 @@ export class DataSettings<rowType>  {
 
     rowClass?: (row: any) => string;
     onSavingRow?: (s: ModelState<any>) => void;
+    onEnterRow: (row: rowType) => void;
+    onNewRow: (row: rowType) => void;
 
     caption: string;
     constructor(restUrl?: string, settings?: IDataSettings<rowType>) {
-
+        this.restList = new RestList<rowType>(restUrl);
+        this.restList._rowReplacedListeners.push((old, curr) => {
+            if (old == this.currentRow)
+                this.setCurrentRow(curr);
+        });
         if (settings) {
             if (settings.columnKeys)
                 this.columns.add(...settings.columnKeys);
@@ -809,19 +828,19 @@ export class DataSettings<rowType>  {
                 this.hideDataArea = settings.hideDataArea;
             if (settings.numOfColumnsInGrid)
                 this.columns.numOfColumnsInGrid = settings.numOfColumnsInGrid;
-            else this.columns.numOfColumnsInGrid = 5;
+            
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
-            this.restList = new RestList<rowType>(restUrl);
-            this.restList._rowReplacedListeners.push((old, curr)=>{
-                if (old == this.currentRow)
-                    this.setCurrentRow(curr);
-            });
+            
 
             if (settings.rowCssClass)
                 this.rowClass = settings.rowCssClass;
             if (settings.onSavingRow)
                 this.onSavingRow = settings.onSavingRow;
+            if (settings.onEnterRow)
+                this.onEnterRow = settings.onEnterRow;
+            if (settings.onNewRow)
+                this.onNewRow = settings.onNewRow;
             if (settings.caption)
                 this.caption = settings.caption;
             this.getOptions = settings.get;
@@ -906,11 +925,11 @@ export class DataSettings<rowType>  {
 
 
             if (this.restList.items.length == 0)
-                this.currentRow = undefined;
+                this.setCurrentRow( undefined);
             else {
 
 
-                this.currentRow = this.restList.items[0];
+                this.setCurrentRow( this.restList.items[0]);
                 this.columns.autoGenerateColumnsBasedOnData();
             }
             return this.restList;
@@ -936,6 +955,7 @@ interface IDataSettings<rowType> {
     allowInsert?: boolean,
     allowDelete?: boolean,
     hideDataArea?: boolean,
+    autoGet?: boolean;
     columnSettings?: ColumnSetting<rowType>[],
     areas?: { [areaKey: string]: ColumnSetting<any>[] },
     columnKeys?: string[],
@@ -943,8 +963,11 @@ interface IDataSettings<rowType> {
     rowButtons?: rowButton<rowType>[],
     get?: getOptions<rowType>,
     onSavingRow?: (s: ModelState<rowType>) => void;
+    onEnterRow?: (r: rowType) => void;
+    onNewRow?: (r: rowType) => void;
     numOfColumnsInGrid?: number;
     caption?: string;
+    
 }
 class ModelState<rowType> {
     row: rowType;
@@ -1021,15 +1044,15 @@ export class RestList<T extends hasId> implements Iterable<T>{
 
     }
     _rowReplacedListeners: ((oldRow: T, newRow: T) => void)[] = [];
-    
+
     private map(item: T): restListItem & T {
 
         let x = <any>item;
         let id = x.id;
         let orig = JSON.stringify(item);
-        x.__wasChanged = () => orig != JSON.stringify(item) || (<any>item).newRow;
+        x.__wasChanged = () => orig != JSON.stringify(item) || isNewRow(item);
         x.reset = () => {
-            if ((<any>item).newRow)
+            if (isNewRow(item))
             {
                 this.items.splice(this.items.indexOf(x), 1);
                 this._rowReplacedListeners.forEach(y => y(x, undefined));
@@ -1086,8 +1109,8 @@ export class RestList<T extends hasId> implements Iterable<T>{
     }
     private save(id: any, c: restListItem & T) {
 
-        let nr: newItemInList = c as any as newItemInList;
-        if (nr.newRow)
+
+        if (isNewRow( c))
             return myFetch(this.url, {
                 method: 'post',
                 headers: {
@@ -1263,11 +1286,33 @@ interface MenuEntry {
     text: string
 }
 export function getDayOfWeek(date: string) {
-    return new Date(date).getDay();
+    return  dateFromDataString(date).getDay();
 }
 export function getDayOfWeekName(date: string) {
-    return new Date(date).toLocaleDateString("en-us", { weekday: "long" });
+    return  dateFromDataString(date).toLocaleDateString("en-us", { weekday: "long" });
 }
+export function dateFromDataString(date: string)
+{
+    let from = date.split('-');
+    return new Date(+from[2],+from[1] - 1, +from[0]);
+}
+export function dateToDataString(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
 
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+function isNewRow(r: any) {
+    if (r) {
+        let nr: newItemInList = r as any as newItemInList;
+        return (nr.newRow)
+    }
+    return false;
+}
 
 

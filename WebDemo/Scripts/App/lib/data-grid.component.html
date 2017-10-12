@@ -3,18 +3,18 @@
         <button class="btn glyphicon glyphicon-pencil btn-primary" *ngIf="settings.columns.allowDesignMode" (click)="designMode=!designMode"></button>
         <button class="btn glyphicon glyphicon-chevron-left" *ngIf="settings.page>1" (click)="settings.previousPage()"></button>
         <button class="btn glyphicon glyphicon-chevron-right" *ngIf="records.items.length>0" (click)="settings.nextPage()"></button>
-        <button class="btn btn-primary glyphicon glyphicon-plus" *ngIf="settings.allowUpdate &&settings.allowInsert" (click)="records.add()"></button>
+        <button class="btn btn-primary glyphicon glyphicon-plus" *ngIf="settings.allowUpdate &&settings.allowInsert" (click)="settings.addNewRow()"></button>
     </div>
 
     <div *ngIf="designMode">
 
-        <pre>
-        {{settings.columns.columnSettingsTypeScript()}}
-        </pre>
+<pre>
+{{settings.columns.columnSettingsTypeScript()}}
+</pre>
 
 
     </div>
-    <div class="table-responsive  col-sm-12" style="min-height:300px">
+    <div class="table-responsive  col-sm-12" style="min-height:200px">
         <table class="table table-bordered table-responsive table-condensed table-hover" *ngIf="settings">
 
             <thead>

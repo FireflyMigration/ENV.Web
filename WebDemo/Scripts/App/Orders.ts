@@ -9,6 +9,7 @@ import * as models from './models';
     <data-grid [settings]="orders"></data-grid>
     <select-popup [settings]="custList"> </select-popup>
     <select-popup [settings]="shipList"> </select-popup>
+    <data-grid [settings]="orderDetails" *ngIf="orders.currentRow&&orders.currentRow.id>0" ></data-grid>
 `
 })
 
@@ -20,7 +21,15 @@ export class Orders {
 
     orders = new utils.DataSettings<models.order>(apiUrl + "orders", {
         allowUpdate: true,
+        allowInsert: true,
+        allowDelete: true,
         hideDataArea: false,
+        get: { limit:3 },
+        onEnterRow: (r) => {
+            this.orderDetails.get({ isEqualTo: { orderID: r.id } });
+        },
+        onNewRow: r => { r.orderDate = utils.dateToDataString(new Date()); },
+        numOfColumnsInGrid: 4,
         columnSettings: [
             { key: "id" },
             {
@@ -30,17 +39,17 @@ export class Orders {
                 },
                 getValue: r => this.customers.get(r.customerID).companyName
             },
+            { key: "orderDate", inputType: "date" },
 
             {
                 key: "shipVia",
                 dropDown: {
-                    items: apiUrl + "shippers"
+                    source: apiUrl + "shippers"
                 },
-                readonly:true
+                cssClass: 'col-sm-3'
+
             },
-            { key: "employeeID" },
-            { key: "orderDate" },
-            { key: "requiredDate" },
+            { key: "requiredDate", inputType: "date" },
             { key: "shippedDate", inputType: "date" },
             { key: "freight" },
             { key: "shipName" },
@@ -49,6 +58,23 @@ export class Orders {
             { key: "shipRegion" },
             { key: "shipPostalCode" },
             { key: "shipCountry" },
+        ]
+    });
+    orderDetails = new utils.DataSettings<models.orderDetail>(apiUrl + "orderdetails", {
+        allowDelete: true,
+        allowInsert: true,
+        allowUpdate: true,
+        onNewRow: (r) => {
+            r.orderID = this.orders.currentRow.id;
+        },
+        get: { isEqualTo: 20 },
+        columnSettings: [
+
+            { key: "productID", caption: "Product", dropDown: { source: apiUrl + "products" } },
+            { key: "unitPrice" },
+            { key: "quantity" },
+            { key: "discount" }
+
         ]
     });
 

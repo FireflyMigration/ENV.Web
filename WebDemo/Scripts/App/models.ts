@@ -38,3 +38,23 @@ export interface shipper {
     companyName?: string;
     phone?: string;
 }
+export interface orderDetail {
+    orderID?: number;
+    productID?: number;
+    unitPrice?: number;
+    quantity?: number;
+    discount?: number;
+    id?: string;
+}
+export interface product {
+    id?: number;
+    productName?: string;
+    supplierID?: number;
+    categoryID?: number;
+    quantityPerUnit?: string;
+    unitPrice?: number;
+    unitsInStock?: number;
+    unitsOnOrder?: number;
+    reorderLevel?: number;
+    discontinued?: boolean;
+}

@@ -10,7 +10,7 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": false,
-    //  "noStrictGenericChecks": true,
+      "noStrictGenericChecks": true,
     "typeRoots": [
       "node_modules/@types"
     ],

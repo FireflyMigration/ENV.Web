@@ -20,7 +20,7 @@ export class Orders {
     shippers = new models.shippers();
 
     orders = new models.orders({
-        allowUpdate: true,
+     //   allowUpdate: true,
         allowInsert: true,
         allowDelete: true,
         hideDataArea: false,

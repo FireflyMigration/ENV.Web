@@ -930,7 +930,7 @@ export class DataSettings<rowType>  {
         if (!this.caption && restUrl) {
             this.caption = makeTitle(restUrl.substring(restUrl.lastIndexOf('/') + 1));
         }
-        this.popupSettings = new SelectPopup(this, settings);
+        this.popupSettings = new SelectPopup(this);
     }
     columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
         this.extraFitler = userFilter;

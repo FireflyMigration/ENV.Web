@@ -993,10 +993,14 @@ export class DataSettings<rowType>  {
     sortedAscending(key: string) {
         if (!this.getOptions)
             return false;
+        if (!key || key == '')
+            return false;
         return this.getOptions.orderBy == key && !this.getOptions.orderByDir;
     }
     sortedDescending(key: string) {
         if (!this.getOptions)
+            return false;
+        if (!key || key == '')
             return false;
         return this.getOptions.orderBy == key && this.getOptions.orderByDir && this.getOptions.orderByDir.toLowerCase().startsWith('d');
     }

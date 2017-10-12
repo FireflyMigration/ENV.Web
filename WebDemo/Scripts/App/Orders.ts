@@ -21,7 +21,7 @@ export class Orders {
         allowUpdate: true,
         allowInsert: true,
         allowDelete: true,
-        get: {limit:3}
+        get: {limit:3},
         onEnterRow: (r) => {
             this.orderDetails.get({ isEqualTo: { orderID: r.id } });
         },
@@ -60,9 +60,15 @@ export class Orders {
                 onUserChangedValue: async r => r.unitPrice = (await this.products.lookup.whenGet({ id: r.productID })).unitPrice
             },
             { key: "unitPrice" },
-            { key: "quantity" },
-            { key: "discount" }
+            { key: "quantity", defaultValue:r=>1 },
+            { caption: "Total", getValue: r => (r.unitPrice * r.quantity).toLocaleString() }
         ]
     });
+    getOrderTotal()
+    {
+        let total = 0;
+        this.orderDetails.items.forEach(o => total += o.unitPrice * o.quantity);
+        return total;
+    }
 }
 

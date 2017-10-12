@@ -37,7 +37,7 @@ export class Orders {
                 click: r => {
                     this.custList.show(c => r.customerID = c.id);
                 },
-                getValue: asbr => this.customers.get(r.customerID).companyName
+                getValue: r => this.customers.get(r.customerID).companyName
             },
             { key: "orderDate", inputType: "date", defaultValue: r => utils.dateToDataString(new Date()) },
 

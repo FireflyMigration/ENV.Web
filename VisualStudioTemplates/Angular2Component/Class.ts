@@ -9,7 +9,4 @@ import * as models from './models';
 })
 export class $safeitemrootname$  {
 
-   
-
 }
-const apiUrl = '/dataApi/';

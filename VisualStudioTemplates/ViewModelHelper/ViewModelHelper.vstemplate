@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
-    <Name>ViewModelHelper</Name>
-    <Description>ViewModelHelper</Description>
-    <Icon>ViewModelHelper.ico</Icon>
+    <Name>ViewModel</Name>
+    <Description>ViewModel</Description>
+    <Icon>ViewModel.ico</Icon>
     <TemplateID>b7fdd76d-4d19-4d5e-8a3f-951af5e385a8</TemplateID>
     <ProjectType>CSharp</ProjectType>
     <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>

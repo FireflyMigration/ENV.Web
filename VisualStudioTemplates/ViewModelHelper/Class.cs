@@ -7,7 +7,7 @@ using ENV.Web;
 
 namespace $rootnamespace$
 {
-	class $safeitemrootname$ : ViewModelHelper
+	class $safeitemrootname$ : ViewModel
 	{
         public $safeitemrootname$()
         {

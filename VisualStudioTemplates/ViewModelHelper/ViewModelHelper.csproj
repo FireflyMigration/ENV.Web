@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Class.cs" />
-    <None Include="ViewModelHelper.ico" />
+    <None Include="ViewModel.ico" />
   </ItemGroup>
   <ItemGroup>
     <VSTemplate Include="ViewModelHelper.vstemplate">

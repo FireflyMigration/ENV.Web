@@ -89,6 +89,9 @@ export class ColumnCollection<rowType> {
                         if (typeof (s.dropDown.source) == "string") {
                             new RestList(s.dropDown.source).get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
                         }
+                        else if (s.dropDown.source instanceof DataSettings) {
+                            s.dropDown.source.get({ limit: 5000 }).then(arr => populateBasedOnArray(arr.items));
+                        }
                         else if (s.dropDown.source instanceof RestList) {
                             s.dropDown.source.get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
                         } else {
@@ -960,7 +963,7 @@ export class DataSettings<rowType>  {
     get(options: getOptions<rowType>) {
         this.getOptions = options;
         this.page = 1;
-        this.getRecords();
+        return this.getRecords();
     }
     sort(key: string) {
         if (!this.getOptions)

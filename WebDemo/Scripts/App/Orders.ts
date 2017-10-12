@@ -16,6 +16,7 @@ import * as models from './models';
 @Injectable()
 export class Orders {
     customers = new utils.Lookup<models.customer, string>(apiUrl + 'customers');
+    products = new utils.Lookup<models.product, number>(apiUrl + "products");
     shipList = new utils.SelectPopup(new utils.DataSettings<models.shipper>(apiUrl + "shippers", {}));
     custList = new utils.SelectPopup(new utils.DataSettings<models.customer>(apiUrl + "customers", {}), { searchColumnKey: 'contactName' });
 
@@ -36,7 +37,7 @@ export class Orders {
                 click: r => {
                     this.custList.show(c => r.customerID = c.id);
                 },
-                getValue: r => this.customers.get(r.customerID).companyName
+                getValue: asbr => this.customers.get(r.customerID).companyName
             },
             { key: "orderDate", inputType: "date", defaultValue: r => utils.dateToDataString(new Date()) },
 
@@ -69,8 +70,12 @@ export class Orders {
         get: { isEqualTo: 20 },
         columnSettings: [
 
-            { key: "productID", caption: "Product", dropDown: { source: apiUrl + "products" } },
-            { key: "unitPrice" },
+            {
+                key: "productID", caption: "Product", dropDown: { source: apiUrl + "products" },
+                onUserChangedValue: async r => r.unitPrice = (await this.products.whenGet(r.productID)).unitPrice
+            },
+            { key: "unitPrice", getValue: r => this.products.get(r.productID).unitPrice },
+
             { key: "quantity" },
             { key: "discount" }
 

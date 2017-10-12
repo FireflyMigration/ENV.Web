@@ -114,9 +114,9 @@ export class ColumnCollection<rowType> {
                         existing.click = s.click;
                     if (s.defaultValue)
                         existing.defaultValue = s.defaultValue;
-                    if (s.userChangedValue)
-                        existing.userChangedValue = s.userChangedValue;
-                    
+                    if (s.onUserChangedValue)
+                        existing.onUserChangedValue = s.onUserChangedValue;
+
 
                 }
                 else {
@@ -283,8 +283,8 @@ export class ColumnCollection<rowType> {
             let m = <ModelState<any>>r.__modelState();
             m.modelState[col.key] = undefined;
         }
-        if (col.userChangedValue)
-            col.userChangedValue(r);
+        if (col.onUserChangedValue)
+            col.onUserChangedValue(r);
 
     }
     items: ColumnSetting<any>[] = [];
@@ -654,7 +654,7 @@ export class DataGridComponent implements OnChanges {
             return;
         this.page--;
     }
-    
+
     catchErrors(what: any, r: any) {
         what.catch(e => e.json().then(e => {
             console.log(e);
@@ -790,7 +790,7 @@ export class DataSettings<rowType>  {
             this.onNewRow(r);
         this.setCurrentRow(r);
     }
-    
+
     addArea(settings: IDataAreaSettings<rowType>) {
         let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
             this.extraFitler = userFilter;
@@ -803,10 +803,10 @@ export class DataSettings<rowType>  {
     currentRow: rowType;
     setCurrentRow(row: rowType) {
         this.currentRow = row;
-        if (this.onEnterRow&&row) {
+        if (this.onEnterRow && row) {
             this.onEnterRow(row);
         }
-        
+
     }
     allowUpdate = false;
     allowInsert = false;
@@ -844,10 +844,10 @@ export class DataSettings<rowType>  {
                 this.hideDataArea = settings.hideDataArea;
             if (settings.numOfColumnsInGrid)
                 this.columns.numOfColumnsInGrid = settings.numOfColumnsInGrid;
-            
+
             if (settings.rowButtons)
                 this.buttons = settings.rowButtons;
-            
+
 
             if (settings.rowCssClass)
                 this.rowClass = settings.rowCssClass;
@@ -941,11 +941,11 @@ export class DataSettings<rowType>  {
 
 
             if (this.restList.items.length == 0)
-                this.setCurrentRow( undefined);
+                this.setCurrentRow(undefined);
             else {
 
 
-                this.setCurrentRow( this.restList.items[0]);
+                this.setCurrentRow(this.restList.items[0]);
                 this.columns.autoGenerateColumnsBasedOnData();
             }
             return this.restList;
@@ -983,7 +983,7 @@ interface IDataSettings<rowType> {
     onNewRow?: (r: rowType) => void;
     numOfColumnsInGrid?: number;
     caption?: string;
-    
+
 }
 class ModelState<rowType> {
     row: rowType;
@@ -1023,7 +1023,7 @@ interface ColumnSetting<rowType> {
     getValue?: (row: rowType) => any;
     cssClass?: (string | ((row: rowType) => string));
     defaultValue?: (row: rowType) => any;
-    userChangedValue?: (row: rowType) => void;
+    onUserChangedValue?: (row: rowType) => void;
     click?: (row: rowType) => void;
     dropDown?: dropDownOptions;
 }
@@ -1070,8 +1070,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
         let orig = JSON.stringify(item);
         x.__wasChanged = () => orig != JSON.stringify(item) || isNewRow(item);
         x.reset = () => {
-            if (isNewRow(item))
-            {
+            if (isNewRow(item)) {
                 this.items.splice(this.items.indexOf(x), 1);
                 this._rowReplacedListeners.forEach(y => y(x, undefined));
             }
@@ -1128,7 +1127,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
     private save(id: any, c: restListItem & T) {
 
 
-        if (isNewRow( c))
+        if (isNewRow(c))
             return myFetch(this.url, {
                 method: 'post',
                 headers: {
@@ -1235,9 +1234,7 @@ export class Lookup<lookupType, idType_or_MainTableType> {
         return this.getInternal(r).found;
     }
 
-    private getInternal(r: any): lookupRowInfo<lookupType> {
-
-
+    private getInternal(r: idType_or_MainTableType): lookupRowInfo<lookupType> {
         let find: getOptions<lookupType> = {};
         this.options(<idType_or_MainTableType>r, find);
         let key = JSON.stringify(find);
@@ -1253,16 +1250,20 @@ export class Lookup<lookupType, idType_or_MainTableType> {
                 res.found = false;
                 return res;
             } else
-                this.restList.get(find).then(() => {
+                res.promise =  this.restList.get(find).then(() => {
                     res.loading = false;
                     if (this.restList.items.length > 0) {
                         res.value = this.restList.items[0];
                         res.found = true;
                     }
+                    return res;
                 });
             return res;
         }
-
+        
+    }
+    whenGet(r: idType_or_MainTableType) {
+        return this.getInternal(r).promise.then(r=>r.value);
     }
 }
 
@@ -1270,6 +1271,7 @@ class lookupRowInfo<type> {
     found = false;
     loading = true;
     value: type = {} as type;
+    promise: Promise<lookupRowInfo<type>>
 
 }
 export class AppHelper {
@@ -1304,15 +1306,14 @@ interface MenuEntry {
     text: string
 }
 export function getDayOfWeek(date: string) {
-    return  dateFromDataString(date).getDay();
+    return dateFromDataString(date).getDay();
 }
 export function getDayOfWeekName(date: string) {
-    return  dateFromDataString(date).toLocaleDateString("en-us", { weekday: "long" });
+    return dateFromDataString(date).toLocaleDateString("en-us", { weekday: "long" });
 }
-export function dateFromDataString(date: string)
-{
+export function dateFromDataString(date: string) {
     let from = date.split('-');
-    return new Date(+from[2],+from[1] - 1, +from[0]);
+    return new Date(+from[2], +from[1] - 1, +from[0]);
 }
 export function dateToDataString(date) {
     var d = new Date(date),

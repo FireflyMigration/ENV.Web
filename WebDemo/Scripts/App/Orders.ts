@@ -2,13 +2,12 @@
 import * as utils from './lib/utils';
 import * as models from './models';
 
-
 @Component({
     template: `
 <h1>Orders</h1>
     <data-grid [settings]="orders"></data-grid>
     <select-popup [settings]="customers"> </select-popup>
-    
+<h2 class="col-sm-12">Order Details</h2>
     <data-grid [settings]="orderDetails" *ngIf="orders.currentRow&&orders.currentRow.id>0" ></data-grid>
 `
 })
@@ -18,13 +17,11 @@ export class Orders {
     customers = new models.customers();
     products = new models.products();
     shippers = new models.shippers();
-
     orders = new models.orders({
-           allowUpdate: true,
+        allowUpdate: true,
         allowInsert: true,
         allowDelete: true,
-        hideDataArea: false,
-        
+        get: {limit:3}
         onEnterRow: (r) => {
             this.orderDetails.get({ isEqualTo: { orderID: r.id } });
         },
@@ -44,17 +41,10 @@ export class Orders {
             },
             { key: "requiredDate", inputType: "date" },
             { key: "shippedDate", inputType: "date" },
-            { key: "freight" },
-            { key: "shipName" },
             { key: "shipAddress" },
             { key: "shipCity" },
-            { key: "shipRegion" },
-            { key: "shipPostalCode" },
-            { key: "shipCountry" },
         ]
     });
-
-
     orderDetails = new models.orderDetails({
         allowDelete: true,
         allowInsert: true,
@@ -70,14 +60,9 @@ export class Orders {
                 onUserChangedValue: async r => r.unitPrice = (await this.products.lookup.whenGet({ id: r.productID })).unitPrice
             },
             { key: "unitPrice" },
-
             { key: "quantity" },
             { key: "discount" }
-
         ]
     });
-    constructor() {
-
-    }
 }
 

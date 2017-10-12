@@ -798,8 +798,21 @@ export class Lookup<lookupType> {
     }
 
     private getInternal(filter: lookupType): lookupRowInfo<lookupType> {
+        if (filter) {
+            let found = false;
+            for (let member in filter) {
+                if (filter[member] != undefined)
+                    found = true;
+            }
+            if (!found)
+                filter = undefined;
+        }
         let find: getOptions<lookupType> = {};
         find.isEqualTo = filter;
+
+
+
+
         let key = JSON.stringify(find);
         if (this.cache == undefined)
             this.cache = {};
@@ -857,7 +870,7 @@ export class DataSettings<rowType>  {
 
             }
         });
-        if (this.onNewRow(r))
+        if (this.onNewRow)
             this.onNewRow(r);
         this.setCurrentRow(r);
     }

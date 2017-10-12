@@ -205,13 +205,13 @@ namespace ENV.Web
     }");
             tw.WriteLine("}");
         }
-        public void CreateTypeScriptInterface(TextWriter tw, string name,string url)
+        public void CreateTypeScriptInterface(TextWriter tw, string name, string url)
         {
-            
+
 
             var singular = NameFixer.MakeSingular(name);
-            
-            
+
+
             tw.WriteLine($@"export class {name} extends utils.DataSettings&lt;{singular}&gt;{{
     constructor(settings?: utils.IDataSettings&lt;{singular}&gt;) {{
         super('{url}', settings);
@@ -254,7 +254,7 @@ namespace ENV.Web
                 else
                     tw.WriteLine(",");
                 tw.Write("   {key:\"" + item.Key + "\", caption:\"" + item.Caption.Replace("\"", "\"\"") + "\"");
-                if (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf,_ignoreUpdateOf,_bp.From))
+                if (item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf, _ignoreUpdateOf, _bp.From))
                     tw.Write(", readonly:true");
                 if (item.getInputType() != "text")
                     tw.Write(", inputType:\"" + item.getInputType() + "\"");
@@ -326,7 +326,7 @@ namespace ENV.Web
                 i.Set("Caption", item.Caption);
                 i.Set("Type", item.getJsonType());
                 i.Set("Input Type", item.getInputType());
-                i.Set("Readonly", item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf,_ignoreUpdateOf,_bp.From) ? "true" : "");
+                i.Set("Readonly", item.IsReadOnly(_denyUpdateColumns, _onlyAllowUpdateOf, _ignoreUpdateOf, _bp.From) ? "true" : "");
 
             }
         }
@@ -371,7 +371,7 @@ namespace ENV.Web
         {
             foreach (var c in _columns)
             {
-                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState,_bp.From,_ignoreUpdateOf);
+                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState, _bp.From, _ignoreUpdateOf);
             }
             try
             {
@@ -457,23 +457,23 @@ namespace ENV.Web
                 x.Set(_key, _getValueFromRow());
             }
 
-            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state,Firefly.Box.Data.Entity updatebleEntity, HashSet<ColumnBase> ignoreUpdateOf)
+            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state, Firefly.Box.Data.Entity updatebleEntity, HashSet<ColumnBase> ignoreUpdateOf)
             {
-                if ((_col.Entity == null || _col.Entity == updatebleEntity)&&!ignoreUpdateOf.Contains(_col))
+                if ((_col.Entity == null || _col.Entity == updatebleEntity) && !ignoreUpdateOf.Contains(_col))
                 {
                     _setValueBasedOnDataItem(item[_key]);
 
                     if (!Comparer.Equal(_col.OriginalValue, _col.Value))
                     {
-                        if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf,ignoreUpdateOf,updatebleEntity))
+                        if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf, ignoreUpdateOf, updatebleEntity))
                             state.AddError(_col, "cannot be updated");
                     }
                 }
             }
 
-            internal bool IsReadOnly(HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf,HashSet<ColumnBase> ignoreUpdateOf, Firefly.Box.Data.Entity updatebleEntity)
+            internal bool IsReadOnly(HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, HashSet<ColumnBase> ignoreUpdateOf, Firefly.Box.Data.Entity updatebleEntity)
             {
-                return denyUpdateOf.Contains(_col) || onlyAllowUpdateOf.Count > 0 && !onlyAllowUpdateOf.Contains(_col) || _col.DbReadOnly||ignoreUpdateOf.Contains(_col)||(_col.Entity!=null&&_col.Entity!=updatebleEntity);
+                return denyUpdateOf.Contains(_col) || onlyAllowUpdateOf.Count > 0 && !onlyAllowUpdateOf.Contains(_col) || _col.DbReadOnly || ignoreUpdateOf.Contains(_col) || (_col.Entity != null && _col.Entity != updatebleEntity);
             }
 
             internal string getJsonType()
@@ -790,7 +790,7 @@ namespace ENV.Web
             response.Write(ToJson());
         }
 
-        public void Required(Data.NumberColumn col,string message= "Required")
+        public void Required(Data.NumberColumn col, string message = "Required")
         {
             Validate(col, v => !Number.IsNullOrZero(v), message);
         }
@@ -807,6 +807,14 @@ namespace ENV.Web
             Validate(col, v => !Time.IsNullOrStartOfDay(v), message);
         }
 
+        public void Exists<T>(TypedColumnBase<T> column, TypedColumnBase<T> equalToColumn, string message = "Was not found in {0}")
+        {
+            if (!(equalToColumn.Entity is ENV.Data.Entity))
+                throw new InvalidOperationException("Invalid entity type");
+
+            Validate(column, v => ((ENV.Data.Entity)equalToColumn.Entity).Contains(equalToColumn.IsEqualTo(column))
+            , string.Format(message, equalToColumn.Entity.Caption));
+        }
     }
 
 }

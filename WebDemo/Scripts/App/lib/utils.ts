@@ -728,7 +728,7 @@ export class DataGridComponent implements OnChanges {
                 click: r => this.catchErrors(r.delete(), r),
                 cssClass: "btn-danger glyphicon glyphicon-trash"
             });
-        for (let b of this.settings.buttons) {
+        for (let b of this.settings._buttons) {
             this.addButton(b);
         }
         if (!this.records) {
@@ -839,7 +839,7 @@ export class DataSettings<rowType>  {
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
-    addNewRow() {
+    private addNewRow() {
         let r = this.restList.add();
         this.columns.items.forEach(item => {
             if (item.defaultValue) {
@@ -874,10 +874,10 @@ export class DataSettings<rowType>  {
     allowUpdate = false;
     allowInsert = false;
     allowDelete = false;
-    hideDataArea = false;
+    private hideDataArea = false;
 
 
-    buttons: rowButtonBase[] = [];
+    _buttons: rowButtonBase[] = [];
 
     rowClass?: (row: any) => string;
     onSavingRow?: (s: ModelState<any>) => void;
@@ -892,7 +892,7 @@ export class DataSettings<rowType>  {
             if (old == this.currentRow)
                 this.setCurrentRow(curr);
         });
-        this.lookup = new Lookup(restUrl);
+        this.lookup = new Lookup<rowType>(restUrl);
         if (settings) {
             if (settings.columnKeys)
                 this.columns.add(...settings.columnKeys);
@@ -911,7 +911,7 @@ export class DataSettings<rowType>  {
                 this.columns.numOfColumnsInGrid = settings.numOfColumnsInGrid;
 
             if (settings.rowButtons)
-                this.buttons = settings.rowButtons;
+                this._buttons = settings.rowButtons;
 
 
             if (settings.rowCssClass)
@@ -941,7 +941,7 @@ export class DataSettings<rowType>  {
 
 
 
-    page = 1;
+    private page = 1;
     nextPage() {
         this.page++;
         this.getRecords();
@@ -1018,7 +1018,7 @@ export class DataSettings<rowType>  {
 
 
 
-    restList: RestList<rowType>;
+    private restList: RestList<rowType>;
     get items(): rowType[] {
         if (this.restList)
             return this.restList.items;

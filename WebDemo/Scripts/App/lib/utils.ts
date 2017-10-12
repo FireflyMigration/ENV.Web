@@ -512,35 +512,36 @@ function makeid() {
 @Component({
     selector: 'select-popup',
     template: `
+
 <!-- Modal -->
-<div class="modal fade" id="{{settings.modalId}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade"  *ngIf="settings && settings.popupSettings" id="{{settings.popupSettings.modalId}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">{{settings.title}}</h4>
+        <h4 class="modal-title" id="myModalLabel">{{settings.popupSettings.title}}</h4>
       </div>
       <div class="modal-body">
 <div class="row">
 <div class="col-sm-10">
         <div class="form-group">
     <label >Search</label>
-    <input type="search" class="form-control" placeholder="{{settings.searchColumnCaption()}}"[(ngModel)]="settings.searchText" (ngModelChange)="settings.search()">
+    <input type="search" class="form-control" placeholder="{{settings.popupSettings.searchColumnCaption()}}"[(ngModel)]="settings.popupSettings.searchText" (ngModelChange)="settings.popupSettings.search()">
   </div>
 </div>
-        <data-grid [settings]="settings.modalList"></data-grid>
+        <data-grid [settings]="settings"></data-grid>
 </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" (click)="settings.modalSelect()">Select</button>
+        <button type="button" class="btn btn-primary" (click)="settings.popupSettings.modalSelect()">Select</button>
       </div>
     </div>
   </div>
 </div>`
 })
 export class SelectPopupComponent {
-    @Input() settings: SelectPopup<any>;
+    @Input() settings: DataSettings<any>;
 
 
 
@@ -552,7 +553,7 @@ export class SelectPopupComponent {
 export interface dropDownOptions {
 
     items?: dropDownItem[] | string[] | any[];
-    source?: Promise<any> | RestList<any> | string;
+    source?: Promise<any> | RestList<any> | string | DataSettings<any>;
     idKey?: string;
     captionKey?: string;
 }
@@ -772,7 +773,69 @@ class DataAreaSettings<rowType>
     }
 }
 
+export class Lookup<lookupType > {
+
+    constructor(url: string) {
+        this.restList = new RestList<lookupType>(url);
+    }
+
+    private restList: RestList<lookupType>;
+    private cache: {};
+
+    get(filter: lookupType): lookupType {
+        return this.getInternal(filter).value;
+    }
+    found(filter: lookupType): boolean {
+        return this.getInternal(filter).found;
+    }
+
+    private getInternal(filter: lookupType): lookupRowInfo<lookupType> {
+        let find: getOptions<lookupType> = {};
+        find.isEqualTo = filter;
+        let key = JSON.stringify(find);
+        if (this.cache == undefined)
+            this.cache = {};
+        if (this.cache[key]) {
+            return this.cache[key];
+        } else {
+            let res = new lookupRowInfo<lookupType>();
+            this.cache[key] = res;
+            if (filter == undefined) {
+                res.loading = false;
+                res.found = false;
+                return res;
+            } else
+                res.promise = this.restList.get(find).then(() => {
+                    res.loading = false;
+                    if (this.restList.items.length > 0) {
+                        res.value = this.restList.items[0];
+                        res.found = true;
+                    }
+                    return res;
+                });
+            return res;
+        }
+
+    }
+    whenGet(r: lookupType) {
+        return this.getInternal(r).promise.then(r => r.value);
+    }
+}
+
+
+
 export class DataSettings<rowType>  {
+
+    
+
+    private popupSettings: SelectPopup<rowType>;
+    show(onSelect: (selected: rowType) => void) {
+        
+            
+        this.popupSettings.show(onSelect);
+    }
+
+
     static getRecords(): any {
         throw new Error("Method not implemented.");
     }
@@ -822,12 +885,14 @@ export class DataSettings<rowType>  {
     onNewRow: (row: rowType) => void;
 
     caption: string;
+    lookup: Lookup<rowType>;
     constructor(restUrl?: string, settings?: IDataSettings<rowType>) {
         this.restList = new RestList<rowType>(restUrl);
         this.restList._rowReplacedListeners.push((old, curr) => {
             if (old == this.currentRow)
                 this.setCurrentRow(curr);
         });
+        this.lookup = new Lookup(restUrl);
         if (settings) {
             if (settings.columnKeys)
                 this.columns.add(...settings.columnKeys);
@@ -865,8 +930,7 @@ export class DataSettings<rowType>  {
         if (!this.caption && restUrl) {
             this.caption = makeTitle(restUrl.substring(restUrl.lastIndexOf('/') + 1));
         }
-
-
+        this.popupSettings = new SelectPopup(this, settings);
     }
     columns = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
         this.extraFitler = userFilter;
@@ -1195,6 +1259,7 @@ interface newItemInList {
 interface hasId {
     id?: any;
 }
+
 interface restListItem {
     save: () => void;
     delete: () => void;
@@ -1215,57 +1280,7 @@ export interface getOptions<T> {
 
 }
 
-export class Lookup<lookupType, idType_or_MainTableType> {
 
-    constructor(url: string, private options?: (mt: idType_or_MainTableType, o: getOptions<lookupType>) => void) {
-        if (!options) {
-            this.options = (mt, o) => o.isEqualTo = <lookupType><any>{ id: mt };
-        }
-        this.restList = new RestList<lookupType>(url);
-    }
-
-    private restList: RestList<lookupType>;
-    private cache: {};
-
-    get(r: idType_or_MainTableType): lookupType {
-        return this.getInternal(r).value;
-    }
-    found(r: idType_or_MainTableType): boolean {
-        return this.getInternal(r).found;
-    }
-
-    private getInternal(r: idType_or_MainTableType): lookupRowInfo<lookupType> {
-        let find: getOptions<lookupType> = {};
-        this.options(<idType_or_MainTableType>r, find);
-        let key = JSON.stringify(find);
-        if (this.cache == undefined)
-            this.cache = {};
-        if (this.cache[key]) {
-            return this.cache[key];
-        } else {
-            let res = new lookupRowInfo<lookupType>();
-            this.cache[key] = res;
-            if (r == undefined) {
-                res.loading = false;
-                res.found = false;
-                return res;
-            } else
-                res.promise =  this.restList.get(find).then(() => {
-                    res.loading = false;
-                    if (this.restList.items.length > 0) {
-                        res.value = this.restList.items[0];
-                        res.found = true;
-                    }
-                    return res;
-                });
-            return res;
-        }
-        
-    }
-    whenGet(r: idType_or_MainTableType) {
-        return this.getInternal(r).promise.then(r=>r.value);
-    }
-}
 
 class lookupRowInfo<type> {
     found = false;

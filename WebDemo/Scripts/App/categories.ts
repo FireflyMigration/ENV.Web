@@ -15,7 +15,7 @@ import * as models from './models';
 @Injectable()
 export class Categories {
 
-    dataSettings = new utils.DataSettings<models.category>(apiUrl + 'categories',{
+    dataSettings = new models.categories({
         allowDelete:true,
         columnKeys: ["id", "categoryName", "description"],
         allowUpdate: true,
@@ -25,7 +25,6 @@ export class Categories {
     });
 
 }
-const apiUrl = '/dataApi/';
 
 
 

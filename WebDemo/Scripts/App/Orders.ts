@@ -7,25 +7,24 @@ import * as models from './models';
     template: `
 <h1>Orders</h1>
     <data-grid [settings]="orders"></data-grid>
-    <select-popup [settings]="custList"> </select-popup>
-    <select-popup [settings]="shipList"> </select-popup>
+    <select-popup [settings]="customers"> </select-popup>
+    
     <data-grid [settings]="orderDetails" *ngIf="orders.currentRow&&orders.currentRow.id>0" ></data-grid>
 `
 })
 
 @Injectable()
 export class Orders {
-    customers = new utils.Lookup<models.customer, string>(apiUrl + 'customers');
-    products = new utils.Lookup<models.product, number>(apiUrl + "products");
-    shipList = new utils.SelectPopup(new utils.DataSettings<models.shipper>(apiUrl + "shippers"));
-    custList = new utils.SelectPopup(new utils.DataSettings<models.customer>(apiUrl + "customers"), { searchColumnKey: 'contactName' });
+    customers = new models.customers();
+    products = new models.products();
+    shippers = new models.shippers();
 
     orders = new models.orders({
         allowUpdate: true,
         allowInsert: true,
         allowDelete: true,
         hideDataArea: false,
-        get: { limit:3 },
+        get: { limit: 3 },
         onEnterRow: (r) => {
             this.orderDetails.get({ isEqualTo: { orderID: r.id } });
         },
@@ -35,16 +34,16 @@ export class Orders {
             {
                 key: "customerID",
                 click: r => {
-                    this.custList.show(c => r.customerID = c.id);
+                    this.customers.show(c => r.customerID = c.id);
                 },
-                getValue: r => this.customers.get(r.customerID).companyName
+                getValue: r => this.customers.lookup.get({ id: r.customerID }).companyName
             },
             { key: "orderDate", inputType: "date", defaultValue: r => utils.dateToDataString(new Date()) },
 
             {
                 key: "shipVia",
                 dropDown: {
-                    source: apiUrl + "shippers"
+                    source: this.shippers
                 },
                 cssClass: 'col-sm-3'
 
@@ -60,31 +59,32 @@ export class Orders {
             { key: "shipCountry" },
         ]
     });
-    orderDetails = new utils.DataSettings<models.orderDetail>(apiUrl + "orderdetails", {
+
+
+    orderDetails = new models.orderDetails({
         allowDelete: true,
         allowInsert: true,
         allowUpdate: true,
         onNewRow: (r) => {
             r.orderID = this.orders.currentRow.id;
         },
-        get: { isEqualTo: 20 },
+        get: { limit: 20 },
         columnSettings: [
 
             {
-                key: "productID", caption: "Product", dropDown: { source: apiUrl + "products" },
-                onUserChangedValue: async r => r.unitPrice = (await this.products.whenGet(r.productID)).unitPrice
+                key: "productID", caption: "Product", dropDown: { source: this.products },
+                onUserChangedValue: async r => r.unitPrice = (await this.products.lookup.whenGet({ id: r.productID })).unitPrice
             },
-            { key: "unitPrice", getValue: r => this.products.get(r.productID).unitPrice },
+            { key: "unitPrice" },
 
             { key: "quantity" },
             { key: "discount" }
 
         ]
     });
-
-
-
-
+    constructor()
+    {
+        
+    }
 }
 
-const apiUrl = '/dataApi/';

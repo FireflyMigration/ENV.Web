@@ -17,10 +17,10 @@ import * as models from './models';
 export class Orders {
     customers = new utils.Lookup<models.customer, string>(apiUrl + 'customers');
     products = new utils.Lookup<models.product, number>(apiUrl + "products");
-    shipList = new utils.SelectPopup(new utils.DataSettings<models.shipper>(apiUrl + "shippers", {}));
-    custList = new utils.SelectPopup(new utils.DataSettings<models.customer>(apiUrl + "customers", {}), { searchColumnKey: 'contactName' });
+    shipList = new utils.SelectPopup(new utils.DataSettings<models.shipper>(apiUrl + "shippers"));
+    custList = new utils.SelectPopup(new utils.DataSettings<models.customer>(apiUrl + "customers"), { searchColumnKey: 'contactName' });
 
-    orders = new utils.DataSettings<models.order>(apiUrl + "orders", {
+    orders = new models.orders({
         allowUpdate: true,
         allowInsert: true,
         allowDelete: true,

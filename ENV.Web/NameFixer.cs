@@ -114,7 +114,7 @@ namespace ENV.Web
                 return name.Remove(name.Length - 1);
             if (name.EndsWith("s"))
                 return name.Remove(name.Length - 1);
-            return name;
+            return name+"Item";
         }
     }
 }

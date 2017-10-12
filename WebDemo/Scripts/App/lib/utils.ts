@@ -966,7 +966,7 @@ export class DataSettings<rowType>  {
 
 
 }
-interface IDataSettings<rowType> {
+export interface IDataSettings<rowType> {
     allowUpdate?: boolean,
     allowInsert?: boolean,
     allowDelete?: boolean,

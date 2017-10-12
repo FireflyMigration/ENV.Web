@@ -8,12 +8,28 @@ using System.Xml;
 
 namespace ENV.Web
 {
-    public class DataApiHelper
+    public class DataApi
     {
-        Dictionary<string, Func<ViewModelHelper>> _controllers = new Dictionary<string, Func<ViewModelHelper>>();
-        public void Register(string key, Func<ViewModelHelper> controller)
+        Dictionary<string, ApiItem> _controllers = new Dictionary<string, ApiItem>();
+        public void Register(string key, Func<ViewModel> controller)
         {
-            _controllers.Add(key.ToLower(), controller);
+            _controllers.Add(key.ToLower(), new ApiItem(key, controller));
+        }
+        class ApiItem
+        {
+            
+            public string Name;
+            Func<ViewModel> _factory;
+            public ApiItem(string name, Func<ViewModel> factory)
+            {
+                Name = name;
+                _factory = factory;
+            }
+
+            internal ViewModel Create()
+            {
+                return _factory();
+            }
         }
        
         public void Register(string name, System.Type t, bool allowInsertUpdateDelete = false)
@@ -21,11 +37,11 @@ namespace ENV.Web
             Register(name, () =>
             {
                 var item = System.Activator.CreateInstance(t);
-                var vmh = item as ViewModelHelper;
+                var vmh = item as ViewModel;
                 if (vmh != null)
                     return vmh;
                 return 
-                new ViewModelHelper((ENV.Data.Entity)item, allowInsertUpdateDelete);
+                new ViewModel((ENV.Data.Entity)item, allowInsertUpdateDelete);
             });
         }
         public void Register(System.Type t, bool allowInsertUpdateDelete = false)
@@ -75,10 +91,10 @@ namespace ENV.Web
                 }
                 if (!string.IsNullOrWhiteSpace(name))
                 {
-                    Func<ViewModelHelper> vmcFactory;
+                    ApiItem vmcFactory;
                     if (_controllers.TryGetValue(name.ToLower(), out vmcFactory))
                     {
-                        var vmc = vmcFactory();
+                        var vmc =  vmcFactory.Create();
                         {
 
                             Response.ContentType = "application/json";
@@ -121,7 +137,7 @@ namespace ENV.Web
                                             else if (responseType.StartsWith("DC"))
                                                 vmc.ColumnKeys(sw);
                                             else
-                                                vmc.CreateTypeScriptInterface(sw, name);
+                                                vmc.CreateTypeScriptInterface(sw, name,Request.Path);
                                         }
                                         else if (string.IsNullOrEmpty(id))
                                             vmc.GetRows().ToWriter(w);
@@ -190,14 +206,14 @@ namespace ENV.Web
                     Response.Write(HTMLISerializedObjectWriter.HTMLPageHeader);
                     Response.Write("<div class=\"container\">");
                     Response.Write($"<h1>{Request.Path} Documentation</h1>");
-                    foreach (var item in _controllers)
+                    foreach (var item in _controllers.Values)
                     {
 
-                        Response.Write("<h2>" + item.Key + "</h2>");
+                        Response.Write("<h2>" + item.Name + "</h2>");
                         string url = Request.Path;
                         if (!url.EndsWith("/"))
                             url += "/";
-                        url += item.Key;
+                        url += item.Name;
                         var sw = new StringBuilder();
                         void x(string linkName, string linkResponseType)
                         {
@@ -218,7 +234,7 @@ namespace ENV.Web
 
                         try
                         {
-                            var c = item.Value();
+                            var c = item.Create();
 
 
 
@@ -261,20 +277,20 @@ namespace ENV.Web
 
   <!-- Nav tabs -->
   <ul class=""nav nav-tabs"" role=""tablist"">
-    <li role=""presentation"" class=""active""><a href=""#{item.Key}_api"" aria-controls=""api"" role=""tab"" data-toggle=""tab"">API</a></li>
-    <li role=""presentation""><a href=""#{item.Key}_parameters"" aria-controls=""profile"" role=""tab"" data-toggle=""tab"">Body Parameters</a></li>
-    <li role=""presentation""><a href=""#{item.Key}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript Interface</a></li>
-    <li role=""presentation""><a href=""#{item.Key}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Column List</a></li>
-    <li role=""presentation""><a href=""#{item.Key}_keys"" aria-controls=""keys"" role=""tab"" data-toggle=""tab"">Typescript Column Keys</a></li>
+    <li role=""presentation"" class=""active""><a href=""#{item.Name}_api"" aria-controls=""api"" role=""tab"" data-toggle=""tab"">API</a></li>
+    <li role=""presentation""><a href=""#{item.Name}_parameters"" aria-controls=""profile"" role=""tab"" data-toggle=""tab"">Body Parameters</a></li>
+    <li role=""presentation""><a href=""#{item.Name}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript</a></li>
+    <li role=""presentation""><a href=""#{item.Name}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Column List</a></li>
+    <li role=""presentation""><a href=""#{item.Name}_keys"" aria-controls=""keys"" role=""tab"" data-toggle=""tab"">Typescript Column Keys</a></li>
   </ul>
 
   <!-- Tab panes -->
   <div class=""tab-content"">
-    <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Key}_api"">{ api}</div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_parameters"">{bodyParameters}</div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptInterface(tw, item.Key))}</pre></div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Key}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Name}_api"">{ api}</div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_parameters"">{bodyParameters}</div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptInterface(tw, item.Name,url))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
   </div>
 
 </div>
@@ -301,7 +317,7 @@ namespace ENV.Web
 
             }
         }
-        private static void PerformInsertOrUpdate(System.Web.HttpResponse Response, System.Web.HttpRequest Request, ViewModelHelper vmc, bool allowed, string name, Func<DataItem, DataItem> action)
+        private static void PerformInsertOrUpdate(System.Web.HttpResponse Response, System.Web.HttpRequest Request, ViewModel vmc, bool allowed, string name, Func<DataItem, DataItem> action)
         {
             PerformInsertOrUpdateOrDelete(Response, vmc, allowed, name, () =>
             {
@@ -319,7 +335,7 @@ namespace ENV.Web
 
             });
         }
-        private static void PerformInsertOrUpdateOrDelete(System.Web.HttpResponse Response, ViewModelHelper vmc, bool allowed, string name, Func<DataItem> action)
+        private static void PerformInsertOrUpdateOrDelete(System.Web.HttpResponse Response, ViewModel vmc, bool allowed, string name, Func<DataItem> action)
         {
             if (!allowed)
             {
@@ -359,7 +375,7 @@ namespace ENV.Web
 
 
         }
-        private static void MethodNotAllowed(HttpResponse Response, ViewModelHelper vmc, string name)
+        private static void MethodNotAllowed(HttpResponse Response, ViewModel vmc, string name)
         {
             vmc.ModelState.AddError($"The requested resource does not support http method '{name}'.");
             Response.Write(vmc.ModelState.ToJson());
@@ -367,7 +383,7 @@ namespace ENV.Web
             return;
         }
 
-        private static DataItem DoIt(System.Web.HttpRequest Request, ViewModelHelper vmc, Func<DataItem, DataItem> action)
+        private static DataItem DoIt(System.Web.HttpRequest Request, ViewModel vmc, Func<DataItem, DataItem> action)
         {
             DataItem r;
             Request.InputStream.Position = 0;

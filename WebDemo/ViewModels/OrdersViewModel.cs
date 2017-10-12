@@ -7,7 +7,7 @@ using ENV.Web;
 
 namespace WebDemo.ViewModels
 {
-    class OrdersViewModel : ViewModelHelper
+    class OrdersViewModel : ViewModel
     {
         Northwind.Models.Orders Orders = new Northwind.Models.Orders();
 

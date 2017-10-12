@@ -16,11 +16,11 @@ using ENV.Data;
 
 namespace ENV.Web
 {
-    public class ViewModelHelper
+    public class ViewModel
     {
 
         protected readonly ENV.UserMethods u;
-        public ViewModelHelper()
+        public ViewModel()
         {
             u = UserMethods.Instance;
             _bp.Load += OnLoad;
@@ -38,7 +38,7 @@ namespace ENV.Web
         }
         protected internal Activities Activity { get { return _bp.Activity; } }
         protected virtual void OnLoad() { }
-        public ViewModelHelper(Firefly.Box.Data.Entity e, bool allowInsertUpdateDelete = false) : this()
+        public ViewModel(Firefly.Box.Data.Entity e, bool allowInsertUpdateDelete = false) : this()
         {
             From = e;
             if (allowInsertUpdateDelete)
@@ -205,9 +205,19 @@ namespace ENV.Web
     }");
             tw.WriteLine("}");
         }
-        public void CreateTypeScriptInterface(TextWriter tw, string name)
+        public void CreateTypeScriptInterface(TextWriter tw, string name,string url)
         {
-            tw.WriteLine("export interface " + NameFixer.MakeSingular(name) + " {");
+            
+
+            var singular = NameFixer.MakeSingular(name);
+            
+            
+            tw.WriteLine($@"export class {name} extends utils.DataSettings&lt;{singular}&gt;{{
+    constructor(settings?: utils.IDataSettings&lt;{singular}&gt;) {{
+        super('{url}', settings);
+    }}
+}}");
+            tw.WriteLine("export interface " + singular + " {");
             init();
             foreach (var item in _columns)
             {

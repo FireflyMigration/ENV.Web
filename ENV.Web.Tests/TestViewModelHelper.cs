@@ -9,7 +9,7 @@ namespace ENV.Web.Tests
     [TestClass]
     public class TestViewModelHelper
     {
-        internal class TestVMHWithMoreThanOneMemoberInThePrimaryKey : ViewModelHelper
+        internal class TestVMHWithMoreThanOneMemoberInThePrimaryKey : ViewModel
         {
             public MockTable mt = new MockTable();
             public TestVMHWithMoreThanOneMemoberInThePrimaryKey()
@@ -46,7 +46,7 @@ namespace ENV.Web.Tests
         }
 
 
-        internal class TestVMH : ViewModelHelper
+        internal class TestVMH : ViewModel
         {
             public MockTable mt = new MockTable();
             public TestVMH()
@@ -153,7 +153,7 @@ namespace ENV.Web.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            ViewModelHelper.HttpContext.Value = new MockHttpContext();
+            ViewModel.HttpContext.Value = new MockHttpContext();
         }
     }
 

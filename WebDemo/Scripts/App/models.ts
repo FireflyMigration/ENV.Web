@@ -20,6 +20,11 @@ export interface order {
     shipPostalCode?: string;
     shipCountry?: string;
 }
+export class orders extends utils.DataSettings<order>{
+    constructor(settings?: utils.IDataSettings<order>) {
+        super('dataapi/orders', settings);
+    }
+}
 export interface customer {
     id?: string;
     companyName?: string;
@@ -57,4 +62,18 @@ export interface product {
     unitsOnOrder?: number;
     reorderLevel?: number;
     discontinued?: boolean;
+}
+
+export class orderDetails extends utils.DataSettings<orderDetail>{
+    constructor(settings?: utils.IDataSettings<orderDetail>) {
+        super('/dataapi/orderDetails', settings);
+    }
+}
+export interface orderDetail {
+    orderID?: number;
+    productID?: number;
+    unitPrice?: number;
+    quantity?: number;
+    discount?: number;
+    id?: string;
 }

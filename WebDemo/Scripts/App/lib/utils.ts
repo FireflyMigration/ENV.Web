@@ -112,6 +112,11 @@ export class ColumnCollection<rowType> {
                         existing.inputType = s.inputType;
                     if (s.click)
                         existing.click = s.click;
+                    if (s.defaultValue)
+                        existing.defaultValue = s.defaultValue;
+                    if (s.userChangedValue)
+                        existing.userChangedValue = s.userChangedValue;
+                    
 
                 }
                 else {
@@ -278,6 +283,9 @@ export class ColumnCollection<rowType> {
             let m = <ModelState<any>>r.__modelState();
             m.modelState[col.key] = undefined;
         }
+        if (col.userChangedValue)
+            col.userChangedValue(r);
+
     }
     items: ColumnSetting<any>[] = [];
     private gridColumns: ColumnSetting<any>[];
@@ -770,11 +778,19 @@ export class DataSettings<rowType>  {
     }
     addNewRow() {
         let r = this.restList.add();
+        this.columns.items.forEach(item => {
+            if (item.defaultValue) {
+                let result = item.defaultValue(r);
+                if (result != undefined)
+                    r[item.key] = result;
+
+            }
+        });
         if (this.onNewRow(r))
             this.onNewRow(r);
         this.setCurrentRow(r);
     }
-
+    
     addArea(settings: IDataAreaSettings<rowType>) {
         let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
             this.extraFitler = userFilter;
@@ -1006,6 +1022,8 @@ interface ColumnSetting<rowType> {
     designMode?: boolean;
     getValue?: (row: rowType) => any;
     cssClass?: (string | ((row: rowType) => string));
+    defaultValue?: (row: rowType) => any;
+    userChangedValue?: (row: rowType) => void;
     click?: (row: rowType) => void;
     dropDown?: dropDownOptions;
 }

@@ -28,7 +28,6 @@ export class Orders {
         onEnterRow: (r) => {
             this.orderDetails.get({ isEqualTo: { orderID: r.id } });
         },
-        onNewRow: r => { r.orderDate = utils.dateToDataString(new Date()); },
         numOfColumnsInGrid: 4,
         columnSettings: [
             { key: "id" },
@@ -39,7 +38,7 @@ export class Orders {
                 },
                 getValue: r => this.customers.get(r.customerID).companyName
             },
-            { key: "orderDate", inputType: "date" },
+            { key: "orderDate", inputType: "date", defaultValue: r => utils.dateToDataString(new Date()) },
 
             {
                 key: "shipVia",

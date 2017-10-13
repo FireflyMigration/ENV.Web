@@ -17,8 +17,8 @@ export class Orders  {
                 { key: "customerID" },
                 { key: "orderDate", inputType: "date" },
                 { key: "shipVia" },
-                { key: "requiredDate" },
-                { key: "shippedDate" },
+                { key: "requiredDate", inputType:"date" },
+                { key: "shippedDate" , inputType:"date" },
                 { key: "shipAddress" },
                 { key: "shipCity" },
             ]

@@ -15,7 +15,11 @@ export class Orders  {
             numOfColumnsInGrid:4,
             columnSettings: [
                 { key: "id", caption: "Order ID", readonly: true },
-                { key: "customerID" },
+                {
+                    key: "customerID",
+                    getValue: o =>
+                        this.customers.lookup.get({ id: o.customerID }).companyName
+                },
                 { key: "orderDate", inputType: "date" },
                 { key: "shipVia" },
                 { key: "requiredDate", inputType:"date" },

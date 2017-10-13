@@ -9,6 +9,7 @@ import * as models from './models';
 `
 })
 export class Orders  {
+    customers = new models.customers();
     orders = new models.orders(
         {
             numOfColumnsInGrid:4,

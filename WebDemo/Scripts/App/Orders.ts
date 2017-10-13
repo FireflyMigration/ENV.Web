@@ -11,20 +11,16 @@ import * as models from './models';
 export class Orders  {
     orders = new models.orders(
         {
+            numOfColumnsInGrid:4,
             columnSettings: [
                 { key: "id", caption: "Order ID", readonly: true },
                 { key: "customerID" },
                 { key: "orderDate", inputType: "date" },
+                { key: "shipVia" },
                 { key: "requiredDate" },
                 { key: "shippedDate" },
-                { key: "shipVia" },
-                { key: "freight" },
-                { key: "shipName" },
                 { key: "shipAddress" },
                 { key: "shipCity" },
-                { key: "shipRegion" },
-                { key: "shipPostalCode" },
-                { key: "shipCountry" },
             ]
         }
     );

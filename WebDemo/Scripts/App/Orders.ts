@@ -5,8 +5,9 @@ import * as models from './models';
 @Component({
     template:`
 <h1>Orders</h1>
+<data-grid [settings]="orders"></data-grid>
 `
 })
 export class Orders  {
-
+    orders = new models.orders();
 }

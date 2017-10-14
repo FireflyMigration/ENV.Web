@@ -12,7 +12,8 @@ export class Orders  {
     customers = new models.customers();
     orders = new models.orders(
         {
-            numOfColumnsInGrid:4,
+            numOfColumnsInGrid: 4,
+            allowUpdate:true,
             columnSettings: [
                 { key: "id", caption: "Order ID", readonly: true },
                 {

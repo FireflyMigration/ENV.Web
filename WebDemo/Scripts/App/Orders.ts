@@ -6,6 +6,7 @@ import * as models from './models';
     template: `
 <h1>Orders</h1>
 <data-grid [settings]="orders"></data-grid>
+<select-popup [settings]="customers"></select-popup>
 `
 })
 export class Orders {
@@ -22,14 +23,15 @@ export class Orders {
                 {
                     key: "customerID",
                     getValue: o =>
-                        this.customers.lookup.get({ id: o.customerID }).companyName
+                        this.customers.lookup.get({ id: o.customerID }).companyName,
+                    click: o => this.customers.showSelectPopup(c => o.customerID = c.id)
                 },
                 { key: "orderDate", inputType: "date" },
                 {
                     key: "shipVia",
                     dropDown: { source: this.shippers },
-                    cssClass:'col-sm-3'
-                    
+                    cssClass: 'col-sm-3'
+
                 },
                 { key: "requiredDate", inputType: "date" },
                 { key: "shippedDate", inputType: "date" },

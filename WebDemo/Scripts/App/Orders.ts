@@ -17,7 +17,15 @@ export class Orders {
             { key: "city" },
         ]});
     shippers = new models.shippers();
-    orderDetails = new models.orderDetails();
+    orderDetails = new models.orderDetails({
+        allowUpdate: true,
+        allowInsert: true,
+        allowDelete: true,
+        onNewRow: od => {
+            od.orderID = this.orders.currentRow.id;
+            od.quantity = 1;
+        }
+    });
     orders = new models.orders(
         {
             numOfColumnsInGrid: 4,

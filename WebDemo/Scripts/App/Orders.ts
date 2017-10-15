@@ -10,6 +10,7 @@ import * as models from './models';
 })
 export class Orders {
     customers = new models.customers();
+    shippers = new models.shippers();
     orders = new models.orders(
         {
             numOfColumnsInGrid: 4,
@@ -24,7 +25,12 @@ export class Orders {
                         this.customers.lookup.get({ id: o.customerID }).companyName
                 },
                 { key: "orderDate", inputType: "date" },
-                { key: "shipVia" },
+                {
+                    key: "shipVia",
+                    dropDown: { source: this.shippers },
+                    cssClass:'col-sm-3'
+                    
+                },
                 { key: "requiredDate", inputType: "date" },
                 { key: "shippedDate", inputType: "date" },
                 { key: "shipAddress" },

@@ -17,5 +17,10 @@ namespace WebDemo.ViewModels
             AllowInsert = true;
             AllowDelete = true;
         }
+        protected override void OnSavingRow()
+        {
+            if (Activity == Activities.Insert)
+                Orders.OrderID.Value = Orders.Max(Orders.OrderID) + 1;
+        }
     }
 }

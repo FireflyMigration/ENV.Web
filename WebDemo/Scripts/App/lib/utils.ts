@@ -881,6 +881,7 @@ export class DataSettings<rowType>  {
             this.page = 1;
             this.getRecords();
         });
+        col.numOfColumnsInGrid = 0;
 
         return new DataAreaSettings<rowType>(col, settings);
     }

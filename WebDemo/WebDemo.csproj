@@ -188,6 +188,7 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\App\lib\data-grid.component.html" />
+    <Content Include="Scripts\App\Orders.html" />
     <Content Include="Scripts\App\lib\utils.css" />
     <Content Include="Scripts\App\main.html" />
     <Content Include="Scripts\bootstrap.js" />

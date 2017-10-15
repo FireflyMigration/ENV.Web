@@ -3,11 +3,11 @@ import * as utils from './lib/utils';
 import * as models from './models';
 
 @Component({
-    templateUrl:'./scripts/app/orders.html'
+    templateUrl: './scripts/app/orders.html'
 })
 export class Orders {
     customers = new models.customers({
-        numOfColumnsInGrid:4,
+        numOfColumnsInGrid: 4,
         columnSettings: [
             { key: "id" },
             { key: "companyName" },
@@ -15,12 +15,19 @@ export class Orders {
             { key: "country" },
             { key: "address" },
             { key: "city" },
-        ]});
+        ]
+    });
     shippers = new models.shippers();
+    products = new models.products();
     orderDetails = new models.orderDetails({
         allowUpdate: true,
         allowInsert: true,
         allowDelete: true,
+        columnSettings: [
+            { key: "productID", caption="Product", dropDown: { source: this.products } },
+            { key: "unitPrice", inputType: "number" },
+            { key: "quantity", inputType: "number" }
+        ],
         onNewRow: od => {
             od.orderID = this.orders.currentRow.id;
             od.quantity = 1;
@@ -52,7 +59,7 @@ export class Orders {
         }
     );
     shipInfoArea = this.orders.addArea({
-        numberOfColumnAreas:2,
+        numberOfColumnAreas: 2,
         columnSettings: [
             { key: "requiredDate", inputType: "date" },
             { key: "shippedDate", inputType: "date" },

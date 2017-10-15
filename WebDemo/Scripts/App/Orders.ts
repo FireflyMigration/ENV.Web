@@ -20,6 +20,7 @@ export class Orders {
     orders = new models.orders(
         {
             numOfColumnsInGrid: 4,
+            get: { limit:4 },
             allowUpdate: true,
             allowInsert: true,
             allowDelete: true,

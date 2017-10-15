@@ -17,6 +17,7 @@ export class Orders {
             { key: "city" },
         ]});
     shippers = new models.shippers();
+    orderDetails = new models.orderDetails();
     orders = new models.orders(
         {
             numOfColumnsInGrid: 4,
@@ -48,5 +49,6 @@ export class Orders {
             { key: "shippedDate", inputType: "date" },
             { key: "shipAddress" },
             { key: "shipCity" },
-        ]});
+        ]
+    });
 }

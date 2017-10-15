@@ -850,7 +850,7 @@ export class DataSettings<rowType>  {
 
 
     private popupSettings: SelectPopup<rowType>;
-    show(onSelect: (selected: rowType) => void) {
+    showSelectPopup(onSelect: (selected: rowType) => void) { 
 
 
         this.popupSettings.show(onSelect);

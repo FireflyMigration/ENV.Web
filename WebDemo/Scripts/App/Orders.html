@@ -13,7 +13,7 @@
             <data-area [settings]="shipInfoArea"></data-area>
         </div>
         <div  class="tab-pane" id="orderDetailsTab">
-            <data-grid [settings]="orderDetails"></data-grid>
+            <data-grid [settings]="orderDetails" *ngIf="orders.currentRow && orders.currentRow.id"></data-grid>
         </div>
     </div>
 </div>

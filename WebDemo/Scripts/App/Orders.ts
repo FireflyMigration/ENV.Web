@@ -21,7 +21,8 @@ export class Orders {
     orders = new models.orders(
         {
             numOfColumnsInGrid: 4,
-            get: { limit:4 },
+            get: { limit: 4 },
+            onEnterRow: o => this.orderDetails.get({ isEqualTo: { orderID: o.id } }),
             allowUpdate: true,
             allowInsert: true,
             allowDelete: true,

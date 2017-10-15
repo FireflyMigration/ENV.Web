@@ -37,13 +37,16 @@ export class Orders {
                     key: "shipVia",
                     dropDown: { source: this.shippers },
                     cssClass: 'col-sm-3'
-
-                },
-                { key: "requiredDate", inputType: "date" },
-                { key: "shippedDate", inputType: "date" },
-                { key: "shipAddress" },
-                { key: "shipCity" },
+                }
             ]
         }
     );
+    shipInfoArea = this.orders.addArea({
+        numberOfColumnAreas:2,
+        columnSettings: [
+            { key: "requiredDate", inputType: "date" },
+            { key: "shippedDate", inputType: "date" },
+            { key: "shipAddress" },
+            { key: "shipCity" },
+        ]});
 }

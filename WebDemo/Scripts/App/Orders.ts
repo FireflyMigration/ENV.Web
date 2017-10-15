@@ -10,7 +10,16 @@ import * as models from './models';
 `
 })
 export class Orders {
-    customers = new models.customers();
+    customers = new models.customers({
+        numOfColumnsInGrid:4,
+        columnSettings: [
+            { key: "id" },
+            { key: "companyName" },
+            { key: "contactName" },
+            { key: "country" },
+            { key: "address" },
+            { key: "city" },
+        ]});
     shippers = new models.shippers();
     orders = new models.orders(
         {

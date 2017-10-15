@@ -13,6 +13,9 @@ namespace WebDemo.ViewModels
         public OrdersViewModel()
         {
             From = Orders;
+            AllowUpdate = true;
+            AllowInsert = true;
+            AllowDelete = true;
         }
     }
 }

@@ -24,7 +24,7 @@ export class Orders {
         allowInsert: true,
         allowDelete: true,
         columnSettings: [
-            { key: "productID", caption="Product", dropDown: { source: this.products } },
+            { key: "productID", caption:"Product", dropDown: { source: this.products } },
             { key: "unitPrice", inputType: "number" },
             { key: "quantity", inputType: "number" }
         ],

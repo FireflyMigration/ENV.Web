@@ -68,6 +68,12 @@ export class Orders {
                     dropDown: { source: this.shippers },
                     cssClass: 'col-sm-3'
                 }
+            ],
+            rowButtons: [
+                {
+                    click: o => window.open('home/print/' + o.id),
+                    cssClass: 'btn btn-primary glyphicon glyphicon-print'
+                }
             ]
         }
     );

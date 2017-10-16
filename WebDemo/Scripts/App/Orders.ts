@@ -72,6 +72,7 @@ export class Orders {
                     cssClass: 'col-sm-3'
                 }
             ],
+            rowCssClass: o => new Date(o.orderDate).getDay() == 1 ? "danger" : "",
             rowButtons: [
                 {
                     click: o => window.open('home/print/' + o.id),

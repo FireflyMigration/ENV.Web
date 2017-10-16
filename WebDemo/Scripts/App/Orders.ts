@@ -29,7 +29,7 @@ export class Orders {
             { key: "quantity", inputType: "number" },
             {
                 caption: "total",
-                getValue: o => (o.quantity * o.unitPrice).toLocaleString()
+                getValue: o => (o.quantity * o.unitPrice).toFixed(2)
             }
         ],
         onNewRow: od => {
@@ -41,7 +41,7 @@ export class Orders {
         let result = 0;
         this.orderDetails.items.forEach(od =>
             result += od.unitPrice * od.quantity);
-        return result;
+        return result.toFixed(2);
     }
     printCurrentOrder() {
         window.open('home/print/' + this.orders.currentRow.id);

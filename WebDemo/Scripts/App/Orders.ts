@@ -62,7 +62,10 @@ export class Orders {
                         this.customers.lookup.get({ id: o.customerID }).companyName,
                     click: o => this.customers.showSelectPopup(c => o.customerID = c.id)
                 },
-                { key: "orderDate", inputType: "date" },
+                {
+                    key: "orderDate", inputType: "date",
+                    cssClass: o => new Date(o.orderDate).getDay()==1?"danger":""
+                },
                 {
                     key: "shipVia",
                     dropDown: { source: this.shippers },

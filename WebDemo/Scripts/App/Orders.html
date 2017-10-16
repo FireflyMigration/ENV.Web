@@ -20,4 +20,5 @@
             <data-grid [settings]="orderDetails" *ngIf="orders.currentRow && orders.currentRow.id"></data-grid>
         </div>
     </div>
+    <button class="btn btn-primary" (click)="printCurrentOrder()">Print</button>
 </div>

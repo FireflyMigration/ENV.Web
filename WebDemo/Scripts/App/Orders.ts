@@ -43,6 +43,9 @@ export class Orders {
             result += od.unitPrice * od.quantity);
         return result;
     }
+    printCurrentOrder() {
+        window.open('home/print/' + this.orders.currentRow.id);
+    }
     orders = new models.orders(
         {
             numOfColumnsInGrid: 4,

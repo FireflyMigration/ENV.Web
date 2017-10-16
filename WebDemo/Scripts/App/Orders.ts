@@ -37,6 +37,12 @@ export class Orders {
             od.quantity = 1;
         }
     });
+    getOrderTotal() {
+        let result = 0;
+        this.orderDetails.items.forEach(od =>
+            result += od.unitPrice * od.quantity);
+        return result;
+    }
     orders = new models.orders(
         {
             numOfColumnsInGrid: 4,

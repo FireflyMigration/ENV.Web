@@ -26,7 +26,11 @@ export class Orders {
         columnSettings: [
             { key: "productID", caption: "Product", dropDown: { source: this.products } },
             { key: "unitPrice", inputType: "number" },
-            { key: "quantity", inputType: "number" }
+            { key: "quantity", inputType: "number" },
+            {
+                caption: "total",
+                getValue: o => (o.quantity * o.unitPrice).toLocaleString()
+            }
         ],
         onNewRow: od => {
             od.orderID = this.orders.currentRow.id;

@@ -64,6 +64,10 @@
     <Reference Include="Northwind">
       <HintPath>..\bin\Northwind.exe</HintPath>
     </Reference>
+    <Reference Include="Northwind.Orders, Version=3.4.24.28703, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Northwind.Orders.dll</HintPath>
+    </Reference>
     <Reference Include="NorthwindBase">
       <HintPath>..\bin\NorthwindBase.dll</HintPath>
     </Reference>

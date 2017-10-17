@@ -850,7 +850,7 @@ export class DataSettings<rowType>  {
 
 
     private popupSettings: SelectPopup<rowType>;
-    showSelectPopup(onSelect: (selected: rowType) => void) { 
+    showSelectPopup(onSelect: (selected: rowType) => void) {
 
 
         this.popupSettings.show(onSelect);
@@ -1170,7 +1170,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
 
         x.save = () => this.save(id, x);
         x.delete = () => {
-            return fetch(this.url + '/' + id, { method: 'delete' }).then(() => { }, onError).then(() => {
+            return fetch(this.url + '/' + id, { method: 'delete', credentials: 'include' }).then(() => { }, onError).then(() => {
                 this.items.splice(this.items.indexOf(x), 1);
                 this._rowReplacedListeners.forEach(y => y(x, undefined));
             });
@@ -1178,7 +1178,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
         }
         return <restListItem & T>x;
     }
-
+    lastGetId = 0;
     get(options?: getOptions<T>) {
 
         let url = new urlBuilder(this.url);
@@ -1197,10 +1197,12 @@ export class RestList<T extends hasId> implements Iterable<T>{
             url.addObject(options.isDifferentFrom, "_ne");
         }
 
+        let getId = ++this.lastGetId;
 
         return myFetch(url.url).then(r => {
             let x: T[] = r;
-            this.items = r.map(x => this.map(x));
+            if (getId == this.lastGetId)
+                this.items = r.map(x => this.map(x));
             return this.items;
         });
     }
@@ -1263,7 +1265,9 @@ class urlBuilder {
     }
 }
 function myFetch(url: string, init?: RequestInit): Promise<any> {
-
+    if (!init)
+        init = {};
+    init.credentials = 'include';
     return fetch(url, init).then(onSuccess, error => {
 
     });

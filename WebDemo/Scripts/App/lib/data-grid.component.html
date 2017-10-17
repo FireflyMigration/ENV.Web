@@ -23,7 +23,7 @@
                         <span  (click)="settings.sort(map.key)">{{map.caption}}</span>
 
 
-                        <span class="glyphicon glyphicon-filter filterButton" [class.filteredFilterButton]="map._filterData" (click)="settings.columns.showFilterDialog(map)"></span>
+                        <span class="glyphicon glyphicon-filter filterButton" [class.filteredFilterButton]="settings.columns.userFilter[map.key]" (click)="settings.columns.showFilterDialog(map)"></span>
                         <div class="filterDialog col-sm-4" *ngIf="settings.columns._shouldShowFilterDialog(map)">
                             <div class="form-group">
                                 <data-control [settings]="settings.columns" [map]="map" [record]="settings.columns.userFilter" [notReadonly]="true"></data-control>

@@ -1061,7 +1061,7 @@ export interface IDataSettings<rowType> {
     allowInsert?: boolean,
     allowDelete?: boolean,
     hideDataArea?: boolean,
-    autoGet?: boolean;
+    
     columnSettings?: ColumnSetting<rowType>[],
     areas?: { [areaKey: string]: ColumnSetting<any>[] },
     columnKeys?: string[],

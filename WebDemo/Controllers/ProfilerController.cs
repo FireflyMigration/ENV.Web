@@ -18,11 +18,19 @@ namespace WebDemo.Controllers
         public static void Init()
         {
             ProfilerPath = Profiler.ProfilerFile;
+
+
             if (!string.IsNullOrEmpty(ProfilerPath))
             {
-                ProfilerPath = Path.Combine(Path.GetDirectoryName(ProfilerPath), "web")+"\\";
-                Directory.CreateDirectory(ProfilerPath);
+                ProfilerPath = Path.GetDirectoryName(ProfilerPath);
             }
+            else
+            {
+                ProfilerPath = Environment.CurrentDirectory;
+            }
+            ProfilerPath = Path.Combine(ProfilerPath, "webDemoProfilerFiles") + "\\";
+            Directory.CreateDirectory(ProfilerPath);
+
             Profiler.ProfilerFile = "";
 
         }

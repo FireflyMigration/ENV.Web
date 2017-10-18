@@ -30,7 +30,7 @@ namespace WebDemo
                 Path.GetDirectoryName( HttpContext.Current.Server.MapPath("")),"bin");
             //determines where the appliaction dlls are
             ENV.AbstractFactory.AlternativeDllPath = Environment.CurrentDirectory;
-            
+             
             //calls a refactored version of the program main of Northwind
             Northwind.Program.Init(new string[0]);
 

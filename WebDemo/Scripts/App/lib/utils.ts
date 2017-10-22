@@ -893,6 +893,64 @@ export class DataSettings<rowType>  {
         }
 
     }
+    nextRow() {
+        if (!this.currentRow && this.items.length > 0)
+            this.setCurrentRow(this.items[0]);
+        if (this.currentRow) {
+            let currentRowPosition = this.items.indexOf(this.currentRow);
+            if (currentRowPosition < this.items.length - 1)
+                this.setCurrentRow(this.items[currentRowPosition + 1]);
+            else
+                this.nextPage().then(() => {
+                    if (this.items.length > 0)
+                        this.setCurrentRow(this.items[0]);
+                });
+        }
+    }
+    previousRowAllowed() {
+        return this.currentRow && this.items.indexOf(this.currentRow) > 0 || this.page > 1;
+    }
+    previousRow() {
+        if (!this.previousRowAllowed())
+            return;
+
+        let currentRowPosition = this.items.indexOf(this.currentRow);
+        if (currentRowPosition > 0)
+            this.setCurrentRow(this.items[currentRowPosition - 1]);
+        else {
+            if (this.page > 1)
+                this.previousPage().then(() => {
+                    if (this.items.length > 0)
+                        this.setCurrentRow(this.items[this.items.length - 1]);
+                });
+        }
+
+    }
+    deleteCurentRow() {
+        if (!this.deleteCurrentRowAllowed)
+            return;
+        this.currentRowAsRestListItemRow().delete();
+    }
+    currentRowAsRestListItemRow() {
+        if (!this.currentRow)
+            return undefined;
+        return <any>this.currentRow as restListItem;
+    }
+    cancelCurrentRowChanges() {
+        if (this.currentRowAsRestListItemRow() && this.currentRowAsRestListItemRow().reset)
+            this.currentRowAsRestListItemRow().reset();
+    }
+    deleteCurrentRowAllowed() {
+        return this.currentRowAsRestListItemRow() && this.currentRowAsRestListItemRow().delete && this.allowDelete && !isNewRow(this.currentRow);
+    }
+    currentRowChanged() {
+        return this.currentRowAsRestListItemRow() && this.currentRowAsRestListItemRow().__wasChanged && this.currentRowAsRestListItemRow().__wasChanged();
+    }
+    saveCurrentRow() {
+        if (this.currentRowAsRestListItemRow() && this.currentRowAsRestListItemRow().save)
+            this.currentRowAsRestListItemRow().save();
+    }
+
     allowUpdate = false;
     allowInsert = false;
     allowDelete = false;
@@ -929,7 +987,7 @@ export class DataSettings<rowType>  {
                 this.allowInsert = true;
             if (settings.hideDataArea)
                 this.hideDataArea = settings.hideDataArea;
-            if (settings.numOfColumnsInGrid)
+            if (settings.numOfColumnsInGrid != undefined)
                 this.columns.numOfColumnsInGrid = settings.numOfColumnsInGrid;
 
             if (settings.rowButtons)
@@ -966,13 +1024,13 @@ export class DataSettings<rowType>  {
     private page = 1;
     nextPage() {
         this.page++;
-        this.getRecords();
+        return this.getRecords();
     }
     previousPage() {
         if (this.page <= 1)
             return;
         this.page--;
-        this.getRecords();
+        return this.getRecords();
     }
     get(options: getOptions<rowType>) {
         this.getOptions = options;
@@ -1104,7 +1162,7 @@ class ModelState<rowType> {
     modelState = {};
 }
 
-interface ColumnSetting<rowType> {
+export interface ColumnSetting<rowType> {
     key?: string;
     caption?: string;
     readonly?: boolean;
@@ -1294,7 +1352,7 @@ interface hasId {
 interface restListItem {
     save: () => void;
     delete: () => void;
-    _wasChanged: () => boolean;
+    __wasChanged: () => boolean;
     reset: () => void;
 }
 export interface getOptions<T> {

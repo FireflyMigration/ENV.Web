@@ -26,12 +26,17 @@ export class newOrders {
 
 
     shippers = new models.shippers();
-
+    products = new models.products();
     orderDetailsDataView = new utils.dataView({
         from: this.orderDetails,
         allowDelete : true,
         allowInsert : true,
-        allowUpdate : true,
+        allowUpdate: true,
+        displayColumns: [
+            { column: this.orderDetails.productID, dropDown: { source: this.products } },
+            this.orderDetails.quantity,
+            this.orderDetails.unitPrice
+        ],
         where: this.orderDetails.orderID.isEqualTo(this.orders.id),
         
         onNewRow: () => {

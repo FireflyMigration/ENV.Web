@@ -29,16 +29,21 @@ export class newOrders {
     products = new models.products();
     orderDetailsDataView = new utils.dataView({
         from: this.orderDetails,
-        allowDelete : true,
-        allowInsert : true,
+        allowDelete: true,
+        allowInsert: true,
         allowUpdate: true,
         displayColumns: [
             { column: this.orderDetails.productID, dropDown: { source: this.products } },
             this.orderDetails.quantity,
-            this.orderDetails.unitPrice
+            this.orderDetails.unitPrice,
+            {
+                caption: 'total',
+                getValue:
+                () => (this.orderDetails.quantity.value * this.orderDetails.unitPrice.value).toFixed(2)
+            }
         ],
         where: this.orderDetails.orderID.isEqualTo(this.orders.id),
-        
+
         onNewRow: () => {
             this.orderDetails.orderID.value = this.orders.id.value;
             this.orderDetails.unitPrice.value = 1;
@@ -60,7 +65,7 @@ export class newOrders {
         }
         ],
         onEnterRow: () => this.orderDetailsDataView.refreshData(),
-        
+
         displayColumns: [
             this.orders.id,
             {
@@ -82,11 +87,11 @@ export class newOrders {
         allowInsert: true
     });
 
-    
+
 
 
     shipInfoArea = this.dv.addArea({
-        numberOfColumnAreas:2,
+        numberOfColumnAreas: 2,
         columnSettings: [
             this.orders.requiredDate,
             this.orders.shippedDate,

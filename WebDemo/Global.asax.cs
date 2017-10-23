@@ -30,9 +30,12 @@ namespace WebDemo
                 Path.GetDirectoryName( HttpContext.Current.Server.MapPath("")),"bin");
             //determines where the appliaction dlls are
             ENV.AbstractFactory.AlternativeDllPath = Environment.CurrentDirectory;
-            
+             
             //calls a refactored version of the program main of Northwind
             Northwind.Program.Init(new string[0]);
+
+            //ApplicationStartup=B && DeploymentMode=B
+            ENV.UserSettings.DoNotDisplayUI = true;
 
             //connection to sql server without a user and password requires giving permission to the iis user
             //Instead I use an sql server password for this demo

@@ -1129,7 +1129,7 @@ export interface IDataSettings<rowType> {
     allowInsert?: boolean,
     allowDelete?: boolean,
     hideDataArea?: boolean,
-    autoGet?: boolean;
+    
     columnSettings?: ColumnSetting<rowType>[],
     areas?: { [areaKey: string]: ColumnSetting<any>[] },
     columnKeys?: string[],
@@ -1263,6 +1263,7 @@ export class RestList<T extends hasId> implements Iterable<T>{
             url.addObject(options.isGreaterThan, "_gt");
             url.addObject(options.isLessThan, "_lt");
             url.addObject(options.isDifferentFrom, "_ne");
+            url.addObject(options.otherUrlParameters);
         }
 
         let getId = ++this.lastGetId;
@@ -1375,6 +1376,7 @@ export interface getOptions<T> {
     isGreaterThan?: T;
     isLessThan?: T;
     isDifferentFrom?: T;
+    otherUrlParameters?: any;
 
 }
 

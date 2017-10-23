@@ -3,11 +3,7 @@ import * as utils from './lib/utils';
 import * as models from './newModels';
 
 @Component({
-    template: `
-<h1>newOrders</h1>
-<data-grid [dataView]="dv"></data-grid>
-<select-popup [dataView]="selectCustomer" ></select-popup>
-`
+    templateUrl:'./scripts/app/newOrders.html'
 })
 export class newOrders {
     orders = new models.orders();

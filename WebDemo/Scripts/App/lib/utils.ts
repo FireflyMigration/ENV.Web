@@ -1639,6 +1639,12 @@ class andFilter implements iFilter {
 
 
 export class dataView {
+    forEach(what: ()=>void): any {
+        this.initDataSettings();
+        this.dataSettings.items.forEach(r => {
+            this.dataSettings.__scopeToRow(r, what);
+        });
+    }
     refreshData(): any {
         this.initDataSettings();
         let getOptions = {} as getOptions<any>;

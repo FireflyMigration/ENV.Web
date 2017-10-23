@@ -99,4 +99,11 @@ export class newOrders {
             this.orders.shipCity
         ]
     });
+    getOrderTotal() {
+        let result = 0;
+        this.dv.forEach(() => {
+            result += this.orderDetails.quantity.value * this.orderDetails.unitPrice.value;
+        });
+        return result.toFixed(2);
+    }
 }

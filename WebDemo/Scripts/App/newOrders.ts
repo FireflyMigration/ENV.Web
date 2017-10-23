@@ -23,8 +23,6 @@ export class newOrders {
             this.customersForSelectCustomer.city
         ]
     });
-
-
     shippers = new models.shippers();
     products = new models.products();
     orderDetailsDataView = new utils.dataView({
@@ -43,7 +41,6 @@ export class newOrders {
             }
         ],
         where: this.orderDetails.orderID.isEqualTo(this.orders.id),
-
         onNewRow: () => {
             this.orderDetails.orderID.value = this.orders.id.value;
             this.orderDetails.unitPrice.value = 1;
@@ -86,10 +83,6 @@ export class newOrders {
         allowUpdate: true,
         allowInsert: true
     });
-
-
-
-
     shipInfoArea = this.dv.addArea({
         numberOfColumnAreas: 2,
         columnSettings: [
@@ -105,5 +98,8 @@ export class newOrders {
             result += this.orderDetails.quantity.value * this.orderDetails.unitPrice.value;
         });
         return result.toFixed(2);
+    }
+    printCurrentOrder() {
+        window.open('home/print/' + this.orders.id.value);
     }
 }

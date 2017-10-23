@@ -1498,6 +1498,9 @@ export class column<dataType> implements ColumnSetting<any> {
     }
     readonly: boolean;
     inputType: string;
+    isEqualTo(value: dataType) {
+        return new filter(apply => apply(this.key, value));
+    }
 }
 export interface iDataColumnSettings {
     key?: string;
@@ -1528,7 +1531,30 @@ export class numberColumn extends column<number>{
 }
 
 export interface iFilter {
-    addToUrl(add: (name: string, val: string) => void): void;
+    __addToUrl(add: (name: string, val: any) => void): void;
+}
+class filter implements iFilter {
+    constructor(private apply: (add: (name: string, val: any) => void) => void) {
+
+    }
+    and(filter: iFilter): iFilter {
+        return new andFilter(this, filter);
+    }
+
+    public __addToUrl(add: (name: string, val: any) => void): void {
+        this.apply(add);
+    }
+}
+class andFilter implements iFilter {
+    constructor(private a: iFilter, private b: iFilter) {
+
+    }
+
+
+    public __addToUrl(add: (name: string, val: any) => void): void {
+        this.a.__addToUrl(add);
+        this.b.__addToUrl(add);
+    }
 }
 
 
@@ -1547,12 +1573,22 @@ export class dataView {
             dataSettings.allowInsert = this.settings.allowInsert;
         if (this.settings.allowDelete)
             dataSettings.allowDelete = this.settings.allowDelete;
+        if (this.settings.where) {
+            dataSettings.get = {};
+            
+            if (this.settings.where instanceof Array) {
+                this.settings.where.forEach(w => {
+                });
+            }
+            
+        }
         return new DataSettings(this.settings.from.__restUrl, dataSettings);
     }
 }
 export interface IdataViewSettings {
     from: entity;
     displayColumns: ColumnSetting<any>[];
+    where?: iFilter[] | iFilter;
     allowUpdate?: boolean,
     allowInsert?: boolean,
     allowDelete?: boolean,

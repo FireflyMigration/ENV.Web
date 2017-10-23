@@ -12,6 +12,10 @@ export class newOrders {
     orders = new models.orders();
     dv = new utils.dataView({
         from: this.orders,
+        where: [
+            this.orders.shipVia.isEqualTo(1),
+            this.orders.shipCity.isEqualTo("London")
+        ],
 
         displayColumns: [
             this.orders.id,

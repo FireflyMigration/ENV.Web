@@ -208,9 +208,9 @@ export class ColumnCollection<rowType> {
             });
         });
 
-        
+
     }
-    
+
     _getColValue(col: ColumnSetting<any>, row: any) {
         let r;
         if (col.getValue) {
@@ -578,7 +578,7 @@ export class SelectPopupComponent {
     ngOnChanges(): void {
         if (this.dataView && !this.settings) {
             this.settings = this.dataView.__getDataSettings();
-            this.dataView.showSelectPopup = (x)=>this.settings.showSelectPopup(()=>x());
+            this.dataView.showSelectPopup = (x) => this.settings.showSelectPopup(() => x());
         }
     }
 }
@@ -937,7 +937,8 @@ export class DataSettings<rowType>  {
     setCurrentRow(row: rowType) {
         this.currentRow = row;
         if (this.onEnterRow && row) {
-            this.onEnterRow(row);
+            this.__scopeToRow(this.currentRow, () =>
+                this.onEnterRow(row));
         }
 
     }
@@ -1210,7 +1211,7 @@ class ModelState<rowType> {
     modelState = {};
 }
 
-export type rowEvent<T> = (row: T, doInScope: ((what:(()=>void)) => void))=>void;
+export type rowEvent<T> = (row: T, doInScope: ((what: (() => void)) => void)) => void;
 
 export interface ColumnSetting<rowType> {
     key?: string;
@@ -1633,6 +1634,12 @@ class andFilter implements iFilter {
 
 
 export class dataView {
+    refreshData(): any {
+        this.initDataSettings();
+        let getOptions = {} as getOptions<any>;
+        applyWhereToGet(this.settings.where, getOptions);
+        this.dataSettings.get(getOptions);
+    }
 
     constructor(private settings?: IdataViewSettings) {
     }
@@ -1659,9 +1666,10 @@ export class dataView {
             dataSettings.allowInsert = this.settings.allowInsert;
         if (this.settings.allowDelete)
             dataSettings.allowDelete = this.settings.allowDelete;
+        if (this.settings.onEnterRow)
+            dataSettings.onEnterRow = this.settings.onEnterRow;
         if (this.settings.where) {
             dataSettings.get = {};
-            dataSettings.get.otherUrlParameters = {};
             applyWhereToGet(this.settings.where, dataSettings.get);
 
         }
@@ -1724,7 +1732,11 @@ class dataSettingsColumnValueProvider implements columnValueProvider {
 
 
     getValue(key: string) {
-        return this.currentRow()[key];
+        let r = this.currentRow();
+        if (!r)
+            return undefined;
+
+        return r[key];
     }
     setValue(key: string, value: any): void {
         this.currentRow()[key] = value;
@@ -1734,9 +1746,9 @@ class relationColumnValueProvider implements columnValueProvider {
 
     currentRow: () => any;
     constructor(to: entity, on: iFilter | iFilter[], ds: dataSettingsColumnValueProvider) {
-        
 
-        
+
+
         for (let key in to) {
             let col = to[key];
             if (col instanceof column) {
@@ -1751,10 +1763,14 @@ class relationColumnValueProvider implements columnValueProvider {
             applyWhereToGet(on, get);
             return l._internalGetByOptions(get).value;
         }
-         
+
     }
     getValue(key: string) {
-        return this.currentRow()[key];
+        let r = this.currentRow();
+        if (!r)
+            return undefined;
+
+        return r[key];
     }
     setValue(key: string, value: any): void {
         this.currentRow()[key] = value;
@@ -1766,6 +1782,7 @@ export interface IdataViewSettings {
     relations?: IRelation | IRelation[];
     displayColumns?: ColumnSetting<any>[];
     where?: iFilter[] | iFilter;
+    onEnterRow?: () => void;
     allowUpdate?: boolean,
     allowInsert?: boolean,
     allowDelete?: boolean,

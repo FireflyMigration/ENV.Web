@@ -7,6 +7,7 @@ import * as models from './newModels';
 })
 export class newOrders {
     orders = new models.orders();
+    orderDetails = new models.orderDetails();
     customers = new models.customers();
 
     customersForSelectCustomer = new models.customers();
@@ -25,6 +26,13 @@ export class newOrders {
 
 
     shippers = new models.shippers();
+
+    orderDetailsDataView = new utils.dataView({
+        from: this.orderDetails,
+        where: this.orderDetails.orderID.isEqualTo(this.orders.id)
+
+    });
+
     dv = new utils.dataView({
         from: this.orders,
         where: [
@@ -39,6 +47,8 @@ export class newOrders {
             on: this.customers.id.isEqualTo(this.orders.customerID)
         }
         ],
+        onEnterRow: () => this.orderDetailsDataView.refreshData(),
+        
         displayColumns: [
             this.orders.id,
             {
@@ -59,6 +69,10 @@ export class newOrders {
         allowUpdate: true,
         allowInsert: true
     });
+
+    
+
+
     shipInfoArea = this.dv.addArea({
         numberOfColumnAreas:2,
         columnSettings: [

@@ -4,16 +4,21 @@
 <div>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a href="#tab1" data-toggle="tab">Tab 1</a></li>
-        <li><a href="#tab2" data-toggle="tab">Tab 2</a></li>
+        <li class="active"><a href="#shipInfo" data-toggle="tab">Ship Info</a></li>
+        <li>
+            <a href="#orderDetailsTab" data-toggle="tab">
+                Order Details, Total:
+            </a>
+        </li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
-        <div class="tab-pane active" id="tab1">
+        <div class="tab-pane active" id="shipInfo">
             <data-area [settings]="shipInfoArea"></data-area>
         </div>
-        <div class="tab-pane" id="tab2">
-            Tab 2 Info
+        <div class="tab-pane" id="orderDetailsTab">
+            <data-grid [dataView]="orderDetailsDataView" *ngIf="orders.id.value"></data-grid>
         </div>
     </div>
+    <button class="btn btn-primary" (click)="printCurrentOrder()">Print</button>
 </div>

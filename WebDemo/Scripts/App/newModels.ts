@@ -51,3 +51,33 @@ export class customers extends utils.entity {
         this.initColumns();
     }
 }
+export class orderDetails extends utils.entity {
+    orderID = new utils.numberColumn('OrderID');
+    productID = new utils.numberColumn('ProductID');
+    unitPrice = new utils.numberColumn('UnitPrice');
+    quantity = new utils.numberColumn('Quantity');
+    discount = new utils.numberColumn('Discount');
+    id = new utils.textColumn('id');
+
+    constructor() {
+        super('/dataapi/orderDetails');
+        this.initColumns();
+    }
+}
+export class products extends utils.entity {
+    id = new utils.numberColumn('ProductID');
+    productName = new utils.textColumn('ProductName');
+    supplierID = new utils.numberColumn('SupplierID');
+    categoryID = new utils.numberColumn('CategoryID');
+    quantityPerUnit = new utils.textColumn('QuantityPerUnit');
+    unitPrice = new utils.numberColumn('UnitPrice');
+    unitsInStock = new utils.numberColumn('UnitsInStock');
+    unitsOnOrder = new utils.numberColumn('UnitsOnOrder');
+    reorderLevel = new utils.numberColumn('ReorderLevel');
+    
+
+    constructor() {
+        super('/dataapi/products');
+        this.initColumns();
+    }
+}

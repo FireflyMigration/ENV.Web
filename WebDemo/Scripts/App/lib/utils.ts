@@ -5,7 +5,7 @@ import { Routes } from '@angular/router';
 
 
 export class ColumnCollection<rowType> {
-    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private _filterData: (f: rowType) => void) {
+    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private _filterData: (f: rowType) => void,private scopeToRow:(r:rowType,andDo:()=>void)=>void) {
 
         if (this.allowDesignMode == undefined) {
             if (location.search)
@@ -191,8 +191,14 @@ export class ColumnCollection<rowType> {
     }
     _getColValue(col: ColumnSetting<any>, row: any) {
         let r;
-        if (col.getValue)
-            r = col.getValue(row);
+        if (col.getValue) {
+            this.scopeToRow(row, () => {
+                r = col.getValue(row)
+                if (r instanceof column)
+                    r = r.value;
+            });
+            
+        }
         else r = row[col.key];
         if (col.inputType == "date")
             r = new Date(r).toLocaleDateString();
@@ -393,7 +399,7 @@ export class DataAreaCompnent implements OnChanges {
         }
         return this.lastCols;
     }
-    @Input() settings: dataAreaSettings = { columns: new ColumnCollection(() => undefined, () => false, null) };
+    @Input() settings: dataAreaSettings = { columns: new ColumnCollection(() => undefined, () => false, null, (r, andDo) => andDo()) };
     @Input() labelWidth = 4;
     @Input() columns = 1;
 }
@@ -884,13 +890,17 @@ export class DataSettings<rowType>  {
             this.onNewRow(r);
         this.setCurrentRow(r);
     }
-
+    
+    noam: string;
+    __scopeToRow(r: rowType, andDo: () => void) {
+        andDo();
+    }
     addArea(settings: IDataAreaSettings<rowType>) {
         let col = new ColumnCollection<rowType>(() => this.currentRow, () => this.allowUpdate, (userFilter) => {
             this.extraFitler = userFilter;
             this.page = 1;
             this.getRecords();
-        });
+        }, (r, andDo) => this.__scopeToRow(r, andDo));
         col.numOfColumnsInGrid = 0;
 
         return new DataAreaSettings<rowType>(col, settings);
@@ -1026,7 +1036,7 @@ export class DataSettings<rowType>  {
         this.extraFitler = userFilter;
         this.page = 1;
         this.getRecords();
-    });
+    }, (r, andDo) => this.__scopeToRow(r, andDo));
 
 
 
@@ -1503,6 +1513,26 @@ export class column<dataType> implements ColumnSetting<any> {
     isEqualTo(value: dataType) {
         return new filter(apply => apply(this.key, value));
     }
+    __valueProvider: columnValueProvider = new dummyColumnStorage();
+    get value() {
+        return  this.__valueProvider.getValue(this.key);
+    }
+    set value(value: dataType) { this.__valueProvider.setValue(this.key, value); }
+}
+export interface columnValueProvider {
+    getValue(key: string): any;
+    setValue(key: string, value: any): void;
+}
+class dummyColumnStorage implements columnValueProvider {
+
+    private _val: string;
+    public getValue(key:string): any {
+        return this._val;
+    }
+
+    public setValue(key:string, value: string): void {
+        this._val = value;
+    }
 }
 export interface iDataColumnSettings {
     key?: string;
@@ -1590,7 +1620,44 @@ export class dataView {
             }
             
         }
-        return new DataSettings(this.settings.from.__restUrl, dataSettings);
+        let result = new DataSettings(this.settings.from.__restUrl, dataSettings);
+        let cvp = new dataSettingsColumnValueProvider(result);
+        for (let key in this.settings.from) {
+            let col = this.settings.from[key];
+            if (col instanceof column) {
+                col.__valueProvider = cvp;
+            }
+
+        }
+        return result;
+    }
+}
+            
+class dataSettingsColumnValueProvider implements columnValueProvider {
+
+    
+    constructor(private ds: DataSettings<any>) {
+        this.currentRow = () => ds.currentRow;
+        ds.noam = "yeah";
+        ds.__scopeToRow = (r, andDo) => {
+            let prev = this.currentRow;
+            this.currentRow = () => r;
+            try {
+                andDo();
+            }
+            finally {
+                this.currentRow = prev;
+            }
+        };
+    }
+    currentRow: () => any;
+
+
+    getValue(key: string) {
+        return this.currentRow()[key];
+    }
+    setValue(key: string, value: any): void {
+        this.currentRow()[key] = value;
     }
 }
 export interface IdataViewSettings {

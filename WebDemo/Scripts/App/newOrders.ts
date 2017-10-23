@@ -13,7 +13,6 @@ export class newOrders {
     dv = new utils.dataView({
         from: this.orders,
         where: [
-            this.orders.shipVia.isEqualTo(1),
             this.orders.shipCity.isEqualTo("London")
         ],
 
@@ -21,7 +20,8 @@ export class newOrders {
             this.orders.id,
             this.orders.customerID,
             this.orders.shippedDate,
-            this.orders.shipVia
+            this.orders.shipVia,
+            { caption: "test", getValue: () => this.orders.shipVia }
         ],
         allowUpdate: true
     });

@@ -6,29 +6,61 @@ import * as models from './newModels';
     template: `
 <h1>newOrders</h1>
 <data-grid [dataView]="dv"></data-grid>
+<select-popup [dataView]="selectCustomer" ></select-popup>
 `
 })
 export class newOrders {
     orders = new models.orders();
+    customers = new models.customers();
+
+    customersForSelectCustomer = new models.customers();
+    selectCustomer = new utils.dataView({
+        from: this.customersForSelectCustomer,
+        numOfColumnsInGrid:4,
+        displayColumns: [
+            this.customersForSelectCustomer.id,
+            this.customersForSelectCustomer.companyName,
+            this.customersForSelectCustomer.contactName,
+            this.customersForSelectCustomer.country,
+            this.customersForSelectCustomer.address,
+            this.customersForSelectCustomer.city
+        ]
+    });
+
+
     shippers = new models.shippers();
     dv = new utils.dataView({
         from: this.orders,
         where: [
             this.orders.shipCity.isEqualTo(() => "London")
         ],
-        relations: {
+        relations: [{
             to: this.shippers,
             on: this.shippers.id.isEqualTo(this.orders.shipVia)
         },
+        {
+            to: this.customers,
+            on: this.customers.id.isEqualTo(this.orders.customerID)
+        }
+        ],
         displayColumns: [
             this.orders.id,
-            this.orders.customerID,
-            this.orders.shippedDate,
+            {
+                column: this.orders.customerID,
+                getValue: () => this.customers.companyName,
+                click: (r, scopeAndDo) =>
+                    this.selectCustomer.showSelectPopup(() =>
+                        scopeAndDo(() =>
+                            this.orders.customerID.value = this.customersForSelectCustomer.id.value))
+                
+            },
+            this.orders.orderDate,
             {
                 column: this.orders.shipVia,
-                getValue: () => this.shippers.companyName
+                dropDown: { source: this.shippers }
             },
         ],
-        allowUpdate: true
+        allowUpdate: true,
+        allowInsert: true
     });
 }

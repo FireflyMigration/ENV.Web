@@ -205,6 +205,29 @@ namespace ENV.Web
     }");
             tw.WriteLine("}");
         }
+        public void CreateTypeScriptClass(TextWriter tw, string name, string url)
+        {
+            init();
+
+
+
+
+            tw.WriteLine($@"export class {name} extends utils.entity {{");
+            foreach (var item in _columns)
+            {
+                tw.WriteLine($"    {item.Key} = new utils.{item.getColumnType()}('{item.Caption}');");
+            }
+            tw.WriteLine($@"
+    constructor() {{
+        super('{url}');
+        this.initColumns();
+    }}
+}}");
+            
+            
+            
+            
+        }
         public void CreateTypeScriptInterface(TextWriter tw, string name, string url)
         {
 
@@ -498,8 +521,18 @@ namespace ENV.Web
                 return "text";
             }
 
-
-
+            internal object getColumnType()
+            {
+                if (_col is BoolColumn)
+                    return "boolColumn";
+                else if (_col is NumberColumn)
+                    return "numberColumn";
+                else if (_col is DateColumn)
+                    return "dateColumn";
+                else if (_col is TimeColumn)
+                    return "timeColumn";
+                return "textColumn";
+            }
         }
         List<ColumnInViewModel> _columns = new List<ColumnInViewModel>();
         Dictionary<ColumnBase, ColumnInViewModel> _colMap = new Dictionary<ColumnBase, ColumnInViewModel>();

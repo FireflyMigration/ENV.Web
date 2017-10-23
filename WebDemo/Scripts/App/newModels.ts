@@ -33,3 +33,21 @@ export class shippers extends utils.entity {
         this.initColumns();
     }
 }
+export class customers extends utils.entity {
+    id = new utils.textColumn('CustomerID');
+    companyName = new utils.textColumn('CompanyName');
+    contactName = new utils.textColumn('ContactName');
+    contactTitle = new utils.textColumn('ContactTitle');
+    address = new utils.textColumn('Address');
+    city = new utils.textColumn('City');
+    region = new utils.textColumn('Region');
+    postalCode = new utils.textColumn('PostalCode');
+    country = new utils.textColumn('Country');
+    phone = new utils.textColumn('Phone');
+    fax = new utils.textColumn('Fax');
+
+    constructor() {
+        super('/dataapi/customers');
+        this.initColumns();
+    }
+}

@@ -102,7 +102,10 @@ export class ColumnCollection<rowType> {
                         }
                         else if (s.dropDown.source instanceof RestList) {
                             s.dropDown.source.get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
-                        } else {
+                        } else if (s.dropDown.source instanceof entity) {
+                            new RestList(s.dropDown.source.__restUrl).get({ limit: 5000 }).then(arr => populateBasedOnArray(arr));
+                        }
+                        else {
                             let x = s.dropDown.source as Promise<any>;
                             if (x.then) {
                                 x.then(arr => populateBasedOnArray(arr));
@@ -197,6 +200,17 @@ export class ColumnCollection<rowType> {
             return false
         return !col.readonly;
     }
+    _click(col: ColumnSetting<any>, row: any) {
+
+        this.scopeToRow(row, () => {
+            col.click(row, what => {
+                this.scopeToRow(row, what);
+            });
+        });
+
+        
+    }
+    
     _getColValue(col: ColumnSetting<any>, row: any) {
         let r;
         if (col.getValue) {
@@ -423,7 +437,7 @@ export class DataAreaCompnent implements OnChanges {
     <div >
         <div [class.input-group]="showDescription()||map.click" *ngIf="!isSelect()">
             <div class="input-group-btn" *ngIf="map.click">
-                <button type="button" class="btn btn-default" (click)="map.click(record)" > <span class="glyphicon glyphicon-chevron-down"></span></button>
+                <button type="button" class="btn btn-default" (click)="settings._click(map,record)" > <span class="glyphicon glyphicon-chevron-down"></span></button>
             </div>
             <input class="form-control"  [(ngModel)]="record[map.key]" type="{{settings._getColDataType(map)}}" (ngModelChange)="settings._colValueChanged(map,record)" />
             <div class="input-group-addon" *ngIf="showDescription()">{{settings._getColValue(map,record)}}</div>
@@ -559,9 +573,14 @@ function makeid() {
 })
 export class SelectPopupComponent {
     @Input() settings: DataSettings<any>;
+    @Input() dataView: dataView;
 
-
-
+    ngOnChanges(): void {
+        if (this.dataView && !this.settings) {
+            this.settings = this.dataView.__getDataSettings();
+            this.dataView.showSelectPopup = (x)=>this.settings.showSelectPopup(()=>x());
+        }
+    }
 }
 
 
@@ -570,7 +589,7 @@ export class SelectPopupComponent {
 export interface dropDownOptions {
 
     items?: dropDownItem[] | string[] | any[];
-    source?: Promise<any> | RestList<any> | string | DataSettings<any>;
+    source?: Promise<any> | RestList<any> | string | DataSettings<any> | entity;
     idKey?: string;
     captionKey?: string;
 }
@@ -1191,6 +1210,8 @@ class ModelState<rowType> {
     modelState = {};
 }
 
+export type rowEvent<T> = (row: T, doInScope: ((what:(()=>void)) => void))=>void;
+
 export interface ColumnSetting<rowType> {
     key?: string;
     caption?: string;
@@ -1201,10 +1222,12 @@ export interface ColumnSetting<rowType> {
     cssClass?: (string | ((row: rowType) => string));
     defaultValue?: (row: rowType) => any;
     onUserChangedValue?: (row: rowType) => void;
-    click?: (row: rowType) => void;
+    click?: rowEvent<rowType>;
     dropDown?: dropDownOptions;
     column?: column<any>
 }
+
+
 
 interface FilteredColumnSetting<rowType> extends ColumnSetting<rowType> {
     _showFilter?: boolean;
@@ -1613,6 +1636,7 @@ export class dataView {
 
     constructor(private settings?: IdataViewSettings) {
     }
+    showSelectPopup: (onSelect: () => void) => void;
     __getDataSettings(): any {
 
         let dataSettings: IDataSettings<any> = {
@@ -1630,6 +1654,8 @@ export class dataView {
             applyWhereToGet(this.settings.where, dataSettings.get);
 
         }
+        if (this.settings.numOfColumnsInGrid != undefined)
+            dataSettings.numOfColumnsInGrid = this.settings.numOfColumnsInGrid;
         let result = new DataSettings(this.settings.from.__restUrl, dataSettings);
         let cvp = new dataSettingsColumnValueProvider(result);
         for (let key in this.settings.from) {
@@ -1725,8 +1751,9 @@ class relationColumnValueProvider implements columnValueProvider {
 }
 export interface IdataViewSettings {
     from: entity;
+    numOfColumnsInGrid?: number;
     relations?: IRelation | IRelation[];
-    displayColumns: ColumnSetting<any>[];
+    displayColumns?: ColumnSetting<any>[];
     where?: iFilter[] | iFilter;
     allowUpdate?: boolean,
     allowInsert?: boolean,

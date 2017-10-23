@@ -748,8 +748,8 @@ export class DataGridComponent implements OnChanges {
                 click: r => {
                     let s = new ModelState(r);
                     r.__modelState = () => s;
-                    if (this.settings.onSavingRow)
-                        this.settings.onSavingRow(s);
+                    this.settings._doSavingRow(s);
+
                     if (s.isValid)
                         this.catchErrors(r.save(), r);
                     else
@@ -915,7 +915,8 @@ export class DataSettings<rowType>  {
             }
         });
         if (this.onNewRow)
-            this.onNewRow(r);
+            this.__scopeToRow(r, () =>
+                this.onNewRow(r));
         this.setCurrentRow(r);
     }
 
@@ -1012,7 +1013,11 @@ export class DataSettings<rowType>  {
     onSavingRow?: (s: ModelState<any>) => void;
     onEnterRow: (row: rowType) => void;
     onNewRow: (row: rowType) => void;
-
+    _doSavingRow(s: ModelState<any>) {
+        if (this.onSavingRow)
+            this.__scopeToRow(s.row,
+                () => this.onSavingRow(s));
+    }
     caption: string;
     lookup: Lookup<rowType>;
     constructor(restUrl?: string, settings?: IDataSettings<rowType>) {
@@ -1668,6 +1673,10 @@ export class dataView {
             dataSettings.allowDelete = this.settings.allowDelete;
         if (this.settings.onEnterRow)
             dataSettings.onEnterRow = this.settings.onEnterRow;
+        if (this.settings.onNewRow)
+            dataSettings.onNewRow = this.settings.onNewRow;
+        if (this.settings.onSavingRow)
+            dataSettings.onSavingRow = this.settings.onSavingRow;
         if (this.settings.where) {
             dataSettings.get = {};
             applyWhereToGet(this.settings.where, dataSettings.get);
@@ -1783,6 +1792,8 @@ export interface IdataViewSettings {
     displayColumns?: ColumnSetting<any>[];
     where?: iFilter[] | iFilter;
     onEnterRow?: () => void;
+    onNewRow?: () => void;
+    onSavingRow?: (modelState: ModelState<any>) => void;
     allowUpdate?: boolean,
     allowInsert?: boolean,
     allowDelete?: boolean,

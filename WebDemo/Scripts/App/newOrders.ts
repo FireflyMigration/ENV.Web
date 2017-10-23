@@ -29,8 +29,15 @@ export class newOrders {
 
     orderDetailsDataView = new utils.dataView({
         from: this.orderDetails,
-        where: this.orderDetails.orderID.isEqualTo(this.orders.id)
-
+        allowDelete : true,
+        allowInsert : true,
+        allowUpdate : true,
+        where: this.orderDetails.orderID.isEqualTo(this.orders.id),
+        
+        onNewRow: () => {
+            this.orderDetails.orderID.value = this.orders.id.value;
+            this.orderDetails.unitPrice.value = 1;
+        }
     });
 
     dv = new utils.dataView({

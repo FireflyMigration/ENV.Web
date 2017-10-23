@@ -23,3 +23,13 @@ export class orders extends utils.entity {
         this.initColumns();
     }
 }
+
+export class shippers extends utils.entity {
+    id = new utils.numberColumn({ caption: 'ShipperID', readonly: true });
+    companyName = new utils.textColumn('CompanyName');
+    phone = new utils.textColumn('Phone');
+    constructor() {
+        super('dataApi/shippers');
+        this.initColumns();
+    }
+}

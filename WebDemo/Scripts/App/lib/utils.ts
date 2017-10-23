@@ -33,6 +33,14 @@ export class ColumnCollection<rowType> {
         for (let c of columns) {
             let s: ColumnSetting<rowType>;
             let x = c as ColumnSetting<rowType>;
+            if (x.column) {
+                if (!x.key && x.column.caption)
+                    x.key = x.column.key;
+                if (!x.caption && x.column.caption)
+                    x.caption = x.column.caption;
+
+            }
+
             if (x.key || x.getValue) {
                 s = x;
             }
@@ -418,7 +426,7 @@ export class DataAreaCompnent implements OnChanges {
                 <button type="button" class="btn btn-default" (click)="map.click(record)" > <span class="glyphicon glyphicon-chevron-down"></span></button>
             </div>
             <input class="form-control"  [(ngModel)]="record[map.key]" type="{{settings._getColDataType(map)}}" (ngModelChange)="settings._colValueChanged(map,record)" />
-            <div class="input-group-addon" *ngIf="showDescription()">{{map.getValue(record)}}</div>
+            <div class="input-group-addon" *ngIf="showDescription()">{{settings._getColValue(map,record)}}</div>
             
         </div>
         <div *ngIf="isSelect()">
@@ -1194,6 +1202,7 @@ export interface ColumnSetting<rowType> {
     onUserChangedValue?: (row: rowType) => void;
     click?: (row: rowType) => void;
     dropDown?: dropDownOptions;
+    column?: column<any>
 }
 
 interface FilteredColumnSetting<rowType> extends ColumnSetting<rowType> {
@@ -1662,9 +1671,14 @@ class dataSettingsColumnValueProvider implements columnValueProvider {
 }
 export interface IdataViewSettings {
     from: entity;
+    relations?: IRelation | IRelation[];
     displayColumns: ColumnSetting<any>[];
     where?: iFilter[] | iFilter;
     allowUpdate?: boolean,
     allowInsert?: boolean,
     allowDelete?: boolean,
+}
+export interface IRelation {
+    to: entity;
+    on: iFilter[] | iFilter;
 }

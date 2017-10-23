@@ -5,7 +5,7 @@ import { Routes } from '@angular/router';
 
 
 export class ColumnCollection<rowType> {
-    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private _filterData: (f: rowType) => void,private scopeToRow:(r:rowType,andDo:()=>void)=>void) {
+    constructor(public currentRow: () => any, private allowUpdate: () => boolean, private _filterData: (f: rowType) => void, private scopeToRow: (r: rowType, andDo: () => void) => void) {
 
         if (this.allowDesignMode == undefined) {
             if (location.search)
@@ -205,7 +205,7 @@ export class ColumnCollection<rowType> {
                 if (r instanceof column)
                     r = r.value;
             });
-            
+
         }
         else r = row[col.key];
         if (col.inputType == "date")
@@ -808,7 +808,7 @@ class DataAreaSettings<rowType>
 export class Lookup<lookupType> {
 
     constructor(url: string) {
-        this.restList = new RestList<lookupType>(url);
+        this.restList = new RestList(url);
     }
 
     private restList: RestList<lookupType>;
@@ -823,20 +823,21 @@ export class Lookup<lookupType> {
 
     private getInternal(filter: lookupType): lookupRowInfo<lookupType> {
         if (filter) {
-            let found = false;
+            let filterHasMember = false;
             for (let member in filter) {
                 if (filter[member] != undefined)
-                    found = true;
+                    filterHasMember = true;
             }
-            if (!found)
+            if (!filterHasMember)
                 filter = undefined;
         }
         let find: getOptions<lookupType> = {};
         find.isEqualTo = filter;
 
+        return this._internalGetByOptions(find);
+    }
 
-
-
+    _internalGetByOptions(find: getOptions<lookupType>): lookupRowInfo<lookupType> {
         let key = JSON.stringify(find);
         if (this.cache == undefined)
             this.cache = {};
@@ -850,18 +851,18 @@ export class Lookup<lookupType> {
                 res.found = false;
                 return res;
             } else
-                res.promise = this.restList.get(find).then(() => {
+                res.promise = this.restList.get(find).then(r => {
                     res.loading = false;
-                    if (this.restList.items.length > 0) {
-                        res.value = this.restList.items[0];
+                    if (r.length > 0) {
+                        res.value = r[0];
                         res.found = true;
                     }
                     return res;
                 });
             return res;
         }
-
     }
+
     whenGet(r: lookupType) {
         return this.getInternal(r).promise.then(r => r.value);
     }
@@ -898,7 +899,7 @@ export class DataSettings<rowType>  {
             this.onNewRow(r);
         this.setCurrentRow(r);
     }
-    
+
     noam: string;
     __scopeToRow(r: rowType, andDo: () => void) {
         andDo();
@@ -1147,7 +1148,7 @@ export interface IDataSettings<rowType> {
     allowInsert?: boolean,
     allowDelete?: boolean,
     hideDataArea?: boolean,
-    
+
     columnSettings?: ColumnSetting<rowType>[],
     areas?: { [areaKey: string]: ColumnSetting<any>[] },
     columnKeys?: string[],
@@ -1289,9 +1290,10 @@ export class RestList<T extends hasId> implements Iterable<T>{
 
         return myFetch(url.url).then(r => {
             let x: T[] = r;
+            let result = r.map(x => this.map(x));
             if (getId == this.lastGetId)
-                this.items = r.map(x => this.map(x));
-            return this.items;
+                this.items = result;
+            return result;
         });
     }
     add(): T {
@@ -1492,7 +1494,7 @@ export class entity {
     }
 
 }
-export function init<T>(item: T, doInit: (i: T)=>void): T {
+export function init<T>(item: T, doInit: (i: T) => void): T {
     doInit(item);
     return item;
 }
@@ -1519,12 +1521,20 @@ export class column<dataType> implements ColumnSetting<any> {
     }
     readonly: boolean;
     inputType: string;
-    isEqualTo(value: dataType) {
-        return new filter(apply => apply(this.key, value));
+    isEqualTo(value: column<dataType> | (() => dataType)) {
+
+        let getValue: (() => dataType);
+        if (isFunction(value))
+            getValue = <(() => dataType)>value;
+        else if (value instanceof column)
+            getValue = () => value.value;
+
+
+        return new filter(apply => apply(this.key, getValue()));
     }
     __valueProvider: columnValueProvider = new dummyColumnStorage();
     get value() {
-        return  this.__valueProvider.getValue(this.key);
+        return this.__valueProvider.getValue(this.key);
     }
     set value(value: dataType) { this.__valueProvider.setValue(this.key, value); }
 }
@@ -1535,11 +1545,11 @@ export interface columnValueProvider {
 class dummyColumnStorage implements columnValueProvider {
 
     private _val: string;
-    public getValue(key:string): any {
+    public getValue(key: string): any {
         return this._val;
     }
 
-    public setValue(key:string, value: string): void {
+    public setValue(key: string, value: string): void {
         this._val = value;
     }
 }
@@ -1617,17 +1627,8 @@ export class dataView {
         if (this.settings.where) {
             dataSettings.get = {};
             dataSettings.get.otherUrlParameters = {};
-            if (this.settings.where instanceof Array) {
-                this.settings.where.forEach(w => {
-                    w.__addToUrl((k, v) => { dataSettings.get.otherUrlParameters[k] = v });
-                });
-            }
-            else {
-                let y = this.settings.where as iFilter;
-                if (y && y.__addToUrl)
-                    y.__addToUrl((k, v) => { dataSettings.get.otherUrlParameters[k] = v });
-            }
-            
+            applyWhereToGet(this.settings.where, dataSettings.get);
+
         }
         let result = new DataSettings(this.settings.from.__restUrl, dataSettings);
         let cvp = new dataSettingsColumnValueProvider(result);
@@ -1638,13 +1639,36 @@ export class dataView {
             }
 
         }
+        if (this.settings.relations) {
+            if (this.settings.relations instanceof Array) {
+                this.settings.relations.forEach(r => new relationColumnValueProvider(r.to, r.on, cvp));
+            }
+            else {
+                let r = this.settings.relations as IRelation;
+                if (r.to && r.on)
+                    new relationColumnValueProvider(r.to, r.on, cvp);
+            }
+        }
         return result;
     }
 }
-            
-class dataSettingsColumnValueProvider implements columnValueProvider {
+function applyWhereToGet(where: iFilter[] | iFilter, options: getOptions<any>) {
+    if (!options.otherUrlParameters)
+        options.otherUrlParameters = {};
+    if (where instanceof Array) {
+        where.forEach(w => {
+            w.__addToUrl((k, v) => { options.otherUrlParameters[k] = v });
+        });
+    }
+    else {
+        let y = where as iFilter;
+        if (y && y.__addToUrl)
+            y.__addToUrl((k, v) => { options.otherUrlParameters[k] = v });
+    }
 
-    
+}
+
+class dataSettingsColumnValueProvider implements columnValueProvider {
     constructor(private ds: DataSettings<any>) {
         this.currentRow = () => ds.currentRow;
         ds.noam = "yeah";
@@ -1662,6 +1686,36 @@ class dataSettingsColumnValueProvider implements columnValueProvider {
     currentRow: () => any;
 
 
+    getValue(key: string) {
+        return this.currentRow()[key];
+    }
+    setValue(key: string, value: any): void {
+        this.currentRow()[key] = value;
+    }
+}
+class relationColumnValueProvider implements columnValueProvider {
+
+    currentRow: () => any;
+    constructor(to: entity, on: iFilter | iFilter[], ds: dataSettingsColumnValueProvider) {
+        
+
+        
+        for (let key in to) {
+            let col = to[key];
+            if (col instanceof column) {
+                col.__valueProvider = this;
+            }
+
+        }
+
+        let l = new DataSettings(to.__restUrl).lookup;
+        this.currentRow = () => {
+            let get: getOptions<any> = {};
+            applyWhereToGet(on, get);
+            return l._internalGetByOptions(get).value;
+        }
+         
+    }
     getValue(key: string) {
         return this.currentRow()[key];
     }

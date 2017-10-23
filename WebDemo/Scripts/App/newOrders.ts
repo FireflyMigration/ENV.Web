@@ -14,11 +14,12 @@ export class newOrders {
     dv = new utils.dataView({
         from: this.orders,
         where: [
-            this.orders.shipCity.isEqualTo("London")
+            this.orders.shipCity.isEqualTo(() => "London")
         ],
-        relations: { to: this.shippers, on: this.shippers.id.isEqualTo(this.orders.shipVia) }
-        ,
-
+        relations: {
+            to: this.shippers,
+            on: this.shippers.id.isEqualTo(this.orders.shipVia)
+        },
         displayColumns: [
             this.orders.id,
             this.orders.customerID,
@@ -27,8 +28,6 @@ export class newOrders {
                 column: this.orders.shipVia,
                 getValue: () => this.shippers.companyName
             },
-
-            
         ],
         allowUpdate: true
     });

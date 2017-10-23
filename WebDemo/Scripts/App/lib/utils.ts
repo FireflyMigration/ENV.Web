@@ -625,12 +625,14 @@ class ColumnDesigner {
 })
 
 
+
 export class DataGridComponent implements OnChanges {
 
     // Inspired by  https://medium.com/@ct7/building-a-reusable-table-layout-for-your-angular-2-project-adf6bba3b498
 
     @Input() records: Iterable<any>;
-    @Input() settings = new DataSettings();
+    @Input() settings: DataSettings<any>;
+    @Input() dataView: dataView;
 
     rowButtons: rowButtonBase[] = [];
     keys: string[] = [];
@@ -698,8 +700,12 @@ export class DataGridComponent implements OnChanges {
 
 
     ngOnChanges(): void {
+        if (this.dataView && !this.settings)
+            this.settings = this.dataView.__getDataSettings();
         if (!this.settings)
             return;
+
+
         this.rowButtons = [];
         if (this.settings.allowUpdate) {
             this.addButton({
@@ -760,8 +766,12 @@ export class DataGridComponent implements OnChanges {
 
 
 }
-function makeTitle(key: string) {
-    return key.slice(0, 1).toUpperCase() + key.replace(/_/g, ' ').slice(1);
+export function makeTitle(name: string) {
+    // insert a space before all caps
+    return name.replace(/([A-Z])/g, ' $1')
+        // uppercase the first character
+        .replace(/^./, (str) => str.toUpperCase()).replace('Email', 'eMail').replace(" I D", " ID");
+
 }
 
 
@@ -1438,3 +1448,112 @@ function isNewRow(r: any) {
 }
 
 
+export class entity {
+    constructor(public __restUrl: string) {
+
+    }
+    protected initColumns() {
+        let x = <any>this;
+        for (let c in x) {
+            let y = x[c];
+
+            if (y instanceof column) {
+                if (!y.key)
+                    y.key = c;
+                this.applyColumn(y);
+            }
+        }
+    }
+    private applyColumn(y: column<any>) {
+        if (!y.caption)
+            y.caption = makeTitle(y.key);
+
+    }
+
+}
+export function init<T>(item: T, doInit: (i: T)=>void): T {
+    doInit(item);
+    return item;
+}
+
+export class column<dataType> implements ColumnSetting<any> {
+    key: string;
+    caption: string;
+    constructor(settingsOrCaption?: iDataColumnSettings | string) {
+        if (settingsOrCaption) {
+            if (typeof (settingsOrCaption) === "string") {
+                this.caption = settingsOrCaption;
+            } else {
+                if (settingsOrCaption.key)
+                    this.key = settingsOrCaption.key;
+                if (settingsOrCaption.caption)
+                    this.caption = settingsOrCaption.caption;
+                if (settingsOrCaption.readonly)
+                    this.readonly = settingsOrCaption.readonly;
+                if (settingsOrCaption.inputType)
+                    this.inputType = settingsOrCaption.inputType;
+            }
+
+        }
+    }
+    readonly: boolean;
+    inputType: string;
+}
+export interface iDataColumnSettings {
+    key?: string;
+    caption?: string;
+    readonly?: boolean;
+    inputType?: string;
+}
+export class textColumn extends column<string>{
+    constructor(settingsOrCaption: iDataColumnSettings | string) {
+        super(settingsOrCaption);
+    }
+}
+export class dateColumn extends column<string>{
+    constructor(settingsOrCaption: iDataColumnSettings | string) {
+        super(settingsOrCaption);
+        if (!this.inputType)
+            this.inputType = 'date';
+    }
+
+
+}
+export class numberColumn extends column<number>{
+    constructor(settingsOrCaption: iDataColumnSettings | string) {
+        super(settingsOrCaption);
+        if (!this.inputType)
+            this.inputType = 'number';
+    }
+}
+
+export interface iFilter {
+    addToUrl(add: (name: string, val: string) => void): void;
+}
+
+
+export class dataView {
+
+    constructor(private settings?: IdataViewSettings) {
+    }
+    __getDataSettings(): any {
+
+        let dataSettings: IDataSettings<any> = {
+            columnSettings: this.settings.displayColumns
+        };
+        if (this.settings.allowUpdate)
+            dataSettings.allowUpdate = this.settings.allowUpdate;
+        if (this.settings.allowInsert)
+            dataSettings.allowInsert = this.settings.allowInsert;
+        if (this.settings.allowDelete)
+            dataSettings.allowDelete = this.settings.allowDelete;
+        return new DataSettings(this.settings.from.__restUrl, dataSettings);
+    }
+}
+export interface IdataViewSettings {
+    from: entity;
+    displayColumns: ColumnSetting<any>[];
+    allowUpdate?: boolean,
+    allowInsert?: boolean,
+    allowDelete?: boolean,
+}

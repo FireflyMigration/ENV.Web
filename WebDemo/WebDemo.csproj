@@ -252,9 +252,12 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\App\app.module.ts" />
     <TypeScriptCompile Include="Scripts\App\Categories.ts" />
+    <TypeScriptCompile Include="Scripts\App\lib\data.ts" />
     <TypeScriptCompile Include="Scripts\App\main.ts" />
     <TypeScriptCompile Include="Scripts\App\models.ts" />
     <TypeScriptCompile Include="Scripts\App\lib\utils.ts" />
+    <TypeScriptCompile Include="Scripts\App\newModels.ts" />
+    <TypeScriptCompile Include="Scripts\App\newOrders.ts" />
     <TypeScriptCompile Include="Scripts\App\Orders.ts" />
   </ItemGroup>
   <ItemGroup>

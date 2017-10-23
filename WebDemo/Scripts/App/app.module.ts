@@ -7,12 +7,14 @@ import * as utils from './lib/utils';
 import { RouterModule, Routes } from '@angular/router';
 import { Categories } from './Categories';
 import { Orders } from './Orders';
+import { newOrders } from './newOrders';
 
 
 
 var app = new utils.AppHelper();
 app.Register(Categories);
 app.Register(Orders);
+app.Register(newOrders);
 
 
 

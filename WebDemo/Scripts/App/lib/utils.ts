@@ -1577,10 +1577,16 @@ export class dataView {
             dataSettings.allowDelete = this.settings.allowDelete;
         if (this.settings.where) {
             dataSettings.get = {};
-            
+            dataSettings.get.otherUrlParameters = {};
             if (this.settings.where instanceof Array) {
                 this.settings.where.forEach(w => {
+                    w.__addToUrl((k, v) => { dataSettings.get.otherUrlParameters[k] = v });
                 });
+            }
+            else {
+                let y = this.settings.where as iFilter;
+                if (y && y.__addToUrl)
+                    y.__addToUrl((k, v) => { dataSettings.get.otherUrlParameters[k] = v });
             }
             
         }

@@ -3,7 +3,7 @@ import * as utils from './lib/utils';
 import * as models from './newModels';
 
 @Component({
-    templateUrl:'./scripts/app/newOrders.html'
+    templateUrl: './scripts/app/newOrders.html'
 })
 export class newOrders {
     orders = new models.orders();
@@ -12,7 +12,7 @@ export class newOrders {
     customersForSelectCustomer = new models.customers();
     selectCustomer = new utils.dataView({
         from: this.customersForSelectCustomer,
-        numOfColumnsInGrid:4,
+        numOfColumnsInGrid: 4,
         displayColumns: [
             this.customersForSelectCustomer.id,
             this.customersForSelectCustomer.companyName,
@@ -48,7 +48,7 @@ export class newOrders {
                     this.selectCustomer.showSelectPopup(() =>
                         scopeAndDo(() =>
                             this.orders.customerID.value = this.customersForSelectCustomer.id.value))
-                
+
             },
             this.orders.orderDate,
             {
@@ -58,5 +58,14 @@ export class newOrders {
         ],
         allowUpdate: true,
         allowInsert: true
+    });
+    shipInfoArea = this.dv.addArea({
+        numberOfColumnAreas:2,
+        columnSettings: [
+            this.orders.requiredDate,
+            this.orders.shippedDate,
+            this.orders.shipAddress,
+            this.orders.shipCity
+        ]
     });
 }

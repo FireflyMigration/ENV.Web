@@ -1636,9 +1636,20 @@ export class dataView {
 
     constructor(private settings?: IdataViewSettings) {
     }
+    addArea(settings: IDataAreaSettings<any>) {
+        this.initDataSettings();
+        return this.dataSettings.addArea(settings);
+    }
     showSelectPopup: (onSelect: () => void) => void;
+    dataSettings: DataSettings<any>;
     __getDataSettings(): any {
 
+        this.initDataSettings();
+        return this.dataSettings;
+    }
+    private initDataSettings() {
+        if (this.dataSettings)
+            return;
         let dataSettings: IDataSettings<any> = {
             columnSettings: this.settings.displayColumns
         };
@@ -1675,7 +1686,7 @@ export class dataView {
                     new relationColumnValueProvider(r.to, r.on, cvp);
             }
         }
-        return result;
+        this.dataSettings = result;
     }
 }
 function applyWhereToGet(where: iFilter[] | iFilter, options: getOptions<any>) {

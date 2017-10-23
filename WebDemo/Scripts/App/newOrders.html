@@ -1,3 +1,19 @@
 ﻿<h1>newOrders</h1>
 <data-grid [dataView]="dv"></data-grid>
 <select-popup [dataView]="selectCustomer"></select-popup>
+<div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#tab1" data-toggle="tab">Tab 1</a></li>
+        <li><a href="#tab2" data-toggle="tab">Tab 2</a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab1">
+            <data-area [settings]="shipInfoArea"></data-area>
+        </div>
+        <div class="tab-pane" id="tab2">
+            Tab 2 Info
+        </div>
+    </div>
+</div>

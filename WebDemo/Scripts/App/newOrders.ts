@@ -52,10 +52,7 @@ export class newOrders {
         where: [
             this.orders.shipCity.isEqualTo(() => "London")
         ],
-        relations: [{
-            to: this.shippers,
-            on: this.shippers.id.isEqualTo(this.orders.shipVia)
-        },
+        relations: [
         {
             to: this.customers,
             on: this.customers.id.isEqualTo(this.orders.customerID)

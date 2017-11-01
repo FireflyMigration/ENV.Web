@@ -1,5 +1,5 @@
 ﻿import { Component } from '@angular/core';
-import * as utils from './lib/utils';
+import * as utils from 'radweb';
 import * as models from './models';
 
 @Component({

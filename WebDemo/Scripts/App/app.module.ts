@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import * as utils from './lib/utils';
+import * as utils from 'radweb';
 import { RouterModule, Routes } from '@angular/router';
 import { Categories } from './Categories';
 import { Orders } from './Orders';

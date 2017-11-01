@@ -1,4 +1,4 @@
-﻿import * as utils from './lib/utils';
+﻿import * as utils from 'radweb';
 export class categories extends utils.DataSettings<category>{
     constructor(settings?: utils.IDataSettings<category>) {
         super('/dataapi/categories', settings);

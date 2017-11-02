@@ -10,7 +10,7 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li *ngFor="let m of app.menues"><a routerLink="{{m.path}}" routerLinkActive="active">{{m.text}}</a> </li>
+                <li *ngFor="let m of router.config"><a routerLink="{{m.path}}" routerLinkActive="active">{{m.path}}</a> </li>
 
             </ul>
         </div>

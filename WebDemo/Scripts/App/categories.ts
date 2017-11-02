@@ -3,12 +3,9 @@ import * as utils from 'radweb';
 import * as models from './models';
 
 @Component({
-
     template: `
 <h1>Categories</h1>
 <data-grid [settings]="dataSettings"> </data-grid>
-
-
 `
 })
 

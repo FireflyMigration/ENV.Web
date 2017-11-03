@@ -52,7 +52,7 @@
       <HintPath>..\bin\ENV.dll</HintPath>
     </Reference>
     <Reference Include="ENV.Web">
-      <HintPath>..\bin\ENV.Web.dll</HintPath>
+      <HintPath>..\lib\ENV.Web.dll</HintPath>
     </Reference>
     <Reference Include="Firefly.Box">
       <HintPath>..\bin\Firefly.Box.dll</HintPath>
@@ -203,6 +203,9 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -255,7 +258,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>56557</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

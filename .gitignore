@@ -277,3 +277,4 @@ __pycache__/
 /buildDebug.log.NoErrors.txt
 **/scripts/App/**/*.js
 **/scripts/App/**/*.map
+/WebDemo/Scripts/NGApp

@@ -278,3 +278,4 @@ __pycache__/
 **/scripts/App/**/*.js
 **/scripts/App/**/*.map
 /WebDemo/Scripts/NGApp
+/WebDemo/Views/Home/index.cshtml

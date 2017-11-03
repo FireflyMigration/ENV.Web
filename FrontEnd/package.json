@@ -5,10 +5,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --prod && npm run copyFilesToMVC",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "copyFilesToMVC": "ts-node copyFilesToMVC.ts"
   },
   "private": true,
   "dependencies": {

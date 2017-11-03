@@ -1,0 +1,9 @@
+tunnels:
+  webSite:
+    proto: http
+    addr: 4200
+    host_header: localhost
+  dataApi:
+    proto: http
+    addr: 56557
+    host_header: localhost

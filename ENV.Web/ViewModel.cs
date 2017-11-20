@@ -212,7 +212,7 @@ namespace ENV.Web
             name = name[0].ToString().ToUpper() + name.Substring(1);
 
 
-            tw.WriteLine($@"export class {name} extends radweb.entity {{");
+            tw.WriteLine($@"export class {name} extends radweb.Entity {{");
             foreach (var item in _columns)
             {
                 tw.WriteLine($"    {item.Key} = new radweb.{item.getColumnType()}('{item.Caption}');");

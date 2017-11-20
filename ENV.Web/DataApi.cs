@@ -288,7 +288,7 @@ namespace ENV.Web
   <div class=""tab-content"">
     <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Name}_api"">{ api}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_parameters"">{bodyParameters}</div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptInterface(tw, item.Name,url))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptClass(tw, item.Name,url))}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
   </div>

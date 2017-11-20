@@ -205,6 +205,29 @@ namespace ENV.Web
     }");
             tw.WriteLine("}");
         }
+        public void CreateTypeScriptClass(TextWriter tw, string name, string url)
+        {
+            init();
+
+            name = name[0].ToString().ToUpper() + name.Substring(1);
+
+
+            tw.WriteLine($@"export class {name} extends radweb.entity {{");
+            foreach (var item in _columns)
+            {
+                tw.WriteLine($"    {item.Key} = new radweb.{item.getColumnType()}('{item.Caption}');");
+            }
+            tw.WriteLine($@"
+    constructor() {{
+        super(() => new {name}(), environment.dataSource, '{name}');
+        this.initColumns();
+    }}
+}}");
+
+
+
+
+        }
         public void CreateTypeScriptInterface(TextWriter tw, string name, string url)
         {
 
@@ -451,6 +474,19 @@ namespace ENV.Web
             public string Key => _key;
             public string Caption => _col.Caption;
 
+
+            internal object getColumnType()
+            {
+                if (_col is BoolColumn)
+                    return "BoolColumn";
+                else if (_col is NumberColumn)
+                    return "NumberColumn";
+                else if (_col is DateColumn)
+                    return "DateColumn";
+                else if (_col is TimeColumn)
+                    return "TimeColumn";
+                return "StringColumn";
+            }
 
             internal void SaveTo(DataItem x)
             {

@@ -12,7 +12,8 @@ import * as radweb from 'radweb';
 export class AppComponent {
   ordersGrid = new radweb.GridSettings(new models.Orders(),
     {
-      numOfColumnsInGrid:4,
+      numOfColumnsInGrid: 4,
+      allowUpdate:true,
       columnSettings: orders => [
         {
           column: orders.id,

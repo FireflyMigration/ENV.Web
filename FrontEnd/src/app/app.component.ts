@@ -40,6 +40,8 @@ export class AppComponent {
           cssClass: 'btn btn-primary glyphicon glyphicon-print'
         }
       ],
+      rowCssClass: orders =>
+        orders.orderDate.getDayOfWeek() == 1 ? "danger" : "",
       columnSettings: orders => [
         {
           column: orders.id,

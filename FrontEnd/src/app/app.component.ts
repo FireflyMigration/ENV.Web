@@ -10,6 +10,7 @@ import * as radweb from 'radweb';
 
 })
 export class AppComponent {
+  selectCustomerGrid = new radweb.GridSettings(new models.Customers());
   ordersGrid = new radweb.GridSettings(new models.Orders(),
     {
       numOfColumnsInGrid: 4,
@@ -23,6 +24,10 @@ export class AppComponent {
           column: orders.customerID,
           getValue: orders =>
             orders.lookup(new models.Customers(), orders.customerID).companyName,
+          click: orders =>
+            this.selectCustomerGrid.showSelectPopup(
+              selectedCustomer =>
+                orders.customerID.value = selectedCustomer.id.value)
         },
         orders.orderDate,
         {

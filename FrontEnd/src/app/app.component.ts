@@ -32,6 +32,14 @@ export class AppComponent {
           where: orderDetails =>
             orderDetails.orderID.isEqualTo(orders.id)
         }),
+      rowButtons: [
+        {
+          click: orders =>
+            window.open(
+              environment.serverUrl + 'home/print/' + orders.id.value),
+          cssClass: 'btn btn-primary glyphicon glyphicon-print'
+        }
+      ],
       columnSettings: orders => [
         {
           column: orders.id,
@@ -97,6 +105,10 @@ export class AppComponent {
       orderDetail =>
         result += orderDetail.quantity.value * orderDetail.unitPrice.value);
     return result.toFixed(2);
+  }
+  printCurrentOrder() {
+    window.open(
+      environment.serverUrl + 'home/print/' + this.ordersGrid.currentRow.id.value);
   }
 }
 

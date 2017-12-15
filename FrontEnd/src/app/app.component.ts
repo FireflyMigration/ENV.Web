@@ -83,7 +83,12 @@ export class AppComponent {
           }
         },
         order_details.unitPrice,
-        order_details.quantity
+        order_details.quantity,
+        {
+          caption: 'Total',
+          getValue: orderDetails =>
+            orderDetails.quantity.value * orderDetails.unitPrice.value
+        }
       ]
     });
 }

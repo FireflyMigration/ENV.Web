@@ -10,7 +10,18 @@ import * as radweb from 'radweb';
 
 })
 export class AppComponent {
-  selectCustomerGrid = new radweb.GridSettings(new models.Customers());
+  selectCustomerGrid = new radweb.GridSettings(new models.Customers(),
+    {
+      numOfColumnsInGrid:4,
+      columnSettings: customers => [
+        customers.id,
+        customers.companyName,
+        customers.contactName,
+        customers.country,
+        customers.address,
+        customers.city
+      ]
+    });
   ordersGrid = new radweb.GridSettings(new models.Orders(),
     {
       numOfColumnsInGrid: 4,

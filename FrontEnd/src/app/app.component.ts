@@ -18,7 +18,11 @@ export class AppComponent {
           column: orders.id,
           readonly: true
         },
-        orders.customerID,
+        {
+          column: orders.customerID,
+          getValue: orders =>
+            orders.lookup(new models.Customers(), orders.customerID).companyName,
+        },
         orders.orderDate,
         orders.shipVia,
         orders.requiredDate,

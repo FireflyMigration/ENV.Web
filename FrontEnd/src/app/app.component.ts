@@ -13,7 +13,7 @@ export class AppComponent {
   ordersGrid = new radweb.GridSettings(new models.Orders(),
     {
       numOfColumnsInGrid: 4,
-      allowUpdate:true,
+      allowUpdate: true,
       columnSettings: orders => [
         {
           column: orders.id,
@@ -25,7 +25,13 @@ export class AppComponent {
             orders.lookup(new models.Customers(), orders.customerID).companyName,
         },
         orders.orderDate,
-        orders.shipVia,
+        {
+          column: orders.shipVia,
+          dropDown: {
+            source: new models.Shippers()
+          },
+          cssClass:'col-sm-3'
+        },
         orders.requiredDate,
         orders.shippedDate,
         orders.shipAddress,

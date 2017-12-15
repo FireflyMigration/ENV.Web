@@ -1,17 +1,2 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div class="container">
-  <data-grid [settings]="settings"></data-grid>
-  <select-popup [settings]="customersSelect"></select-popup>
-  <div>
-    <tabset>
-      <tab heading="Ship Info">
-        <data-area [settings]="shipInfoArea"></data-area>
-      </tab>
-      <tab heading="Order Details {{getOrderTotal()}}">
-        <data-grid [settings]="orderDetailsSettings"></data-grid>
-      </tab>
-    </tabset>
+<h1>Orders </h1>
 
-    <button class="btn btn-success" (click)="printOrder()">Print</button>
-    <button class="btn btn-success" (click)="test()">Test</button>
-  </div>

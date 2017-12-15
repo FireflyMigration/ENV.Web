@@ -10,5 +10,22 @@ import * as radweb from 'radweb';
 
 })
 export class AppComponent {
-  ordersGrid = new radweb.GridSettings(new models.Orders());
+  ordersGrid = new radweb.GridSettings(new models.Orders(),
+    {
+      numOfColumnsInGrid:4,
+      columnSettings: orders => [
+        {
+          column: orders.id,
+          readonly: true
+        },
+        orders.customerID,
+        orders.orderDate,
+        orders.shipVia,
+        orders.requiredDate,
+        orders.shippedDate,
+        orders.shipAddress,
+        orders.shipCity
+      ]
+    }
+  );
 }

@@ -12,7 +12,8 @@ import * as radweb from 'radweb';
 export class AppComponent {
   selectCustomerGrid = new radweb.GridSettings(new models.Customers(),
     {
-      numOfColumnsInGrid:4,
+      numOfColumnsInGrid: 4,
+      get: { limit: 4 },
       columnSettings: customers => [
         customers.id,
         customers.companyName,
@@ -46,7 +47,7 @@ export class AppComponent {
           dropDown: {
             source: new models.Shippers()
           },
-          cssClass:'col-sm-3'
+          cssClass: 'col-sm-3'
         },
         orders.requiredDate,
         orders.shippedDate,

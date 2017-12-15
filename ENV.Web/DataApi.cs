@@ -247,9 +247,9 @@ namespace ENV.Web
 
                             }
                             addLine("GET", true);
-                            addLine("GET");
                             if (c.AllowInsert)
-                                addLine("POST");
+                                addLine("POST",true);
+                            addLine("GET");
                             if (c.AllowUpdate)
                                 addLine("PUT");
                             if (c.AllowDelete)
@@ -268,7 +268,7 @@ namespace ENV.Web
                                 using (var tw = new System.IO.StringWriter())
                                 {
                                     method(tw);
-                                    return tw.ToString();
+                                    return ENV.UserMethods.Instance.XMLVal( tw.ToString());
                                 }
                             }
 

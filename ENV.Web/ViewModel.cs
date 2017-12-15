@@ -211,11 +211,17 @@ namespace ENV.Web
 
             name = name[0].ToString().ToUpper() + name.Substring(1);
 
-
-            tw.WriteLine($@"export class {name} extends radweb.Entity {{");
+            string idColumnType = "string";
+            if (_idColumn is NumberColumn)
+                idColumnType = "number";
+            
+            tw.WriteLine($@"export class {name} extends radweb.Entity<{idColumnType}> {{");
             foreach (var item in _columns)
             {
-                tw.WriteLine($"    {item.Key} = new radweb.{item.getColumnType()}('{item.Caption}');");
+                var args = "";
+                if (item.Caption.ToLowerInvariant() != item.Key.ToLowerInvariant())
+                    args = "'" + item.Caption + "'";
+                tw.WriteLine($"    {item.Key} = new radweb.{item.getColumnType()}({args});");
             }
             tw.WriteLine($@"
     constructor() {{

@@ -1,5 +1,5 @@
 import { environment } from './../environments/environment';
-import { Component } from '@angular/core';
+import { Component, transition } from '@angular/core';
 import * as models from './models';
 import * as radweb from 'radweb';
 
@@ -58,7 +58,7 @@ export class AppComponent {
     }
   );
   shipInfoArea = this.ordersGrid.addArea({
-    numberOfColumnAreas:2,
+    numberOfColumnAreas: 2,
     columnSettings: orders => [
       orders.requiredDate,
       orders.shippedDate,
@@ -66,5 +66,15 @@ export class AppComponent {
       orders.shipCity
     ]
   });
-  orderDetailsGrid = new radweb.GridSettings(new models.Order_details());
+  orderDetailsGrid = new radweb.GridSettings(new models.Order_details(),
+    {
+      allowUpdate: true,
+      allowDelete: true,
+      allowInsert: true,
+      onNewRow: orderDetail => {
+        orderDetail.orderID.value = this.ordersGrid.currentRow.id.value;
+        orderDetail.quantity.value = 1;
+      }
+    });
 }
+

@@ -10,5 +10,5 @@ import * as radweb from 'radweb';
 
 })
 export class AppComponent {
-
+  ordersGrid = new radweb.GridSettings(new models.Orders());
 }

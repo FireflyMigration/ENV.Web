@@ -48,12 +48,17 @@ export class AppComponent {
             source: new models.Shippers()
           },
           cssClass: 'col-sm-3'
-        },
-        orders.requiredDate,
-        orders.shippedDate,
-        orders.shipAddress,
-        orders.shipCity
+        }
       ]
     }
   );
+  shipInfoArea = this.ordersGrid.addArea({
+    numberOfColumnAreas:2,
+    columnSettings: orders => [
+      orders.requiredDate,
+      orders.shippedDate,
+      orders.shipAddress,
+      orders.shipCity
+    ]
+  });
 }

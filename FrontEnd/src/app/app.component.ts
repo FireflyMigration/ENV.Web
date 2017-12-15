@@ -27,6 +27,11 @@ export class AppComponent {
     {
       numOfColumnsInGrid: 4,
       allowUpdate: true,
+      onEnterRow: orders =>
+        this.orderDetailsGrid.get({
+          where: orderDetails =>
+            orderDetails.orderID.isEqualTo(orders.id)
+        }),
       columnSettings: orders => [
         {
           column: orders.id,

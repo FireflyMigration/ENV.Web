@@ -91,5 +91,12 @@ export class AppComponent {
         }
       ]
     });
+  getOrderTotal() {
+    let result = 0;
+    this.orderDetailsGrid.items.forEach(
+      orderDetail =>
+        result += orderDetail.quantity.value * orderDetail.unitPrice.value);
+    return result.toFixed(2);
+  }
 }
 

@@ -5,7 +5,7 @@
   <tab heading='Ship Info'>
     <data-area [settings]="shipInfoArea"></data-area>
   </tab>
-  <tab heading='Order Details'>
+  <tab heading='Order Details {{getOrderTotal()}}'>
     <data-grid [settings]="orderDetailsGrid"></data-grid>
   </tab>
 </tabset>

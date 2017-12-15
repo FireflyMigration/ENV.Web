@@ -74,7 +74,17 @@ export class AppComponent {
       onNewRow: orderDetail => {
         orderDetail.orderID.value = this.ordersGrid.currentRow.id.value;
         orderDetail.quantity.value = 1;
-      }
+      },
+      columnSettings: order_details => [
+        {
+          column: order_details.productID,
+          dropDown: {
+            source: new models.Products()
+          }
+        },
+        order_details.unitPrice,
+        order_details.quantity
+      ]
     });
 }
 

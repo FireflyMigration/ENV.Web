@@ -61,4 +61,5 @@ export class AppComponent {
       orders.shipCity
     ]
   });
+  orderDetailsGrid = new radweb.GridSettings(new models.Order_details());
 }

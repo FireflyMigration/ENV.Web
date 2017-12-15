@@ -3,7 +3,9 @@
 <select-popup [settings]="selectCustomerGrid"></select-popup>
 <tabset>
   <tab heading='Ship Info'>
-    <data-area [settings]="shipInfoArea" ></data-area>
+    <data-area [settings]="shipInfoArea"></data-area>
   </tab>
-  <tab heading='Tab 2'>Tab 2 content</tab>
+  <tab heading='Order Details'>
+    <data-grid [settings]="orderDetailsGrid"></data-grid>
+  </tab>
 </tabset>

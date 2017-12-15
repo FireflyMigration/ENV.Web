@@ -32,6 +32,7 @@ export class Orders extends radweb.Entity<number> {
       this.initColumns();
   }
 }
+
 export class Order_details extends radweb.Entity<string> {
   orderID = new radweb.NumberColumn();
   productID = new radweb.NumberColumn();
@@ -64,7 +65,6 @@ export class Customers extends radweb.Entity<string> {
       this.initColumns();
   }
 }
-
 export class Products extends radweb.Entity<number> {
   id = new radweb.NumberColumn('ProductID');
   productName = new radweb.StringColumn();

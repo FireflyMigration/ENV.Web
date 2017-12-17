@@ -138,6 +138,43 @@ namespace ENV.Web.Tests
 
         }
         [TestMethod]
+        public void Test_Issue_6()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            t.c.Caption = "last";
+            vmh.From = t;
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "last");
+
+        }
+        [TestMethod]
+        public void Test_Issue_7()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            t.c.Caption = "last name";
+            vmh.From = t;
+            vmh.MapColumn(t.c);
+            vmh.MapColumn(t.b);
+            vmh.AssertColumnKey(t.b, "c2");
+            vmh.AssertColumnKey(t.c, "lastName");
+
+        }
+        [TestMethod]
+        public void Test_Issue_8()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            t.c.Caption = "Last name";
+            vmh.From = t;
+            vmh.MapColumn(t.a);
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "lastName");
+            vmh.AssertColumnKey(t.a, "id");
+
+        }
+        [TestMethod]
         public void TestSingularNames()
         {
             using (var t = new BulkTester((x, r) => NameFixer.MakeSingular(x).ShouldBe(r, x)))
@@ -146,7 +183,7 @@ namespace ENV.Web.Tests
                 t.Test("products", "product");
                 t.Test("CATEGORIES", "CATEGORY");
                 t.Test("PRODUCTS", "PRODUCT");
-                t.Test("NOAM", "NOAM");
+                t.Test("NOAM", "NOAMItem");
 
             }
         }

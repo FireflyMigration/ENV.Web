@@ -13,7 +13,6 @@ export class AppComponent {
   selectCustomerGrid = new radweb.GridSettings(new models.Customers(),
     {
       numOfColumnsInGrid: 4,
-      get: { limit: 4 },
       columnSettings: customers => [
         customers.id,
         customers.companyName,
@@ -26,6 +25,7 @@ export class AppComponent {
   ordersGrid = new radweb.GridSettings(new models.Orders(),
     {
       numOfColumnsInGrid: 4,
+      get: { limit: 4 },
       allowUpdate: true,
       onEnterRow: orders =>
         this.orderDetailsGrid.get({

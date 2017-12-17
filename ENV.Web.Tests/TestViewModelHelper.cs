@@ -175,6 +175,18 @@ namespace ENV.Web.Tests
 
         }
         [TestMethod]
+        public void Test_Issue_9()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            t.c.Caption = "LastName";
+            vmh.From = t;
+            vmh.MapColumn(t.a);
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "lastName");
+
+        }
+        [TestMethod]
         public void TestSingularNames()
         {
             using (var t = new BulkTester((x, r) => NameFixer.MakeSingular(x).ShouldBe(r, x)))

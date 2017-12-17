@@ -13,8 +13,8 @@ namespace ENV.Web
         {
             name = EntityScriptGenerator.FixNameForDb(HebrewTranslateCsStyle(name));
             if (name.Length >= 2)
-                
-                    return name[0].ToString().ToLower() + name.Substring(1);
+
+                return name[0].ToString().ToLower() + name.Substring(1);
             return name;
         }
         public static string HebrewTranslateCsStyle(string source)
@@ -28,9 +28,13 @@ namespace ENV.Web
                 if (HasHebrewInIt(y))
                 {
                     y = HebrewTranslateOracleStyle(y);
+                    if (y.Length > 0)
+                        y = y.Substring(0, 1).ToUpper() + y.Remove(0, 1).ToLower();
                 }
-                if (y.Length > 0)
-                    y = y.Substring(0, 1).ToUpper() + y.Remove(0, 1).ToLower();
+                else
+                    if (y.Length > 0)
+                        y = y.Substring(0, 1).ToUpper() + y.Remove(0, 1);
+
                 output.Append(y);
 
 
@@ -114,7 +118,7 @@ namespace ENV.Web
                 return name.Remove(name.Length - 1);
             if (name.EndsWith("s"))
                 return name.Remove(name.Length - 1);
-            return name+"Item";
+            return name + "Item";
         }
     }
 }

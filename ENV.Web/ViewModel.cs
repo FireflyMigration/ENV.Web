@@ -88,7 +88,7 @@ namespace ENV.Web
         FilterCollection _tempFilter = new FilterCollection();
         protected RelationCollection Relations { get { return _bp.Relations; } }
         protected FilterCollection Where { get { return _bp.Where; } }
-        protected Sort OrderBy { get { return _bp.OrderBy; } }
+        protected Sort OrderBy { get { return _bp.OrderBy; } set { _bp.OrderBy = value; } }
         protected internal ColumnCollection Columns => _bp.Columns;
         protected internal bool AllowUpdate { get; set; }
         protected internal bool AllowDelete { get; set; }

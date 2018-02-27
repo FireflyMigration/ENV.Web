@@ -58,7 +58,7 @@ namespace ENV.Web
         void InternalRegister(System.Type t,bool onlyIfKeyNotAlreadyInUsed, bool allowInsertUpdateDelete = false)
         {
             var x = t.Name;
-            if (x.EndsWith("viewmodel"))
+            if (x.EndsWith("ViewModel"))
                 x = x.Remove(x.Length - 9);
             if (onlyIfKeyNotAlreadyInUsed && _controllers.ContainsKey(x))
                 return;

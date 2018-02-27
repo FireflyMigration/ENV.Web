@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ENV.Web;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -19,7 +20,11 @@ namespace WebDemo.Controllers
 
             return View();
         }
-
+        [PrintToPDF]
+        public void Print(int id)
+        {
+            new Northwind.Orders.Print_Order().Run(id);
+        }
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

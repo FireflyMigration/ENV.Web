@@ -88,7 +88,7 @@ namespace ENV.Web
         FilterCollection _tempFilter = new FilterCollection();
         protected RelationCollection Relations { get { return _bp.Relations; } }
         protected FilterCollection Where { get { return _bp.Where; } }
-        protected Sort OrderBy { get { return _bp.OrderBy; } }
+        protected Sort OrderBy { get { return _bp.OrderBy; } set { _bp.OrderBy = value; } }
         protected internal ColumnCollection Columns => _bp.Columns;
         protected internal bool AllowUpdate { get; set; }
         protected internal bool AllowDelete { get; set; }
@@ -211,11 +211,17 @@ namespace ENV.Web
 
             name = name[0].ToString().ToUpper() + name.Substring(1);
 
-
-            tw.WriteLine($@"export class {name} extends radweb.Entity {{");
+            string idColumnType = "string";
+            if (_idColumn is NumberColumn)
+                idColumnType = "number";
+            
+            tw.WriteLine($@"export class {name} extends radweb.Entity<{idColumnType}> {{");
             foreach (var item in _columns)
             {
-                tw.WriteLine($"    {item.Key} = new radweb.{item.getColumnType()}('{item.Caption}');");
+                var args = "";
+                if (item.Caption.ToLowerInvariant() != item.Key.ToLowerInvariant())
+                    args = "'" + item.Caption + "'";
+                tw.WriteLine($"    {item.Key} = new radweb.{item.getColumnType()}({args});");
             }
             tw.WriteLine($@"
     constructor() {{

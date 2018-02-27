@@ -26,6 +26,38 @@ namespace ENV.Web.Tests
             it["id"].Number.ShouldBe(1);
         }
         [TestMethod]
+        public void TestTab() {
+
+            var di = new DataItem();
+            di.Set("x", "a\tB");
+            var j = di.ToJson();
+            j.ShouldContain("\"x\":\"a\\tB\"");
+            di = DataItem.FromJson(j);
+            di["x"].Text.ShouldBe("a\tB");
+        }
+        [TestMethod]
+        public void TestTab_1()
+        {
+
+            var di = new DataItem();
+            di.Set("x", "a\\tB");
+            var j = di.ToJson();
+            j.ShouldContain("\"x\":\"a\\\\tB\"");
+            di = DataItem.FromJson(j);
+            di["x"].Text.ShouldBe("a\\tB");
+        }
+        [TestMethod]
+        public void TestNewLine()
+        {
+
+            var di = new DataItem();
+            di.Set("x", "a\r\nB");
+            var j = di.ToJson();
+            j.ShouldContain("\"x\":\"a\\r\\nB\"");
+            di = DataItem.FromJson(j);
+            di["x"].Text.ShouldBe("a\r\nB");
+        }
+        [TestMethod]
         public void TestJsonParse()
         {
             var dl = new DataList();

@@ -364,7 +364,7 @@ namespace ENV.Web
                 WriteEndArray();
             }
             else
-                _writer.Write("\"" + value.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r") + "\"");
+                _writer.Write("\"" + value.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t") + "\"");
         }
 
         public void Dispose()
@@ -785,7 +785,10 @@ namespace ENV.Web
                         break;
                     default:
 
-                        setState(new ReadValueThatMayOrMayNotBeQuoted(_next, new char[] { ',', '}' }, s => _done(_name, s)), true);
+                        setState(new ReadValueThatMayOrMayNotBeQuoted(_next, new char[] { ',', '}' }, s => _done(_name, 
+                            s.Replace("\\n","\n")
+                            .Replace("\\r", "\r")
+                            .Replace("\\t", "\t"))), true);
                         break;
                 }
             }

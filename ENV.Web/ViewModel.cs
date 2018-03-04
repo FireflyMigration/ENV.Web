@@ -395,12 +395,13 @@ namespace ENV.Web
             }, Activities.Update, () => result = GetItem());
             return result;
         }
+        public bool IgnoreUpdateOfNonUpdatableColumns { get; set; }
 
         private void UpdateColumnsBasedIn(DataItem item)
         {
             foreach (var c in _columns)
             {
-                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState, _bp.From, _ignoreUpdateOf);
+                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState, _bp.From, _ignoreUpdateOf,IgnoreUpdateOfNonUpdatableColumns);
             }
             try
             {
@@ -499,7 +500,7 @@ namespace ENV.Web
                 x.Set(_key, _getValueFromRow());
             }
 
-            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state, Firefly.Box.Data.Entity updatebleEntity, HashSet<ColumnBase> ignoreUpdateOf)
+            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state, Firefly.Box.Data.Entity updatebleEntity, HashSet<ColumnBase> ignoreUpdateOf,bool disableCannotBeUpdatedError)
             {
                 if ((_col.Entity == null || _col.Entity == updatebleEntity) && !ignoreUpdateOf.Contains(_col))
                 {
@@ -508,7 +509,13 @@ namespace ENV.Web
                     if (!Comparer.Equal(_col.OriginalValue, _col.Value))
                     {
                         if (IsReadOnly(denyUpdateOf, onlyAllowUpdateOf, ignoreUpdateOf, updatebleEntity))
-                            state.AddError(_col, "cannot be updated");
+                            if (!disableCannotBeUpdatedError)
+                                state.AddError(_col, "cannot be updated");
+                            else
+                            {
+                                _col.Value = _col.OriginalValue;
+                                _col.DbReadOnly = true;
+                            }
                     }
                 }
             }

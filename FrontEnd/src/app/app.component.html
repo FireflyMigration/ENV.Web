@@ -7,31 +7,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Cool Web Application</a>
+      <a class="navbar-brand" routerLink="/">Cool Web Application</a>
     </div>
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
+    <!-- Display all links based on the registered routes -->
     <div class="collapse navbar-collapse" [collapse]=isCollapsed>
       <ul class="nav navbar-nav">
-        <li class="active">
-          <a href="#">Link
+        <ng-container *ngFor="let m of router.config">
+          <li routerLinkActive="active" *ngIf="m.path && m.path.indexOf(':')<0">
+            <a routerLink="{{m.path}}">{{m.path}}
               <span class="sr-only">(current)</span>
-          </a>
-        </li>
+            </a>
+          </li>
+        </ng-container>
       </ul>
     </div>
   </div>
 </nav>
-
-<h1>Orders</h1>
-<data-grid [settings]="ordersGrid"></data-grid>
-<select-popup [settings]="selectCustomerGrid"></select-popup>
-<tabset>
-  <tab heading='Ship Info'>
-    <data-area [settings]="shipInfoArea"></data-area>
-  </tab>
-  <tab heading='Order Details {{getOrderTotal()}}'>
-    <data-grid [settings]="orderDetailsGrid"></data-grid>
-  </tab>
-</tabset>
-<button class="btn btn-primary" (click)="printCurrentOrder()">Print</button>
+<router-outlet></router-outlet>

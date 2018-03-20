@@ -19,12 +19,12 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "../node_modules/bootstrap3/dist/css/bootstrap.min.css",
         "styles.css"
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.min.js",
-        "../node_modules/bootstrap/js/modal.js"
+        "../node_modules/bootstrap3/js/modal.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

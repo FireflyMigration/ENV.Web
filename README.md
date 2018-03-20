@@ -14,7 +14,7 @@ MVC.NET, REST Api and the migrated code.
 ### Browser
 1. HTML5
 2. bootstrap - for the styling
-3. Angular2 - as the application framework
+3. Angular5 - as the application framework
 4. Typescript - as the coding language
 
 ## Tutorial

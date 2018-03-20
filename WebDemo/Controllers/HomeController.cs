@@ -20,11 +20,7 @@ namespace WebDemo.Controllers
 
             return View();
         }
-        [PrintToPDF]
-        public void Print(int id)
-        {
-            new Northwind.Orders.Print_Order().Run(id);
-        }
+    
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

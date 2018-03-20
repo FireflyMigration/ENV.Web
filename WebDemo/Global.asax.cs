@@ -31,7 +31,7 @@ namespace WebDemo
             //determines where the appliaction dlls are
             ENV.AbstractFactory.AlternativeDllPath = Environment.CurrentDirectory;
              
-            //calls a refactored version of the program main of Northwind
+            // Call the init of the original application to load it's ini and other settings
             Northwind.Program.Init(new string[0]);
 
             //ApplicationStartup=B && DeploymentMode=B

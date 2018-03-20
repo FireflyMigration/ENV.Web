@@ -10,8 +10,10 @@ import * as radweb from 'radweb';
 
 })
 export class AppComponent {
+  isCollapsed = true;
   selectCustomerGrid = new radweb.GridSettings(new models.Customers(),
     {
+      
       numOfColumnsInGrid: 4,
       columnSettings: customers => [
         customers.id,

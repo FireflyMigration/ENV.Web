@@ -19,13 +19,17 @@ try {
     copyFile(path.join(distDir, f), path.join(targetDir, f));
   });
   //create index.cshtml
+  let csHtml = fs.readFileSync('dist/index.html').toString();
+  csHtml = csHtml.replace(/src="/g,'src="'+distDirInTarget+'/');
+  csHtml = csHtml.replace(/href="styles/g,'href="'+distDirInTarget+'/styles');
+   
   fs.writeFileSync(
     path.join(targetProjectDir, mvcIndexFile),
     `@{
       Layout = null;
   }
-  <base href="/${distDirInTarget}/">` +
-    fs.readFileSync('dist/index.html').toString());
+  ` +
+    csHtml);
   console.log("DONE!!!!!")
 }
 catch (error) {

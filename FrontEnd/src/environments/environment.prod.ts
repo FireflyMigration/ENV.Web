@@ -1,6 +1,6 @@
 import { DataProviderFactory, RestDataProvider } from 'radweb';
 
-const serverUrl= '';
+const serverUrl= '/';
 export const environment = {
   production: true,
   serverUrl,

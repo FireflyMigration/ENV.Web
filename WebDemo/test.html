@@ -1,95 +1,1631 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8" />
-    <title></title>
-    <link href="/Content/bootstrap.css" rel="stylesheet" />
+    <head>
+        <base href="/Scripts/NGApp/">
+        <meta charset="utf-8">
+        <title>FrontEnd</title>
+        <base href="/">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="favicon.ico">
+        <link href="styles.5409bd8f6f0505b8b495.bundle.css" rel="stylesheet">
+        <style></style>
+        <style>
+            .filterDialog[_ngcontent-c1] {
+                background-color: white;
+                position: absolute;
+                padding: 10px;
+                border-color: gray;
+                border-width: 2px;
+                border-style: solid;
+                z-index: 800;
+                border-radius: 5px;
+            }
 
+                .filterDialog[_ngcontent-c1] .form-group[_ngcontent-c1] {
+                    margin-right: 0;
+                    margin-left: 0;
+                }
 
+            .designModeButton[_ngcontent-c1] span[_ngcontent-c1] {
+                visibility: hidden;
+            }
 
+            .designModeButton[_ngcontent-c1]:hover span[_ngcontent-c1] {
+                visibility: visible
+            }
+
+            .headerWithFilter[_ngcontent-c1] {
+            }
+
+                .headerWithFilter[_ngcontent-c1] .filterButton[_ngcontent-c1] {
+                    visibility: hidden;
+                }
+
+                .headerWithFilter[_ngcontent-c1] .filteredFilterButton[_ngcontent-c1] {
+                    visibility: visible;
+                }
+
+                .headerWithFilter[_ngcontent-c1]:hover .filterButton[_ngcontent-c1] {
+                    visibility: visible;
+                }
+
+            .filterButton[_ngcontent-c1] {
+            }
+
+            table[_ngcontent-c1] input[_ngcontent-c1] {
+                min-width: 75px;
+            }
+
+            table[_ngcontent-c1] select[_ngcontent-c1] {
+                min-width: 100px
+            }
+        </style>
+        <style>
+            .columnDesigner[_ngcontent-c2] {
+                background-color: white;
+                position: absolute;
+                padding: 10px;
+                border-color: gray;
+                border-width: 2px;
+                border-style: solid;
+                z-index: 800;
+                border-radius: 5px;
+                width: 300px;
+            }
+
+                .columnDesigner[_ngcontent-c2] .form-group[_ngcontent-c2] {
+                    margin-right: 0;
+                    margin-left: 0;
+                }
+        </style>
+    </head>
 </head>
 <body>
-    noam
-    <span style="position:absolute;display:inline-block;width:150px;top:10px">test</span>
-    honig
-    <form class="form-inline">
-        <div class="form-group">
-            <label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>
-            <div class="input-group">
-                <div class="input-group-addon">$</div>
-                <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount">
-                <div class="input-group-addon">bla bla bla bla bla bla</div>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Transfer cash</button>
-    </form>
-    <div class="container body-content">
-        <div class="row">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
-                    <div style="position:relative; top:500px;height:100px" >
-                        My Testing 123
+
+    <div class="container">
+        <app-root _nghost-c0="" ng-version="5.2.9">
+            <h1 _ngcontent-c0="">Orders</h1>
+            <data-grid _ngcontent-c0="" _nghost-c1="">
+
+                <!---->
+                <div _ngcontent-c1="">
+                    <!----><div _ngcontent-c1="" class="pull-right">
+                        <!---->
+                        <!---->
+                        <!----><button _ngcontent-c1="" class="btn glyphicon glyphicon-chevron-right"></button>
+                        <!---->
                     </div>
-                    <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
-                        
+                    <!----><table _ngcontent-c1="" class="table table-bordered table-condensed table-hover table-striped ">
+
+                        <thead _ngcontent-c1="">
+                            <tr _ngcontent-c1="">
+                                <!---->
+                                <th _ngcontent-c1="" class="headerWithFilter">
+
+                                    <span _ngcontent-c1="">OrderID</span>
+
+
+                                    <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <column-designer _ngcontent-c1="" _nghost-c2="">
+                                        <!---->
+                                        <span _ngcontent-c2="" class="designModeButton pull-right">
+                                            <!---->
+                                        </span>
+                                    </column-designer>
+
+
+
+
+
+                                </th>
+                                <th _ngcontent-c1="" class="headerWithFilter">
+
+                                    <span _ngcontent-c1="">Customer ID</span>
+
+
+                                    <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <column-designer _ngcontent-c1="" _nghost-c2="">
+                                        <!---->
+                                        <span _ngcontent-c2="" class="designModeButton pull-right">
+                                            <!---->
+                                        </span>
+                                    </column-designer>
+
+
+
+
+
+                                </th>
+                                <th _ngcontent-c1="" class="headerWithFilter">
+
+                                    <span _ngcontent-c1="">Order Date</span>
+
+
+                                    <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <column-designer _ngcontent-c1="" _nghost-c2="">
+                                        <!---->
+                                        <span _ngcontent-c2="" class="designModeButton pull-right">
+                                            <!---->
+                                        </span>
+                                    </column-designer>
+
+
+
+
+
+                                </th>
+                                <th _ngcontent-c1="" class="headerWithFilter">
+
+                                    <span _ngcontent-c1="">Ship Via</span>
+
+
+                                    <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <column-designer _ngcontent-c1="" _nghost-c2="">
+                                        <!---->
+                                        <span _ngcontent-c2="" class="designModeButton pull-right">
+                                            <!---->
+                                        </span>
+                                    </column-designer>
+
+
+
+
+
+                                </th>
+                                <!---->
+                                <th _ngcontent-c1="" class="col-xs-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody _ngcontent-c1="">
+                            <!---->
+                            <tr _ngcontent-c1="" class="active">
+
+                                <!---->
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!----><span>10248</span>
+                                        <!---->
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div class="input-group">
+                                                    <!----><div class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"> <span class="glyphicon glyphicon-chevron-down"></span></button>
+                                                    </div>
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="text">
+                                                    <!----><div class="input-group-addon" style="width:60%;text-align:left">Vins et alcools Chevalier</div>
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div>
+                                                    <!---->
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="date">
+                                                    <!---->
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="col-sm-3">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!---->
+                                                <!----><div>
+                                                    <select class="form-control ng-untouched ng-pristine ng-valid">
+                                                        <!---->
+                                                        <option value="1">Speedy Express</option>
+                                                        <option value="2">United Package</option>
+                                                        <option value="3">Federal Shipping</option>
+
+                                                    </select>
+                                                </div>
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <!---->
+                                <td _ngcontent-c1="" style="white-space:nowrap">
+                                    <!----><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!----><button _ngcontent-c1="" class="btn btn btn-primary glyphicon glyphicon-print"></button>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr _ngcontent-c1="" class="">
+
+                                <!---->
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!----><span>10249</span>
+                                        <!---->
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div class="input-group">
+                                                    <!----><div class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"> <span class="glyphicon glyphicon-chevron-down"></span></button>
+                                                    </div>
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="text">
+                                                    <!----><div class="input-group-addon" style="width:60%;text-align:left">Toms Spezialiteten</div>
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div>
+                                                    <!---->
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="date">
+                                                    <!---->
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="col-sm-3">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!---->
+                                                <!----><div>
+                                                    <select class="form-control ng-untouched ng-pristine ng-valid">
+                                                        <!---->
+                                                        <option value="1">Speedy Express</option>
+                                                        <option value="2">United Package</option>
+                                                        <option value="3">Federal Shipping</option>
+
+                                                    </select>
+                                                </div>
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <!---->
+                                <td _ngcontent-c1="" style="white-space:nowrap">
+                                    <!----><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!----><button _ngcontent-c1="" class="btn btn btn-primary glyphicon glyphicon-print"></button>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr _ngcontent-c1="" class="danger">
+
+                                <!---->
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!----><span>10250</span>
+                                        <!---->
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div class="input-group">
+                                                    <!----><div class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"> <span class="glyphicon glyphicon-chevron-down"></span></button>
+                                                    </div>
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="text">
+                                                    <!----><div class="input-group-addon" style="width:60%;text-align:left">Hanari Carnes</div>
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div>
+                                                    <!---->
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="date">
+                                                    <!---->
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="col-sm-3">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!---->
+                                                <!----><div>
+                                                    <select class="form-control ng-untouched ng-pristine ng-valid">
+                                                        <!---->
+                                                        <option value="1">Speedy Express</option>
+                                                        <option value="2">United Package</option>
+                                                        <option value="3">Federal Shipping</option>
+
+                                                    </select>
+                                                </div>
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <!---->
+                                <td _ngcontent-c1="" style="white-space:nowrap">
+                                    <!----><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!----><button _ngcontent-c1="" class="btn btn btn-primary glyphicon glyphicon-print"></button>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr _ngcontent-c1="" class="danger">
+
+                                <!---->
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!----><span>10251</span>
+                                        <!---->
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div class="input-group">
+                                                    <!----><div class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"> <span class="glyphicon glyphicon-chevron-down"></span></button>
+                                                    </div>
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="text">
+                                                    <!----><div class="input-group-addon" style="width:60%;text-align:left">Victuailles en stock</div>
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!----><div>
+                                                    <!---->
+                                                    <input class="form-control ng-untouched ng-pristine ng-valid" type="date">
+                                                    <!---->
+
+                                                </div>
+                                                <!---->
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <td _ngcontent-c1="" class="col-sm-3">
+                                    <data-control _ngcontent-c1="">
+                                        <!---->
+                                        <!----><div class="">
+                                            <div>
+                                                <!---->
+                                                <!----><div>
+                                                    <select class="form-control ng-untouched ng-pristine ng-valid">
+                                                        <!---->
+                                                        <option value="1">Speedy Express</option>
+                                                        <option value="2">United Package</option>
+                                                        <option value="3">Federal Shipping</option>
+
+                                                    </select>
+                                                </div>
+                                                <!---->
+
+                                            </div>
+                                        </div>
+                                    </data-control>
+                                </td>
+                                <!---->
+                                <td _ngcontent-c1="" style="white-space:nowrap">
+                                    <!----><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!---->
+                                    </span><span _ngcontent-c1="">
+                                        <!----><button _ngcontent-c1="" class="btn btn btn-primary glyphicon glyphicon-print"></button>
+                                    </span>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <!----><data-area _ngcontent-c1="">
+
+                    <!----><div class="form-horizontal">
+
+                        <!----><div class="col-sm-6">
+                            <!---->
+                        </div><div class="col-sm-6">
+                            <!---->
+                        </div>
+                    </div>
+
+
+                </data-area>
+            </data-grid>
+            <select-popup _ngcontent-c0="">
+
+
+                <!----><div aria-labelledby="myModalLabel" class="modal fade" role="dialog" tabindex="-1" id="2gzi7">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Select  Customers</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+
+                                    <div>
+                                        <div class="form-group">
+                                            <label>Search</label>
+                                            <input class="form-control ng-untouched ng-pristine ng-valid" type="search" placeholder="">
+                                        </div>
+                                    </div>
+                                    <data-grid _nghost-c1="">
+
+                                        <!---->
+                                        <div _ngcontent-c1="">
+                                            <!----><div _ngcontent-c1="" class="pull-right">
+                                                <!---->
+                                                <!---->
+                                                <!----><button _ngcontent-c1="" class="btn glyphicon glyphicon-chevron-right"></button>
+                                                <!---->
+                                            </div>
+                                            <!----><table _ngcontent-c1="" class="table table-bordered table-condensed table-hover table-striped ">
+
+                                                <thead _ngcontent-c1="">
+                                                    <tr _ngcontent-c1="">
+                                                        <!---->
+                                                        <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                            <span _ngcontent-c1="">CustomerID</span>
+
+
+                                                            <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                            <!---->
+                                                            <!---->
+                                                            <!---->
+                                                            <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                                <!---->
+                                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                                    <!---->
+                                                                </span>
+                                                            </column-designer>
+
+
+
+
+
+                                                        </th>
+                                                        <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                            <span _ngcontent-c1="">Company Name</span>
+
+
+                                                            <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                            <!---->
+                                                            <!---->
+                                                            <!---->
+                                                            <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                                <!---->
+                                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                                    <!---->
+                                                                </span>
+                                                            </column-designer>
+
+
+
+
+
+                                                        </th>
+                                                        <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                            <span _ngcontent-c1="">Contact Name</span>
+
+
+                                                            <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                            <!---->
+                                                            <!---->
+                                                            <!---->
+                                                            <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                                <!---->
+                                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                                    <!---->
+                                                                </span>
+                                                            </column-designer>
+
+
+
+
+
+                                                        </th>
+                                                        <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                            <span _ngcontent-c1="">Country</span>
+
+
+                                                            <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                            <!---->
+                                                            <!---->
+                                                            <!---->
+                                                            <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                                <!---->
+                                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                                    <!---->
+                                                                </span>
+                                                            </column-designer>
+
+
+
+
+
+                                                        </th>
+                                                        <!---->
+                                                    </tr>
+                                                </thead>
+                                                <tbody _ngcontent-c1="">
+                                                    <!---->
+                                                    <tr _ngcontent-c1="" class="active">
+
+                                                        <!---->
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>ALFKI</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Alfreds Futterkiste</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Maria Anders</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Germany</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <!---->
+                                                    </tr>
+                                                    <tr _ngcontent-c1="" class="">
+
+                                                        <!---->
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>ANATR</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Ana Trujillo Emparedados y helados</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Ana Trujillo</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Mexico</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <!---->
+                                                    </tr>
+                                                    <tr _ngcontent-c1="" class="">
+
+                                                        <!---->
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>ANTON</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Antonio Moreno Taquerea</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Antonio Moreno</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Mexico</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <!---->
+                                                    </tr>
+                                                    <tr _ngcontent-c1="" class="">
+
+                                                        <!---->
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>AROUT</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Around the Horn</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Thomas Hardy</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>UK</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <!---->
+                                                    </tr>
+                                                    <tr _ngcontent-c1="" class="">
+
+                                                        <!---->
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>BERGS</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Berglunds snabbkep</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Christina Berglund</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Sweden</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <!---->
+                                                    </tr>
+                                                    <tr _ngcontent-c1="" class="">
+
+                                                        <!---->
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>BLAUS</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Blauer See Delikatessen</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Hanna Moos</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Germany</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <!---->
+                                                    </tr>
+                                                    <tr _ngcontent-c1="" class="">
+
+                                                        <!---->
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>BLONP</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Blondesddsl pere et fils</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>Frederique Citeaux</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <td _ngcontent-c1="" class="">
+                                                            <data-control _ngcontent-c1="">
+                                                                <!----><span>France</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </td>
+                                                        <!---->
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!----><data-area _ngcontent-c1="">
+
+                                            <!----><div class="form-horizontal">
+
+                                                <!----><div class="col-sm-6">
+                                                    <!----><div class="form-group ">
+                                                        <div class="col-sm-4">
+                                                            <!----><label class="control-label">Address</label>
+                                                            <column-designer _nghost-c2="">
+                                                                <!---->
+                                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                                    <!---->
+                                                                </span>
+                                                            </column-designer>
+                                                        </div>
+                                                        <div class="col-sm-8">
+                                                            <data-control>
+                                                                <!----><span>Obere Str. 57</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </div>
+                                                    </div>
+                                                </div><div class="col-sm-6">
+                                                    <!----><div class="form-group ">
+                                                        <div class="col-sm-4">
+                                                            <!----><label class="control-label">City</label>
+                                                            <column-designer _nghost-c2="">
+                                                                <!---->
+                                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                                    <!---->
+                                                                </span>
+                                                            </column-designer>
+                                                        </div>
+                                                        <div class="col-sm-8">
+                                                            <data-control>
+                                                                <!----><span>Berlin</span>
+                                                                <!---->
+                                                            </data-control>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </data-area>
+                                    </data-grid>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                                <button class="btn btn-primary" type="button">Select</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
-                    <span class="col-xs-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount">
-                            <div class="input-group-btn input-group-addon"></div>
-                        </div>
-                    </span>
+            </select-popup>
+            <tabset _ngcontent-c0="" class="tab-container">
+                <ul class="nav nav-tabs"> <!----><li class="nav-item active"> <a class="nav-link active" href="javascript:void(0);" id=""> <span>Ship Info</span> <!----> </a> </li><li class="nav-item"> <a class="nav-link" href="javascript:void(0);" id=""> <span>Order Details 440.00</span> <!----> </a> </li> </ul> <div class="tab-content">
+                    <tab _ngcontent-c0="" heading="Ship Info" class="active tab-pane">
+                        <data-area _ngcontent-c0="">
 
-                    <span class="col-xs-7">
-                        <span type="password" class="form-control form-control-static" id="inputPassword3" placeholder="Password"></span>
-                    </span>
+                            <!----><div class="form-horizontal">
+
+                                <!----><div class="col-sm-6">
+                                    <!----><div class="form-group ">
+                                        <div class="col-sm-4">
+                                            <!----><label class="control-label">Required Date</label>
+                                            <column-designer _nghost-c2="">
+                                                <!---->
+                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                    <!---->
+                                                </span>
+                                            </column-designer>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <data-control>
+                                                <!---->
+                                                <!----><div class="">
+                                                    <div>
+                                                        <!----><div>
+                                                            <!---->
+                                                            <input class="form-control ng-untouched ng-pristine ng-valid" type="date">
+                                                            <!---->
+
+                                                        </div>
+                                                        <!---->
+                                                        <!---->
+
+                                                    </div>
+                                                </div>
+                                            </data-control>
+                                        </div>
+                                    </div><div class="form-group ">
+                                        <div class="col-sm-4">
+                                            <!----><label class="control-label">Shipped Date</label>
+                                            <column-designer _nghost-c2="">
+                                                <!---->
+                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                    <!---->
+                                                </span>
+                                            </column-designer>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <data-control>
+                                                <!---->
+                                                <!----><div class="">
+                                                    <div>
+                                                        <!----><div>
+                                                            <!---->
+                                                            <input class="form-control ng-untouched ng-pristine ng-valid" type="date">
+                                                            <!---->
+
+                                                        </div>
+                                                        <!---->
+                                                        <!---->
+
+                                                    </div>
+                                                </div>
+                                            </data-control>
+                                        </div>
+                                    </div>
+                                </div><div class="col-sm-6">
+                                    <!----><div class="form-group ">
+                                        <div class="col-sm-4">
+                                            <!----><label class="control-label">Ship Address</label>
+                                            <column-designer _nghost-c2="">
+                                                <!---->
+                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                    <!---->
+                                                </span>
+                                            </column-designer>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <data-control>
+                                                <!---->
+                                                <!----><div class="">
+                                                    <div>
+                                                        <!----><div>
+                                                            <!---->
+                                                            <input class="form-control ng-untouched ng-pristine ng-valid" type="text">
+                                                            <!---->
+
+                                                        </div>
+                                                        <!---->
+                                                        <!---->
+
+                                                    </div>
+                                                </div>
+                                            </data-control>
+                                        </div>
+                                    </div><div class="form-group ">
+                                        <div class="col-sm-4">
+                                            <!----><label class="control-label">Ship City</label>
+                                            <column-designer _nghost-c2="">
+                                                <!---->
+                                                <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                    <!---->
+                                                </span>
+                                            </column-designer>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <data-control>
+                                                <!---->
+                                                <!----><div class="">
+                                                    <div>
+                                                        <!----><div>
+                                                            <!---->
+                                                            <input class="form-control ng-untouched ng-pristine ng-valid" type="text">
+                                                            <!---->
+
+                                                        </div>
+                                                        <!---->
+                                                        <!---->
+
+                                                    </div>
+                                                </div>
+                                            </data-control>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </data-area>
+                    </tab>
+                    <tab _ngcontent-c0="" class="tab-pane">
+                        <data-grid _ngcontent-c0="" _nghost-c1="">
+
+                            <!---->
+                            <div _ngcontent-c1="">
+                                <!----><div _ngcontent-c1="" class="pull-right">
+                                    <!---->
+                                    <!---->
+                                    <!----><button _ngcontent-c1="" class="btn glyphicon glyphicon-chevron-right"></button>
+                                    <!----><button _ngcontent-c1="" class="btn btn-primary glyphicon glyphicon-plus"></button>
+                                </div>
+                                <!----><table _ngcontent-c1="" class="table table-bordered table-condensed table-hover table-striped ">
+
+                                    <thead _ngcontent-c1="">
+                                        <tr _ngcontent-c1="">
+                                            <!---->
+                                            <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                <span _ngcontent-c1="">Product ID</span>
+
+
+                                                <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                <!---->
+                                                <!---->
+                                                <!---->
+                                                <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                    <!---->
+                                                    <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                        <!---->
+                                                    </span>
+                                                </column-designer>
+
+
+
+
+
+                                            </th>
+                                            <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                <span _ngcontent-c1="">Unit Price</span>
+
+
+                                                <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                <!---->
+                                                <!---->
+                                                <!---->
+                                                <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                    <!---->
+                                                    <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                        <!---->
+                                                    </span>
+                                                </column-designer>
+
+
+
+
+
+                                            </th>
+                                            <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                <span _ngcontent-c1="">Quantity</span>
+
+
+                                                <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                <!---->
+                                                <!---->
+                                                <!---->
+                                                <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                    <!---->
+                                                    <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                        <!---->
+                                                    </span>
+                                                </column-designer>
+
+
+
+
+
+                                            </th>
+                                            <th _ngcontent-c1="" class="headerWithFilter">
+
+                                                <span _ngcontent-c1="">Total</span>
+
+
+                                                <span _ngcontent-c1="" class="glyphicon glyphicon-filter filterButton"></span>
+                                                <!---->
+                                                <!---->
+                                                <!---->
+                                                <column-designer _ngcontent-c1="" _nghost-c2="">
+                                                    <!---->
+                                                    <span _ngcontent-c2="" class="designModeButton pull-right">
+                                                        <!---->
+                                                    </span>
+                                                </column-designer>
+
+
+
+
+
+                                            </th>
+                                            <!---->
+                                            <th _ngcontent-c1="" class="col-xs-2"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody _ngcontent-c1="">
+                                        <!---->
+                                        <tr _ngcontent-c1="" class="active">
+
+                                            <!---->
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!---->
+                                                            <!----><div>
+                                                                <select class="form-control ng-untouched ng-pristine ng-valid">
+                                                                    <!---->
+                                                                    <option value="1">Chai</option>
+                                                                    <option value="2">Chang</option>
+                                                                    <option value="3">Aniseed Syrup</option>
+                                                                    <option value="4">Chef Anton's Cajun Seasoning</option>
+                                                                    <option value="5">Chef Anton's Gumbo Mix</option>
+                                                                    <option value="6">Grandma's Boysenberry Spread</option>
+                                                                    <option value="7">Uncle Bob's Organic Dried Pears</option>
+                                                                    <option value="8">Northwoods Cranberry Sauce</option>
+                                                                    <option value="9">Mishi Kobe Niku</option>
+                                                                    <option value="10">Ikura</option>
+                                                                    <option value="11">Queso Cabrales</option>
+                                                                    <option value="12">Queso Manchego La Pastora</option>
+                                                                    <option value="13">Konbu</option>
+                                                                    <option value="14">Tofu</option>
+                                                                    <option value="15">Genen Shouyu</option>
+                                                                    <option value="16">Pavlova</option>
+                                                                    <option value="17">Alice Mutton</option>
+                                                                    <option value="18">Carnarvon Tigers</option>
+                                                                    <option value="19">Teatime Chocolate Biscuits</option>
+                                                                    <option value="20">Sir Rodney's Marmalade</option>
+                                                                    <option value="21">Sir Rodney's Scones</option>
+                                                                    <option value="22">Gustaf's Kneckebred</option>
+                                                                    <option value="23">Tunnbred</option>
+                                                                    <option value="24">Guarane Fantestica</option>
+                                                                    <option value="25">NuNuCa Nue-Nougat-Creme</option>
+                                                                    <option value="26">Gumber Gummiberchen</option>
+                                                                    <option value="27">Schoggi Schokolade</option>
+                                                                    <option value="28">Ressle Sauerkraut</option>
+                                                                    <option value="29">Theringer Rostbratwurst</option>
+                                                                    <option value="30">Nord-Ost Matjeshering</option>
+                                                                    <option value="31">Gorgonzola Telino</option>
+                                                                    <option value="32">Mascarpone Fabioli</option>
+                                                                    <option value="33">Geitost</option>
+                                                                    <option value="34">Sasquatch Ale</option>
+                                                                    <option value="35">Steeleye Stout</option>
+                                                                    <option value="36">Inlagd Sill</option>
+                                                                    <option value="37">Gravad lax</option>
+                                                                    <option value="38">Cete de Blaye</option>
+                                                                    <option value="39">Chartreuse verte</option>
+                                                                    <option value="40">Boston Crab Meat</option>
+                                                                    <option value="41">Jack's New England Clam Chowder</option>
+                                                                    <option value="42">Singaporean Hokkien Fried Mee</option>
+                                                                    <option value="43">Ipoh Coffee</option>
+                                                                    <option value="44">Gula Malacca</option>
+                                                                    <option value="45">Rogede sild</option>
+                                                                    <option value="46">Spegesild</option>
+                                                                    <option value="47">Zaanse koeken</option>
+                                                                    <option value="48">Chocolade</option>
+                                                                    <option value="49">Maxilaku</option>
+                                                                    <option value="50">Valkoinen suklaa</option>
+                                                                    <option value="51">Manjimup Dried Apples</option>
+                                                                    <option value="52">Filo Mix</option>
+                                                                    <option value="53">Perth Pasties</option>
+                                                                    <option value="54">Tourtiere</option>
+                                                                    <option value="55">Pete chinois</option>
+                                                                    <option value="56">Gnocchi di nonna Alice</option>
+                                                                    <option value="57">Ravioli Angelo</option>
+                                                                    <option value="58">Escargots de Bourgogne</option>
+                                                                    <option value="59">Raclette Courdavault</option>
+                                                                    <option value="60">Camembert Pierrot</option>
+                                                                    <option value="61">Sirop d'erable</option>
+                                                                    <option value="62">Tarte au sucre</option>
+                                                                    <option value="63">Vegie-spread</option>
+                                                                    <option value="64">Wimmers gute Semmelknedel</option>
+                                                                    <option value="65">Louisiana Fiery Hot Pepper Sauce</option>
+                                                                    <option value="66">Louisiana Hot Spiced Okra</option>
+                                                                    <option value="67">Laughing Lumberjack Lager</option>
+                                                                    <option value="68">Scottish Longbreads</option>
+                                                                    <option value="69">Gudbrandsdalsost</option>
+                                                                    <option value="70">Outback Lager</option>
+                                                                    <option value="71">Flotemysost</option>
+                                                                    <option value="72">Mozzarella di Giovanni</option>
+                                                                    <option value="73">Red Kaviar</option>
+                                                                    <option value="74">Longlife Tofu</option>
+                                                                    <option value="75">Rhenbreu Klosterbier</option>
+                                                                    <option value="76">Lakkalikeeri</option>
+                                                                    <option value="77">Original Frankfurter grene Soee</option>
+
+                                                                </select>
+                                                            </div>
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!----><div>
+                                                                <!---->
+                                                                <input class="form-control ng-untouched ng-pristine ng-valid" type="number">
+                                                                <!---->
+
+                                                            </div>
+                                                            <!---->
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!----><div>
+                                                                <!---->
+                                                                <input class="form-control ng-untouched ng-pristine ng-valid" type="number">
+                                                                <!---->
+
+                                                            </div>
+                                                            <!---->
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!----><span>168</span>
+                                                    <!---->
+                                                </data-control>
+                                            </td>
+                                            <!---->
+                                            <td _ngcontent-c1="" style="white-space:nowrap">
+                                                <!----><span _ngcontent-c1="">
+                                                    <!---->
+                                                </span><span _ngcontent-c1="">
+                                                    <!---->
+                                                </span><span _ngcontent-c1="">
+                                                    <!----><button _ngcontent-c1="" class="btn btn-danger glyphicon glyphicon-trash"></button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr _ngcontent-c1="" class="">
+
+                                            <!---->
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!---->
+                                                            <!----><div>
+                                                                <select class="form-control ng-untouched ng-pristine ng-valid">
+                                                                    <!---->
+                                                                    <option value="1">Chai</option>
+                                                                    <option value="2">Chang</option>
+                                                                    <option value="3">Aniseed Syrup</option>
+                                                                    <option value="4">Chef Anton's Cajun Seasoning</option>
+                                                                    <option value="5">Chef Anton's Gumbo Mix</option>
+                                                                    <option value="6">Grandma's Boysenberry Spread</option>
+                                                                    <option value="7">Uncle Bob's Organic Dried Pears</option>
+                                                                    <option value="8">Northwoods Cranberry Sauce</option>
+                                                                    <option value="9">Mishi Kobe Niku</option>
+                                                                    <option value="10">Ikura</option>
+                                                                    <option value="11">Queso Cabrales</option>
+                                                                    <option value="12">Queso Manchego La Pastora</option>
+                                                                    <option value="13">Konbu</option>
+                                                                    <option value="14">Tofu</option>
+                                                                    <option value="15">Genen Shouyu</option>
+                                                                    <option value="16">Pavlova</option>
+                                                                    <option value="17">Alice Mutton</option>
+                                                                    <option value="18">Carnarvon Tigers</option>
+                                                                    <option value="19">Teatime Chocolate Biscuits</option>
+                                                                    <option value="20">Sir Rodney's Marmalade</option>
+                                                                    <option value="21">Sir Rodney's Scones</option>
+                                                                    <option value="22">Gustaf's Kneckebred</option>
+                                                                    <option value="23">Tunnbred</option>
+                                                                    <option value="24">Guarane Fantestica</option>
+                                                                    <option value="25">NuNuCa Nue-Nougat-Creme</option>
+                                                                    <option value="26">Gumber Gummiberchen</option>
+                                                                    <option value="27">Schoggi Schokolade</option>
+                                                                    <option value="28">Ressle Sauerkraut</option>
+                                                                    <option value="29">Theringer Rostbratwurst</option>
+                                                                    <option value="30">Nord-Ost Matjeshering</option>
+                                                                    <option value="31">Gorgonzola Telino</option>
+                                                                    <option value="32">Mascarpone Fabioli</option>
+                                                                    <option value="33">Geitost</option>
+                                                                    <option value="34">Sasquatch Ale</option>
+                                                                    <option value="35">Steeleye Stout</option>
+                                                                    <option value="36">Inlagd Sill</option>
+                                                                    <option value="37">Gravad lax</option>
+                                                                    <option value="38">Cete de Blaye</option>
+                                                                    <option value="39">Chartreuse verte</option>
+                                                                    <option value="40">Boston Crab Meat</option>
+                                                                    <option value="41">Jack's New England Clam Chowder</option>
+                                                                    <option value="42">Singaporean Hokkien Fried Mee</option>
+                                                                    <option value="43">Ipoh Coffee</option>
+                                                                    <option value="44">Gula Malacca</option>
+                                                                    <option value="45">Rogede sild</option>
+                                                                    <option value="46">Spegesild</option>
+                                                                    <option value="47">Zaanse koeken</option>
+                                                                    <option value="48">Chocolade</option>
+                                                                    <option value="49">Maxilaku</option>
+                                                                    <option value="50">Valkoinen suklaa</option>
+                                                                    <option value="51">Manjimup Dried Apples</option>
+                                                                    <option value="52">Filo Mix</option>
+                                                                    <option value="53">Perth Pasties</option>
+                                                                    <option value="54">Tourtiere</option>
+                                                                    <option value="55">Pete chinois</option>
+                                                                    <option value="56">Gnocchi di nonna Alice</option>
+                                                                    <option value="57">Ravioli Angelo</option>
+                                                                    <option value="58">Escargots de Bourgogne</option>
+                                                                    <option value="59">Raclette Courdavault</option>
+                                                                    <option value="60">Camembert Pierrot</option>
+                                                                    <option value="61">Sirop d'erable</option>
+                                                                    <option value="62">Tarte au sucre</option>
+                                                                    <option value="63">Vegie-spread</option>
+                                                                    <option value="64">Wimmers gute Semmelknedel</option>
+                                                                    <option value="65">Louisiana Fiery Hot Pepper Sauce</option>
+                                                                    <option value="66">Louisiana Hot Spiced Okra</option>
+                                                                    <option value="67">Laughing Lumberjack Lager</option>
+                                                                    <option value="68">Scottish Longbreads</option>
+                                                                    <option value="69">Gudbrandsdalsost</option>
+                                                                    <option value="70">Outback Lager</option>
+                                                                    <option value="71">Flotemysost</option>
+                                                                    <option value="72">Mozzarella di Giovanni</option>
+                                                                    <option value="73">Red Kaviar</option>
+                                                                    <option value="74">Longlife Tofu</option>
+                                                                    <option value="75">Rhenbreu Klosterbier</option>
+                                                                    <option value="76">Lakkalikeeri</option>
+                                                                    <option value="77">Original Frankfurter grene Soee</option>
+
+                                                                </select>
+                                                            </div>
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!----><div>
+                                                                <!---->
+                                                                <input class="form-control ng-untouched ng-pristine ng-valid" type="number">
+                                                                <!---->
+
+                                                            </div>
+                                                            <!---->
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!----><div>
+                                                                <!---->
+                                                                <input class="form-control ng-untouched ng-pristine ng-valid" type="number">
+                                                                <!---->
+
+                                                            </div>
+                                                            <!---->
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!----><span>98</span>
+                                                    <!---->
+                                                </data-control>
+                                            </td>
+                                            <!---->
+                                            <td _ngcontent-c1="" style="white-space:nowrap">
+                                                <!----><span _ngcontent-c1="">
+                                                    <!---->
+                                                </span><span _ngcontent-c1="">
+                                                    <!---->
+                                                </span><span _ngcontent-c1="">
+                                                    <!----><button _ngcontent-c1="" class="btn btn-danger glyphicon glyphicon-trash"></button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr _ngcontent-c1="" class="">
+
+                                            <!---->
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!---->
+                                                            <!----><div>
+                                                                <select class="form-control ng-untouched ng-pristine ng-valid">
+                                                                    <!---->
+                                                                    <option value="1">Chai</option>
+                                                                    <option value="2">Chang</option>
+                                                                    <option value="3">Aniseed Syrup</option>
+                                                                    <option value="4">Chef Anton's Cajun Seasoning</option>
+                                                                    <option value="5">Chef Anton's Gumbo Mix</option>
+                                                                    <option value="6">Grandma's Boysenberry Spread</option>
+                                                                    <option value="7">Uncle Bob's Organic Dried Pears</option>
+                                                                    <option value="8">Northwoods Cranberry Sauce</option>
+                                                                    <option value="9">Mishi Kobe Niku</option>
+                                                                    <option value="10">Ikura</option>
+                                                                    <option value="11">Queso Cabrales</option>
+                                                                    <option value="12">Queso Manchego La Pastora</option>
+                                                                    <option value="13">Konbu</option>
+                                                                    <option value="14">Tofu</option>
+                                                                    <option value="15">Genen Shouyu</option>
+                                                                    <option value="16">Pavlova</option>
+                                                                    <option value="17">Alice Mutton</option>
+                                                                    <option value="18">Carnarvon Tigers</option>
+                                                                    <option value="19">Teatime Chocolate Biscuits</option>
+                                                                    <option value="20">Sir Rodney's Marmalade</option>
+                                                                    <option value="21">Sir Rodney's Scones</option>
+                                                                    <option value="22">Gustaf's Kneckebred</option>
+                                                                    <option value="23">Tunnbred</option>
+                                                                    <option value="24">Guarane Fantestica</option>
+                                                                    <option value="25">NuNuCa Nue-Nougat-Creme</option>
+                                                                    <option value="26">Gumber Gummiberchen</option>
+                                                                    <option value="27">Schoggi Schokolade</option>
+                                                                    <option value="28">Ressle Sauerkraut</option>
+                                                                    <option value="29">Theringer Rostbratwurst</option>
+                                                                    <option value="30">Nord-Ost Matjeshering</option>
+                                                                    <option value="31">Gorgonzola Telino</option>
+                                                                    <option value="32">Mascarpone Fabioli</option>
+                                                                    <option value="33">Geitost</option>
+                                                                    <option value="34">Sasquatch Ale</option>
+                                                                    <option value="35">Steeleye Stout</option>
+                                                                    <option value="36">Inlagd Sill</option>
+                                                                    <option value="37">Gravad lax</option>
+                                                                    <option value="38">Cete de Blaye</option>
+                                                                    <option value="39">Chartreuse verte</option>
+                                                                    <option value="40">Boston Crab Meat</option>
+                                                                    <option value="41">Jack's New England Clam Chowder</option>
+                                                                    <option value="42">Singaporean Hokkien Fried Mee</option>
+                                                                    <option value="43">Ipoh Coffee</option>
+                                                                    <option value="44">Gula Malacca</option>
+                                                                    <option value="45">Rogede sild</option>
+                                                                    <option value="46">Spegesild</option>
+                                                                    <option value="47">Zaanse koeken</option>
+                                                                    <option value="48">Chocolade</option>
+                                                                    <option value="49">Maxilaku</option>
+                                                                    <option value="50">Valkoinen suklaa</option>
+                                                                    <option value="51">Manjimup Dried Apples</option>
+                                                                    <option value="52">Filo Mix</option>
+                                                                    <option value="53">Perth Pasties</option>
+                                                                    <option value="54">Tourtiere</option>
+                                                                    <option value="55">Pete chinois</option>
+                                                                    <option value="56">Gnocchi di nonna Alice</option>
+                                                                    <option value="57">Ravioli Angelo</option>
+                                                                    <option value="58">Escargots de Bourgogne</option>
+                                                                    <option value="59">Raclette Courdavault</option>
+                                                                    <option value="60">Camembert Pierrot</option>
+                                                                    <option value="61">Sirop d'erable</option>
+                                                                    <option value="62">Tarte au sucre</option>
+                                                                    <option value="63">Vegie-spread</option>
+                                                                    <option value="64">Wimmers gute Semmelknedel</option>
+                                                                    <option value="65">Louisiana Fiery Hot Pepper Sauce</option>
+                                                                    <option value="66">Louisiana Hot Spiced Okra</option>
+                                                                    <option value="67">Laughing Lumberjack Lager</option>
+                                                                    <option value="68">Scottish Longbreads</option>
+                                                                    <option value="69">Gudbrandsdalsost</option>
+                                                                    <option value="70">Outback Lager</option>
+                                                                    <option value="71">Flotemysost</option>
+                                                                    <option value="72">Mozzarella di Giovanni</option>
+                                                                    <option value="73">Red Kaviar</option>
+                                                                    <option value="74">Longlife Tofu</option>
+                                                                    <option value="75">Rhenbreu Klosterbier</option>
+                                                                    <option value="76">Lakkalikeeri</option>
+                                                                    <option value="77">Original Frankfurter grene Soee</option>
+
+                                                                </select>
+                                                            </div>
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!----><div>
+                                                                <!---->
+                                                                <input class="form-control ng-untouched ng-pristine ng-valid" type="number">
+                                                                <!---->
+
+                                                            </div>
+                                                            <!---->
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!---->
+                                                    <!----><div class="">
+                                                        <div>
+                                                            <!----><div>
+                                                                <!---->
+                                                                <input class="form-control ng-untouched ng-pristine ng-valid" type="number">
+                                                                <!---->
+
+                                                            </div>
+                                                            <!---->
+                                                            <!---->
+
+                                                        </div>
+                                                    </div>
+                                                </data-control>
+                                            </td>
+                                            <td _ngcontent-c1="" class="">
+                                                <data-control _ngcontent-c1="">
+                                                    <!----><span>174</span>
+                                                    <!---->
+                                                </data-control>
+                                            </td>
+                                            <!---->
+                                            <td _ngcontent-c1="" style="white-space:nowrap">
+                                                <!----><span _ngcontent-c1="">
+                                                    <!---->
+                                                </span><span _ngcontent-c1="">
+                                                    <!---->
+                                                </span><span _ngcontent-c1="">
+                                                    <!----><button _ngcontent-c1="" class="btn btn-danger glyphicon glyphicon-trash"></button>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!----><data-area _ngcontent-c1="">
+
+                                <!----><div class="form-horizontal">
+
+                                    <!----><div class="col-sm-6">
+                                        <!---->
+                                    </div><div class="col-sm-6">
+                                        <!---->
+                                    </div>
+                                </div>
+
+
+                            </data-area>
+                        </data-grid>
+                    </tab>
                 </div>
-                <div class="form-group">
-                    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
-                    <div class="col-xs-10">
-                        <div class="input-group">
-                            <div class="input-group-btn">
-                                <button type="button" class="btn btn-default "> <span class="glyphicon glyphicon-chevron-down"></span></button>
-                            </div>
-                            <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount">
-                            <div class="input-group-addon">the description text</div>
-
-
-                        </div>
-                        <div class="form-group">
-                            <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
-                            <div class="col-sm-10 ">
-                                <div class="input-group">
-
-                                    <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount">
-
-
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> Remember me
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <button type="submit" class="btn btn-default">Sign in</button>
-                            </div>
-                        </div>
-            </form>
-        </div>
+            </tabset>
+            <button _ngcontent-c0="" class="btn btn-primary">Print</button>
+        </app-root>
     </div>
-
 </body>
 </html>

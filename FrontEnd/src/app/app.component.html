@@ -1,27 +1,29 @@
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" (click)="isCollapsed = !isCollapsed" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" routerLink="/">Cool Web Application</a>
+<mat-toolbar color="primary">
+    <button mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span> Web Demo</span>
+  </mat-toolbar>
+<mat-sidenav-container class="app-sidenav-container">
+  <mat-sidenav #sidenav class="app-sidenav mat-elevation-z10" [opened]="!isScreenSmall()" [mode]="isScreenSmall()?'over':'side'">
+    
+    <mat-nav-list role="list">
+      <ng-container *ngFor="let m of router.config">
+        <mat-list-item *ngIf="m.path && m.path.indexOf(':')<0" routerLinkActive="active-route" >
+          <a matLine [routerLink]="m.path">{{m.path}}</a>
+        </mat-list-item>
+        
+      </ng-container>
+    </mat-nav-list>
+
+  </mat-sidenav>
+  <div class="app-sidenav-content ">
+    
+
+    <div class="wrapper">
+      <router-outlet></router-outlet>
     </div>
 
-    <!-- Display all links based on the registered routes -->
-    <div class="collapse navbar-collapse" [collapse]=isCollapsed>
-      <ul class="nav navbar-nav">
-        <ng-container *ngFor="let m of router.config">
-          <li routerLinkActive="active" *ngIf="m.path && m.path.indexOf(':')<0">
-            <a routerLink="{{m.path}}">{{m.path}}
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-        </ng-container>
-      </ul>
-    </div>
   </div>
-</nav>
-<router-outlet></router-outlet>
+
+</mat-sidenav-container>

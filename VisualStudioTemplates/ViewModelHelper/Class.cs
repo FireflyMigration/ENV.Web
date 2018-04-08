@@ -4,6 +4,7 @@ using System.Text;
 using Firefly.Box;
 using ENV;
 using ENV.Web;
+using ENV.Data;
 
 namespace $rootnamespace$
 {

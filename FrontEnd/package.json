@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "nc":"ng generate component --spec false",
+    "gc":"ng generate component --spec false",
     "start": "ng serve",
     "build": "ng build --prod && npm run copyFilesToMVC",
     "test": "ng test",

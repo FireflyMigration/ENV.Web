@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { RadWebModule } from 'radweb';
 import { AppRoutingModule } from './app-routing.module';
 import { HomeComponent } from './home/home.component';
+import { FormsModule } from '@angular/forms'; 
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { HomeComponent } from './home/home.component';
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
     RadWebModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

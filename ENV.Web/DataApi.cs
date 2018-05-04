@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Firefly.Box.Testing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,6 +64,10 @@ namespace ENV.Web
             if (onlyIfKeyNotAlreadyInUsed && _controllers.ContainsKey(x))
                 return;
             Register(x, t, allowInsertUpdateDelete);
+        }
+        public void TestApinameExists(string name, bool exists)
+        {
+            _controllers.ContainsKey(name.ToLower()).ShouldBe(exists, "Controller " + name + " exists");
         }
         public void ProcessRequest(string name, string id = null)
         {

@@ -202,6 +202,7 @@ namespace ENV.Web
                     else
                     {
                         Response.StatusCode = 404;
+                        Response.Write("Couldn't find api named: " + name);
                         return;
                     }
                 }

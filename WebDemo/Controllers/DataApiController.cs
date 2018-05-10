@@ -16,9 +16,9 @@ namespace WebDemo.Controllers
 
         }
         // GET: DataApi
-        public void Index(string name, string id = null)
+        public void Index(string dataApiRegisteredName, string id = null)
         {
-            _dataApi.ProcessRequest(name, id);
+            _dataApi.ProcessRequest(dataApiRegisteredName, id);
         }
     }
 }

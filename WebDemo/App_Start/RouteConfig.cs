@@ -12,7 +12,7 @@ namespace WebDemo
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-            routes.MapRoute("DataApi", "dataApi/{name}/{id}", new { controller = "DataApi", action = "Index",name=UrlParameter.Optional, id = UrlParameter.Optional });
+            routes.MapRoute("DataApi", "dataApi/{dataApiRegisteredName}/{id}", new { controller = "DataApi", action = "Index", dataApiRegisteredName = UrlParameter.Optional, id = UrlParameter.Optional });
             routes.MapRoute(
                   name: "Default",
                   url: "{controller}/{action}/{id}",

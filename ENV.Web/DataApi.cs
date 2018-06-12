@@ -414,7 +414,7 @@ namespace ENV.Web
     <li><strong>_page</strong> - Page Number</li>
     <li><strong>_sort</strong> - Sort Columns</li>
     <li><strong>_order</strong> - Sort Direction</li>
-    <li><strong>_gt, _gte, _lt, _lte, _ne</strong> - Filter Data Options</li>
+    <li><strong>_gt, _gte, _lt, _lte, _ne, _st (starts with), _contains</strong> - Filter Data Options</li>
 </ul>";
     }
     class NotFoundException : Exception

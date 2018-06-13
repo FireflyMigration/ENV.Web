@@ -107,7 +107,12 @@ namespace ENV.Web
             var di = new DataItem();
             foreach (var pair in JObject.Parse(s))
             {
-                di.Set(pair.Key, pair.Value.ToObject<string>());
+                object value = pair.Value.ToObject<object>();
+                if (value is JArray)
+                    value = DataList.FromJson(value.ToString());
+                else
+                    value = value.ToString();
+                di.Set(pair.Key, value);
             }
 
             return di;

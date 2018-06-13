@@ -9,6 +9,7 @@ using System.Web;
 using System.Xml;
 using System.Collections;
 using ENV.Utilities;
+using Newtonsoft.Json.Linq;
 
 namespace ENV.Web
 {
@@ -96,12 +97,27 @@ namespace ENV.Web
                 return sw.ToString();
             }
         }
+
         public static DataItem FromJson(string s)
         {
             if (string.IsNullOrEmpty(s))
-                throw new InvalidOperationException("Empty JSON Content - did you forget settings the ContentType:application/json");
-            return (DataItem)new JsonParser().FromJson(s);
+                throw new InvalidOperationException(
+                    "Empty JSON Content - did you forget settings the ContentType:application/json");
+
+            var di = new DataItem();
+            foreach (var pair in JObject.Parse(s))
+            {
+                object value = pair.Value.ToObject<object>();
+                if (value is JArray)
+                    value = DataList.FromJson(value.ToString());
+                else
+                    value = value.ToString();
+                di.Set(pair.Key, value);
+            }
+
+            return di;
         }
+
         class Val
         {
             public string Name { get; set; }
@@ -593,7 +609,16 @@ namespace ENV.Web
         }
         public static DataList FromJson(string s)
         {
-            return (DataList)new JsonParser().FromJson(s);
+            var result = new DataList();
+
+            var jArr = JArray.Parse(s);
+            foreach (var jObj in jArr.Children<JObject>())
+            {
+                var di = DataItem.FromJson(jObj.ToString());
+                result.AddItem(di);
+            }
+
+            return result;
         }
 
 

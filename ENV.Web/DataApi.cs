@@ -142,10 +142,26 @@ namespace ENV.Web
                                             else if (responseType.StartsWith("DC"))
                                                 vmc.ColumnKeys(sw);
                                             else
-                                                vmc.CreateTypeScriptInterface(sw, name,Request.Path);
+                                                vmc.CreateTypeScriptInterface(sw, name, Request.Path);
                                         }
                                         else if (string.IsNullOrEmpty(id))
-                                            vmc.GetRows().ToWriter(w);
+                                        {
+                                            var rows = vmc.GetRows();
+                                            var action = System.Web.HttpContext.Current.Request.Params["__action"]??"";
+                                            
+                                            switch (action.ToUpper()) {
+                                                case "COUNT":
+
+                                                    var di = new DataItem();
+                                                    di.Set("count", rows.Count);
+                                                    di.ToWriter(w);
+                                                    break;
+                                                default:
+                                            rows.ToWriter(w);
+                                                    break;
+                                                    
+                                            }
+                                        }
                                         else
                                             try
                                             {
@@ -414,7 +430,8 @@ namespace ENV.Web
     <li><strong>_page</strong> - Page Number</li>
     <li><strong>_sort</strong> - Sort Columns</li>
     <li><strong>_order</strong> - Sort Direction</li>
-    <li><strong>_gt, _gte, _lt, _lte, _ne</strong> - Filter Data Options</li>
+    <li><strong>__action</strong> - count => return the number of rows based on the filter</li>
+    <li><strong>_gt, _gte, _lt, _lte, _ne, _st (starts with), _contains</strong> - Filter Data Options</li>
 </ul>";
     }
     class NotFoundException : Exception

@@ -130,6 +130,8 @@ namespace ENV.Web
                 item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_lt"), _tempFilter, new lesser());
                 item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_lte"), _tempFilter, new lessOrEqual());
                 item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_ne"), _tempFilter, new different());
+                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_contains"), _tempFilter, new contains());
+                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_st"), _tempFilter, new startsWith());
             }
             long start = 0;
             long numOfRows = 25;
@@ -214,7 +216,7 @@ namespace ENV.Web
             string idColumnType = "string";
             if (_idColumn is NumberColumn)
                 idColumnType = "number";
-            
+
             tw.WriteLine($@"export class {name} extends radweb.Entity<{idColumnType}> {{");
             foreach (var item in _columns)
             {
@@ -401,7 +403,7 @@ namespace ENV.Web
         {
             foreach (var c in _columns)
             {
-                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState, _bp.From, _ignoreUpdateOf,IgnoreUpdateOfNonUpdatableColumns);
+                c.UpdateDataBasedOnItem(item, _denyUpdateColumns, _onlyAllowUpdateOf, ModelState, _bp.From, _ignoreUpdateOf, IgnoreUpdateOfNonUpdatableColumns);
             }
             try
             {
@@ -500,7 +502,7 @@ namespace ENV.Web
                 x.Set(_key, _getValueFromRow());
             }
 
-            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state, Firefly.Box.Data.Entity updatebleEntity, HashSet<ColumnBase> ignoreUpdateOf,bool disableCannotBeUpdatedError)
+            internal void UpdateDataBasedOnItem(DataItem item, HashSet<ColumnBase> denyUpdateOf, HashSet<ColumnBase> onlyAllowUpdateOf, ViewModelState state, Firefly.Box.Data.Entity updatebleEntity, HashSet<ColumnBase> ignoreUpdateOf, bool disableCannotBeUpdatedError)
             {
                 if ((_col.Entity == null || _col.Entity == updatebleEntity) && !ignoreUpdateOf.Contains(_col))
                 {
@@ -714,6 +716,36 @@ namespace ENV.Web
         public override void What<T>(TypedColumnBase<T> col, T val)
         {
             result = col.IsDifferentFrom(val);
+        }
+    }
+    class startsWith : filterAbstract
+    {
+        public override void What<T>(TypedColumnBase<T> col, T val)
+        {
+            var tcol = col as TextColumn;
+            if (tcol != null)
+                result = tcol.StartsWith(val.ToString());
+        }
+    }
+    class contains : filterAbstract
+    {
+        public override void What<T>(TypedColumnBase<T> col, T val)
+        {
+            var tcol = col as TextColumn;
+            if (tcol != null)
+            {
+                var fc = new FilterCollection();
+                var e = col.Entity as ENV.Data.Entity;
+                if (e != null && e.DataProvider is ENV.Data.DataProvider.DynamicSQLSupportingDataProvider)
+                {
+                    fc.Add("{0} like {1}", col, "%" + val + "%");
+                }
+                else
+                {
+                    fc.Add(() => tcol.Value.Contains(val.ToString()));
+                }
+                result = fc;
+            }
         }
     }
 

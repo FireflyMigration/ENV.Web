@@ -15,7 +15,8 @@
       <ul class="nav navbar-nav">
         <ng-container *ngFor="let m of router.config">
           <li routerLinkActive="active" *ngIf="m.path && m.path.indexOf(':')<0">
-            <a routerLink="{{m.path}}">{{m.path}}
+            <a routerLink="{{m.path}}">
+              {{m.path}}
               <span class="sr-only">(current)</span>
             </a>
           </li>
@@ -24,4 +25,7 @@
     </div>
   </div>
 </nav>
-<router-outlet></router-outlet>
+<div class="container">
+  <router-outlet></router-outlet>
+</div>
+

@@ -164,7 +164,7 @@ namespace ENV.Web
                 for (int i = 0; i < s.Length; i++)
                 {
                     ColumnInViewModel cvm;
-                    if (_colsPerKey.TryGetValue(s[i], out cvm))
+                    if (_colsPerKey.TryGetValue(s[i].ToUpper(), out cvm))
                     {
                         var so = SortDirection.Ascending;
                         if (o.Length > i && o[i].ToLower().StartsWith("d"))
@@ -629,7 +629,7 @@ namespace ENV.Web
                 name = NameFixer.fixName(name);
                 var orgName = name;
                 int i = 1;
-                while (_colsPerKey.ContainsKey(name))
+                while (_colsPerKey.ContainsKey(name.ToUpper()))
                 {
                     name = orgName + (i++).ToString();
                 }
@@ -638,7 +638,7 @@ namespace ENV.Web
                     Caster.Cast(column, v, new setValueForColumn());
                 }, column);
                 _colMap.Add(column, cv);
-                _colsPerKey.Add(name, cv);
+                _colsPerKey.Add(name.ToUpper(), cv);
                 _columns.Add(cv);
                 Columns.Add(column);
             }

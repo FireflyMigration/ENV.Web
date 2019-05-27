@@ -16,6 +16,8 @@ namespace ENV.Web
         {
             _controllers.Add(key.ToLower(), new ApiItem(key, controller));
         }
+        public bool DisableIDRestResolution { get; set; }
+        public string UseUrlBasedMethodParamName { get; set; }
         class ApiItem
         {
             
@@ -84,6 +86,7 @@ namespace ENV.Web
                     if (!string.IsNullOrWhiteSpace(x))
                         Response.Headers.Add("Access-Control-Allow-Origin", x);
                 }
+                if (!DisableIDRestResolution)
                 {//fix id stuff
                     var url = Request.RawUrl;
                     var z = url.IndexOf('?');
@@ -94,6 +97,7 @@ namespace ENV.Web
                     if (x[x.Length - 1] != name)
                         id = x[x.Length - 1];
                 }
+                ENV.IO.WebWriter.ThereWasAnOutput();
                 if (!string.IsNullOrWhiteSpace(name))
                 {
                     ApiItem vmcFactory;
@@ -103,7 +107,14 @@ namespace ENV.Web
                         {
 
                             Response.ContentType = "application/json";
-                            switch (Request.HttpMethod.ToLower())
+                            var method = Request.HttpMethod.ToLower();
+                            if (!string.IsNullOrEmpty(UseUrlBasedMethodParamName))
+                            {
+                                var url = Request[UseUrlBasedMethodParamName];
+                                if (!string.IsNullOrEmpty(url))
+                                    method = url;
+                            }
+                            switch (method)
                             {
                                 case "get":
                                     using (var sw = new System.IO.StringWriter())
@@ -145,23 +156,7 @@ namespace ENV.Web
                                                 vmc.CreateTypeScriptInterface(sw, name, Request.Path);
                                         }
                                         else if (string.IsNullOrEmpty(id))
-                                        {
-                                            var rows = vmc.GetRows();
-                                            var action = System.Web.HttpContext.Current.Request.Params["__action"]??"";
-                                            
-                                            switch (action.ToUpper()) {
-                                                case "COUNT":
-
-                                                    var di = new DataItem();
-                                                    di.Set("count", rows.Count);
-                                                    di.ToWriter(w);
-                                                    break;
-                                                default:
-                                            rows.ToWriter(w);
-                                                    break;
-                                                    
-                                            }
-                                        }
+                                            vmc.GetRows().ToWriter(w);
                                         else
                                             try
                                             {
@@ -218,7 +213,6 @@ namespace ENV.Web
                     else
                     {
                         Response.StatusCode = 404;
-                        Response.Write("Couldn't find api named: " + name);
                         return;
                     }
                 }
@@ -302,7 +296,7 @@ namespace ENV.Web
     <li role=""presentation"" class=""active""><a href=""#{item.Name}_api"" aria-controls=""api"" role=""tab"" data-toggle=""tab"">API</a></li>
     <li role=""presentation""><a href=""#{item.Name}_parameters"" aria-controls=""profile"" role=""tab"" data-toggle=""tab"">Body Parameters</a></li>
     <li role=""presentation""><a href=""#{item.Name}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript</a></li>
-    <li role=""presentation""><a href=""#{item.Name}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Column List</a></li>
+    <li role=""presentation""><a href=""#{item.Name}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Interface</a></li>
     <li role=""presentation""><a href=""#{item.Name}_keys"" aria-controls=""keys"" role=""tab"" data-toggle=""tab"">Typescript Column Keys</a></li>
   </ul>
 
@@ -311,7 +305,7 @@ namespace ENV.Web
     <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Name}_api"">{ api}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_parameters"">{bodyParameters}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptClass(tw, item.Name,url))}</pre></div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_settings""><pre>{getCodeSnippet(c.FullColumnList)}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_settings""><pre>{getCodeSnippet(tw=>c.CreateTypeScriptInterface(tw,item.Name,url))}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
   </div>
 

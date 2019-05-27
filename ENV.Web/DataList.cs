@@ -22,6 +22,7 @@ namespace ENV.Web
         {
             Set((IEnumerable<ColumnBase>)cols);
         }
+        public string[] Keys { get { return _vals.Keys.ToArray<string>(); } }
         public void Set(IEnumerable<ColumnBase> cols)
         {
             foreach (var c in cols)
@@ -149,7 +150,7 @@ namespace ENV.Web
             }
             return null;
         }
-        internal DataItemValue this[string key]
+        public DataItemValue this[string key]
         {
             get
             {
@@ -165,7 +166,7 @@ namespace ENV.Web
             _o = o;
         }
 
-        internal Number Number
+        public Number Number
         {
 
             get
@@ -177,7 +178,7 @@ namespace ENV.Web
             }
         }
 
-        internal Text Text
+        public Text Text
         {
             get
             {if (_o == null)
@@ -185,7 +186,7 @@ namespace ENV.Web
                 return _o.ToString();
             }
         }
-        internal Date Date
+        public Date Date
         {
             get
             {
@@ -195,7 +196,7 @@ namespace ENV.Web
                 return Date.Parse(_o.ToString(), ("YYYY-MM-DD"));
             }
         }
-        internal Time Time
+        public Time Time
         {
             get
             {
@@ -205,7 +206,7 @@ namespace ENV.Web
                 return Time.Parse(_o.ToString(), ("HH:MM:SS"));
             }
         }
-        internal Bool Bool
+        public Bool Bool
         {
             get
             {
@@ -213,6 +214,20 @@ namespace ENV.Web
                 if (Bool.TryCast(_o, out r))
                     return r;
                 return _o.ToString() == "true";
+            }
+        }
+        public DataList DataList
+        {
+            get
+            {
+                return _o as DataList;
+            }
+        }
+        public DataItem DataItem
+        {
+            get
+            {
+                return _o as DataItem;
             }
         }
 

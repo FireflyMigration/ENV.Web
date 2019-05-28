@@ -243,11 +243,6 @@ namespace ENV.Web
             var singular = NameFixer.MakeSingular(name);
 
 
-            tw.WriteLine($@"export class {name} extends radweb.DataSettings&lt;{singular}&gt;{{
-    constructor(settings?: radweb.IDataSettings&lt;{singular}&gt;) {{
-        super(environment.apiUrl + '{url}', settings);
-    }}
-}}");
             tw.WriteLine("export interface " + singular + " {");
             init();
             foreach (var item in _columns)

@@ -486,8 +486,9 @@ namespace ENV.Web
 <html lang=""en"">
 <head>
      <meta name=""viewport"" content=""width=device-width, initial-scale=1"">
-     <link href=""/content/bootstrap.min.css"" rel=""stylesheet"">
-<link href=""./content/bootstrap.min.css"" rel=""stylesheet"">
+<style>"+StoredStuff.BootstrapCss+@"
+</style>
+     
 </head>
 <body>";
 
@@ -582,8 +583,8 @@ namespace ENV.Web
             if (!string.IsNullOrEmpty(BodyAddition))
                 _writer.WriteLine(BodyAddition);
             _writer.WriteLine(@"</body>
-    <script src=""../Scripts/jquery-1.10.2.js""></script>
-    <script src=""../Scripts/bootstrap.js""></script>
+    <script >"+StoredStuff.JQuery+@"</script>
+    <script >"+StoredStuff.BootstrapJs+@"</script>
 </html>");
         }
     }

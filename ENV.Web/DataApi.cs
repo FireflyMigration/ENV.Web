@@ -16,11 +16,11 @@ namespace ENV.Web
         {
             _controllers.Add(key.ToLower(), new ApiItem(key, controller));
         }
-        public bool DisableIDRestResolution { get; set; }
+        bool PrgnameTypeRequest { get; set; }
         public string UseUrlBasedMethodParamName { get; set; }
         class ApiItem
         {
-            
+
             public string Name;
             Func<ViewModel> _factory;
             public ApiItem(string name, Func<ViewModel> factory)
@@ -34,7 +34,7 @@ namespace ENV.Web
                 return _factory();
             }
         }
-       
+
         public void Register(string name, System.Type t, bool allowInsertUpdateDelete = false)
         {
             Register(name, () =>
@@ -43,7 +43,7 @@ namespace ENV.Web
                 var vmh = item as ViewModel;
                 if (vmh != null)
                     return vmh;
-                return 
+                return
                 new ViewModel((ENV.Data.Entity)item, allowInsertUpdateDelete);
             });
         }
@@ -58,7 +58,7 @@ namespace ENV.Web
                 Register(item.Value);
             }
         }
-        void InternalRegister(System.Type t,bool onlyIfKeyNotAlreadyInUsed, bool allowInsertUpdateDelete = false)
+        void InternalRegister(System.Type t, bool onlyIfKeyNotAlreadyInUsed, bool allowInsertUpdateDelete = false)
         {
             var x = t.Name;
             if (x.EndsWith("ViewModel"))
@@ -71,6 +71,15 @@ namespace ENV.Web
         {
             _controllers.ContainsKey(name.ToLower()).ShouldBe(exists, "Controller " + name + " exists");
         }
+        public string ApiParameterName = "api";
+        public string IdParameterName = "id";
+        public void ProcessRequestAspx()
+        {
+            PrgnameTypeRequest = true;
+            var r = System.Web.HttpContext.Current.Request;
+            ProcessRequest(r[ApiParameterName], r[IdParameterName]);
+
+        }
         public void ProcessRequest(string name, string id = null)
         {
             try
@@ -79,14 +88,8 @@ namespace ENV.Web
                 var Request = System.Web.HttpContext.Current.Request;
                 Firefly.Box.Context.Current.SetNonUIThread();
                 var responseType = (System.Web.HttpContext.Current.Request.Params["_response"] ?? "J").ToUpper();
-                Response.Headers.Add("Access-Control-Allow-Credentials", "true");
-                Response.Headers.Add("Access-Control-Allow-Headers", "content-type");
-                {
-                    var x = Request["HTTP_ORIGIN"];
-                    if (!string.IsNullOrWhiteSpace(x))
-                        Response.Headers.Add("Access-Control-Allow-Origin", x);
-                }
-                if (!DisableIDRestResolution)
+
+                if (!PrgnameTypeRequest)
                 {//fix id stuff
                     var url = Request.RawUrl;
                     var z = url.IndexOf('?');
@@ -103,7 +106,7 @@ namespace ENV.Web
                     ApiItem vmcFactory;
                     if (_controllers.TryGetValue(name.ToLower(), out vmcFactory))
                     {
-                        var vmc =  vmcFactory.Create();
+                        var vmc = vmcFactory.Create();
                         {
 
                             Response.ContentType = "application/json";
@@ -227,15 +230,28 @@ namespace ENV.Web
 
                         Response.Write("<h2>" + item.Name + "</h2>");
                         string url = Request.Path;
-                        if (!url.EndsWith("/"))
-                            url += "/";
-                        url += item.Name;
+                        if (PrgnameTypeRequest)
+                        {
+                            url = Request.RawUrl+"&"+ApiParameterName+"="+item.Name;
+                        }
+                        else
+                        {
+                            if (!url.EndsWith("/"))
+                                url += "/";
+                            url += item.Name;
+                        }
                         var sw = new StringBuilder();
                         void x(string linkName, string linkResponseType)
                         {
                             var linkUrl = url;
                             if (!string.IsNullOrEmpty(linkResponseType))
-                                linkUrl += "?_response=" + linkResponseType;
+                            {
+                                if (linkUrl.Contains("?"))
+                                    linkUrl += "&";
+                                else
+                                    linkUrl += "?";
+                                linkUrl += "_response=" + linkResponseType;
+                            }
                             if (sw.Length != 0)
                                 sw.Append(" | ");
                             sw.Append($"<a href=\"{linkUrl}\">{linkName}</a> ");
@@ -259,12 +275,14 @@ namespace ENV.Web
                             {
                                 var i = dl.AddItem();
                                 i.Set("HTTP Method", action);
-                                i.Set("URL", url + (dontNeedId ? "" : "/{id}"));
+                                i.Set("URL", url + 
+                                    (dontNeedId ? "" :(this.PrgnameTypeRequest?"&"+IdParameterName+"={id}" :"/{id}"))+
+                                    (!string.IsNullOrEmpty(UseUrlBasedMethodParamName)?"&"+UseUrlBasedMethodParamName+"="+action:""));
 
                             }
                             addLine("GET", true);
                             if (c.AllowInsert)
-                                addLine("POST",true);
+                                addLine("POST", true);
                             addLine("GET");
                             if (c.AllowUpdate)
                                 addLine("PUT");
@@ -284,7 +302,7 @@ namespace ENV.Web
                                 using (var tw = new System.IO.StringWriter())
                                 {
                                     method(tw);
-                                    return ENV.UserMethods.Instance.XMLVal( tw.ToString());
+                                    return ENV.UserMethods.Instance.XMLVal(tw.ToString());
                                 }
                             }
 
@@ -295,8 +313,8 @@ namespace ENV.Web
   <ul class=""nav nav-tabs"" role=""tablist"">
     <li role=""presentation"" class=""active""><a href=""#{item.Name}_api"" aria-controls=""api"" role=""tab"" data-toggle=""tab"">API</a></li>
     <li role=""presentation""><a href=""#{item.Name}_parameters"" aria-controls=""profile"" role=""tab"" data-toggle=""tab"">Body Parameters</a></li>
-    <li role=""presentation""><a href=""#{item.Name}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript</a></li>
     <li role=""presentation""><a href=""#{item.Name}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Interface</a></li>
+    <li role=""presentation""><a href=""#{item.Name}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript Radweb</a></li>
     <li role=""presentation""><a href=""#{item.Name}_keys"" aria-controls=""keys"" role=""tab"" data-toggle=""tab"">Typescript Column Keys</a></li>
   </ul>
 
@@ -304,8 +322,8 @@ namespace ENV.Web
   <div class=""tab-content"">
     <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Name}_api"">{ api}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_parameters"">{bodyParameters}</div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptClass(tw, item.Name,url))}</pre></div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_settings""><pre>{getCodeSnippet(tw=>c.CreateTypeScriptInterface(tw,item.Name,url))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptClass(tw, item.Name, url))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_settings""><pre>{getCodeSnippet(tw => c.CreateTypeScriptInterface(tw, item.Name, url))}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
   </div>
 
@@ -322,10 +340,9 @@ namespace ENV.Web
 
                     Response.Write(optionalUrlParametersHtmlDoc);
                     Response.Write("</div>");
-                    Response.Write(@"<script src=""./Scripts/jquery-1.10.2.js""></script>");
-                    Response.Write(@"<script src=""../Scripts/jquery-1.10.2.js""></script>");
-                    Response.Write(@"<script src=""./Scripts/bootstrap.js""></script>");
-                    Response.Write(@"<script src=""../Scripts/bootstrap.js""></script>");
+                    Response.Write(@"<script>" + StoredStuff.JQuery + @"</script>");
+                    Response.Write(@"<script >" + StoredStuff.BootstrapJs + "</script>");
+
                 }
             }
             finally
@@ -373,7 +390,7 @@ namespace ENV.Web
             }
             catch (Firefly.Box.Data.DataProvider.DatabaseErrorException ex)
             {
-                
+
                 vmc.ModelState.AddError(ex.ErrorType.ToString());
             }
             catch (Exception ex)

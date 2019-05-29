@@ -75,6 +75,8 @@ namespace ENV.Web
         }
         public string ApiParameterName = "api";
         public string IdParameterName = "id";
+        public string HttpMethodParamName { get; set; }
+        public bool PostOnly { get; set; }
         public void ProcessRequestAspx()
         {
             PrgnameTypeRequest = true;
@@ -84,7 +86,7 @@ namespace ENV.Web
         }
         public void ProcessRequest(string name, string id = null)
         {
-            ProcessRequest(name, id,WebHelper.HttpContext.Value);
+            ProcessRequest(name, id,new HttpContextBridgeToIHttpContext(HttpContext.Current, PostOnly,HttpMethodParamName));
         }
         void ProcessRequest(string name, string id ,IMyHttpContext context)
         {
@@ -95,7 +97,7 @@ namespace ENV.Web
                 Firefly.Box.Context.Current.SetNonUIThread();
                 var responseType = (System.Web.HttpContext.Current.Request.Params["_response"] ?? "J").ToUpper();
 
-                if (!PrgnameTypeRequest&&!WebHelper.PostOnly)
+                if (!PrgnameTypeRequest&&!PostOnly)
                 {//fix id stuff
                     var url = Request.RawUrl;
                     var z = url.IndexOf('?');
@@ -278,7 +280,7 @@ namespace ENV.Web
                                 i.Set("HTTP Method", action);
                                 i.Set("URL", url +
                                     (dontNeedId ? "" : (this.PrgnameTypeRequest ? "&" + IdParameterName + "={id}" : "/{id}")) +
-                                    (!string.IsNullOrEmpty(WebHelper. UseUrlBasedMethodParamName) ? "&" + WebHelper. UseUrlBasedMethodParamName + "=" + action : ""));
+                                    (!string.IsNullOrEmpty(HttpMethodParamName) ? "&" + HttpMethodParamName + "=" + action : ""));
 
                             }
                             addLine("GET", true);

@@ -1,18 +1,22 @@
-﻿using System;
+﻿using ENV.Web;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using ENV.Web;
 
 namespace WebDemo.Controllers
 {
-    public class DataApiController : Controller
+    public class PostDataApiController : Controller
     {
-        static DataApi _dataApi = new DataApi();
-        static DataApiController()
+        static DataApi _dataApi = new DataApi()
         {
-            
+            PostOnly = true,
+            HttpMethodParamName = "method"
+        };
+        static PostDataApiController()
+        {
+
             _dataApi.Register(typeof(Northwind.Models.Categories), true);
 
         }

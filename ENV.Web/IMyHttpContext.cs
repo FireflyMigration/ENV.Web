@@ -28,12 +28,12 @@ namespace ENV.Web
     {
         System.Web.HttpContext _current;
 
-
-        public HttpContextBridgeToIHttpContext(System.Web.HttpContext current)
+        
+        public HttpContextBridgeToIHttpContext(System.Web.HttpContext current,bool postOnly, string HttpMethodParamName)
         {
             _current = current;
-            Request = new WebReqestBridgeToRequest(current.Request);
-            if (WebHelper.PostOnly)
+            Request = new WebReqestBridgeToRequest(current.Request, HttpMethodParamName);
+            if (postOnly)
                 Request = new PostOnlyWebRequest(Request);
             Response = new WebResponseBridgeToResponse(current.Response);
         }
@@ -50,10 +50,11 @@ namespace ENV.Web
     internal class WebReqestBridgeToRequest : WebRequest
     {
         System.Web.HttpRequest _request;
-
-        public WebReqestBridgeToRequest(System.Web.HttpRequest request)
+        string _httpMethodParamName;
+        public WebReqestBridgeToRequest(System.Web.HttpRequest request,string httpMethodParamName)
         {
             _request = request;
+            _httpMethodParamName = httpMethodParamName;
         }
         public string GetRequestInputString()
         {
@@ -69,8 +70,8 @@ namespace ENV.Web
         {
             get
             {
-                if (!string.IsNullOrEmpty(WebHelper.UseUrlBasedMethodParamName))
-                    return this[WebHelper.UseUrlBasedMethodParamName];
+                if (!string.IsNullOrEmpty(_httpMethodParamName))
+                    return this[_httpMethodParamName];
                 return _request.HttpMethod;
             }
         }

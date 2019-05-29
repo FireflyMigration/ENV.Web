@@ -12,10 +12,15 @@ namespace ENV.Web
 {
     public class WebHelper
     {
-        internal static ContextStatic<IMyHttpContext> HttpContext = new ContextStatic<IMyHttpContext>(() => new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current));
-        public static bool PostOnly { get; set; }
-        public static string UseUrlBasedMethodParamName { get; set; }
-        public static void ReturnJson(ISerializedObject item)
+        internal ContextStatic<IMyHttpContext> HttpContext;
+        public WebHelper() {
+            HttpContext = 
+            new ContextStatic<IMyHttpContext>(() =>
+            new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current, PostOnly, null));
+        }
+        public  bool PostOnly { get; set; }
+        
+        public void ReturnJson(ISerializedObject item)
         {
             using (var sw = new StringWriter())
             {
@@ -27,29 +32,29 @@ namespace ENV.Web
                 WriteJsonString(sw.ToString());
             }
         }
-        public static DataItem DataItemFromJsonBody()
+        public  DataItem DataItemFromJsonBody()
         {
             return DataItem.FromJson(HttpContext.Value.Request.GetRequestInputString());
         }
-        public static objectType ObjectFromJsonBody<objectType>()
+        public  objectType ObjectFromJsonBody<objectType>()
         {
 
             return JsonConvert.DeserializeObject<objectType>(HttpContext.Value.Request.GetRequestInputString());
 
         }
-        public static dynamic DynamicFromJsonBody()
+        public  dynamic DynamicFromJsonBody()
         {
           
                 return JObject.Parse(HttpContext.Value.Request.GetRequestInputString());
             
         }
-        private static void WriteJsonString(string s)
+        private  void WriteJsonString(string s)
         {
             ENV.IO.WebWriter.ThereWasAnOutput();
             HttpContext.Value.Response.ContentType = "application/json";
             HttpContext.Value.Response.Write(s);
         }
-        public static void ReturnJson(object o)
+        public  void ReturnJson(object o)
         {
             WriteJsonString(JsonConvert.SerializeObject(o));
 

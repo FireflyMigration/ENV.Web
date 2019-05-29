@@ -71,7 +71,7 @@ namespace ENV.Web
             get
             {
                 if (!string.IsNullOrEmpty(_httpMethodParamName))
-                    return this[_httpMethodParamName];
+                    return this[_httpMethodParamName]??"get";
                 return _request.HttpMethod;
             }
         }

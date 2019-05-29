@@ -12,13 +12,12 @@ namespace ENV.Web
 {
     public class WebHelper
     {
-        internal ContextStatic<IMyHttpContext> HttpContext;
-        public WebHelper() {
-            HttpContext = 
-            new ContextStatic<IMyHttpContext>(() =>
-            new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current, PostOnly, null));
+        IMyHttpContext _context;
+        public WebHelper(bool postOnly=false) {
+            
+            _context = new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current, postOnly, null);
         }
-        public  bool PostOnly { get; set; }
+        
         
         public void ReturnJson(ISerializedObject item)
         {
@@ -34,25 +33,25 @@ namespace ENV.Web
         }
         public  DataItem DataItemFromJsonBody()
         {
-            return DataItem.FromJson(HttpContext.Value.Request.GetRequestInputString());
+            return DataItem.FromJson(_context.Request.GetRequestInputString());
         }
         public  objectType ObjectFromJsonBody<objectType>()
         {
 
-            return JsonConvert.DeserializeObject<objectType>(HttpContext.Value.Request.GetRequestInputString());
+            return JsonConvert.DeserializeObject<objectType>(_context.Request.GetRequestInputString());
 
         }
         public  dynamic DynamicFromJsonBody()
         {
           
-                return JObject.Parse(HttpContext.Value.Request.GetRequestInputString());
+                return JObject.Parse(_context.Request.GetRequestInputString());
             
         }
         private  void WriteJsonString(string s)
         {
             ENV.IO.WebWriter.ThereWasAnOutput();
-            HttpContext.Value.Response.ContentType = "application/json";
-            HttpContext.Value.Response.Write(s);
+            _context.Response.ContentType = "application/json";
+            _context.Response.Write(s);
         }
         public  void ReturnJson(object o)
         {

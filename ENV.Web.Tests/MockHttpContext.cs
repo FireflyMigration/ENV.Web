@@ -8,7 +8,7 @@ namespace ENV.Web.Tests
 {
     class MockHttpContext : ENV.Web.IMyHttpContext, WebRequest, WebResponse
     {
-        public string this[string key] => throw new NotImplementedException();
+        public string this[string key] => null;
 
         public WebRequest Request => this;
 

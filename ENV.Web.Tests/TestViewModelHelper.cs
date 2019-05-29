@@ -34,7 +34,7 @@ namespace ENV.Web.Tests
             mt.InsertRow(1, 1, "noam");
             mt.InsertRow(2, 2, "yael");
             var vmc = new TestVMHWithMoreThanOneMemoberInThePrimaryKey();
-            var dl = vmc.GetRows();
+            var dl = vmc.GetRows(new MockHttpContext());
             dl.Count.ShouldBe(2);
             dl[0]["c1"].Number.ShouldBe(1);
             dl[1]["c1"].Number.ShouldBe(2);
@@ -69,7 +69,7 @@ namespace ENV.Web.Tests
             mt.InsertRow(1, 1, "noam");
             mt.InsertRow(2, 2, "yael");
             var vmc = new TestVMH();
-            var dl = vmc.GetRows();
+            var dl = vmc.GetRows(new MockHttpContext());
             dl.Count.ShouldBe(2);
             dl[0]["id"].Number.ShouldBe(1);
             dl[1]["id"].Number.ShouldBe(2);
@@ -102,7 +102,7 @@ namespace ENV.Web.Tests
             mt.InsertRow(1, 1, "noam");
             mt.InsertRow(2, 2, "yael");
             var vmc = new TestVMH();
-            var item = vmc.GetRows();
+            var item = vmc.GetRows(new MockHttpContext());
             vmc.Delete(item[0]["id"].Text);
             mt.CountRows().ShouldBe(1);
             new BusinessProcess { From = mt }.ForFirstRow(() => mt.c.ShouldBe("yael"));
@@ -211,11 +211,7 @@ namespace ENV.Web.Tests
 
             }
         }
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            ViewModel.HttpContext.Value = new MockHttpContext();
-        }
+    
     }
 
 

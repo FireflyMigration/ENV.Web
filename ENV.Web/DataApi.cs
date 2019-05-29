@@ -1,4 +1,5 @@
-﻿using Firefly.Box.Testing;
+﻿using Firefly.Box;
+using Firefly.Box.Testing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace ENV.Web
 {
     public class DataApi
     {
+         static ContextStatic<IMyHttpContext> HttpContext = new ContextStatic<IMyHttpContext>(() => new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current));
         Dictionary<string, ApiItem> _controllers = new Dictionary<string, ApiItem>();
         public void Register(string key, Func<ViewModel> controller)
         {
@@ -82,10 +84,14 @@ namespace ENV.Web
         }
         public void ProcessRequest(string name, string id = null)
         {
+            ProcessRequest(name, id,HttpContext.Value);
+        }
+        void ProcessRequest(string name, string id ,IMyHttpContext context)
+        {
+            var Request = context.Request;
+            var Response = context.Response;
             try
             {
-                var Response = System.Web.HttpContext.Current.Response;
-                var Request = System.Web.HttpContext.Current.Request;
                 Firefly.Box.Context.Current.SetNonUIThread();
                 var responseType = (System.Web.HttpContext.Current.Request.Params["_response"] ?? "J").ToUpper();
 
@@ -159,7 +165,7 @@ namespace ENV.Web
                                                 vmc.CreateTypeScriptInterface(sw, name, Request.Path);
                                         }
                                         else if (string.IsNullOrEmpty(id))
-                                            vmc.GetRows().ToWriter(w);
+                                            vmc.GetRows(Request).ToWriter(w);
                                         else
                                             try
                                             {
@@ -201,7 +207,7 @@ namespace ENV.Web
                                         allowedMethods += ",POST";
                                     if (vmc.AllowDelete)
                                         allowedMethods += ",DELETE";
-                                    Response.Headers.Add("Access-Control-Allow-Methods", allowedMethods);
+                                    Response.AddHeader("Access-Control-Allow-Methods", allowedMethods);
                                     Response.StatusCode = 204;
                                     return;
                                 case "default":
@@ -232,7 +238,7 @@ namespace ENV.Web
                         string url = Request.Path;
                         if (PrgnameTypeRequest)
                         {
-                            url = Request.RawUrl+"&"+ApiParameterName+"="+item.Name;
+                            url = Request.RawUrl + "&" + ApiParameterName + "=" + item.Name;
                         }
                         else
                         {
@@ -275,9 +281,9 @@ namespace ENV.Web
                             {
                                 var i = dl.AddItem();
                                 i.Set("HTTP Method", action);
-                                i.Set("URL", url + 
-                                    (dontNeedId ? "" :(this.PrgnameTypeRequest?"&"+IdParameterName+"={id}" :"/{id}"))+
-                                    (!string.IsNullOrEmpty(UseUrlBasedMethodParamName)?"&"+UseUrlBasedMethodParamName+"="+action:""));
+                                i.Set("URL", url +
+                                    (dontNeedId ? "" : (this.PrgnameTypeRequest ? "&" + IdParameterName + "={id}" : "/{id}")) +
+                                    (!string.IsNullOrEmpty(UseUrlBasedMethodParamName) ? "&" + UseUrlBasedMethodParamName + "=" + action : ""));
 
                             }
                             addLine("GET", true);
@@ -350,25 +356,21 @@ namespace ENV.Web
 
             }
         }
-        private static void PerformInsertOrUpdate(System.Web.HttpResponse Response, System.Web.HttpRequest Request, ViewModel vmc, bool allowed, string name, Func<DataItem, DataItem> action)
+        private static void PerformInsertOrUpdate(WebResponse Response, WebRequest Request, ViewModel vmc, bool allowed, string name, Func<DataItem, DataItem> action)
         {
             PerformInsertOrUpdateOrDelete(Response, vmc, allowed, name, () =>
             {
                 DataItem r;
-                Request.InputStream.Position = 0;
-                using (var sr = new System.IO.StreamReader(Request.InputStream))
-                {
-                    r = action(DataItem.FromJson(sr.ReadToEnd()));
+                    r = action(DataItem.FromJson(Request.GetRequestInputString()));
                     if (r == null && vmc.ModelState.IsValid)
                         vmc.ModelState.Message = "The request in invalid";
-                }
 
                 return r;
 
 
             });
         }
-        private static void PerformInsertOrUpdateOrDelete(System.Web.HttpResponse Response, ViewModel vmc, bool allowed, string name, Func<DataItem> action)
+        private static void PerformInsertOrUpdateOrDelete(WebResponse Response, ViewModel vmc, bool allowed, string name, Func<DataItem> action)
         {
             if (!allowed)
             {
@@ -408,7 +410,7 @@ namespace ENV.Web
 
 
         }
-        private static void MethodNotAllowed(HttpResponse Response, ViewModel vmc, string name)
+        private static void MethodNotAllowed(WebResponse Response, ViewModel vmc, string name)
         {
             vmc.ModelState.AddError($"The requested resource does not support http method '{name}'.");
             Response.Write(vmc.ModelState.ToJson());
@@ -430,7 +432,7 @@ namespace ENV.Web
             return r;
         }
 
-        private static void ResponseIsHtml(System.Web.HttpResponse Response)
+        private static void ResponseIsHtml(WebResponse Response)
         {
             Response.ContentType = "text/html";
         }
@@ -447,4 +449,7 @@ namespace ENV.Web
     }
     class NotFoundException : Exception
     { }
+
+   
+
 }

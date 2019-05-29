@@ -116,27 +116,27 @@ namespace ENV.Web
             _bp.Where.Add(_tempFilter);
 
         }
-        internal static ContextStatic<IMyHttpContext> HttpContext = new ContextStatic<IMyHttpContext>(() => new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current));
-        public DataList GetRows()
+        
+        internal DataList GetRows(WebRequest req)
         {
             init();
             var dl = new DataList();
 
             foreach (var item in _colsPerKey)
             {
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key), _tempFilter, new equalToFilter());
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_gt"), _tempFilter, new greater());
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_gte"), _tempFilter, new greaterEqual());
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_lt"), _tempFilter, new lesser());
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_lte"), _tempFilter, new lessOrEqual());
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_ne"), _tempFilter, new different());
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_contains"), _tempFilter, new contains());
-                item.Value.addFilter(HttpContext.Value.GetRequestParam(item.Key + "_st"), _tempFilter, new startsWith());
+                item.Value.addFilter(req[item.Key], _tempFilter, new equalToFilter());
+                item.Value.addFilter(req[item.Key + "_gt"], _tempFilter, new greater());
+                item.Value.addFilter(req[item.Key + "_gte"], _tempFilter, new greaterEqual());
+                item.Value.addFilter(req[item.Key + "_lt"], _tempFilter, new lesser());
+                item.Value.addFilter(req[item.Key + "_lte"], _tempFilter, new lessOrEqual());
+                item.Value.addFilter(req[item.Key + "_ne"], _tempFilter, new different());
+                item.Value.addFilter(req[item.Key + "_contains"], _tempFilter, new contains());
+                item.Value.addFilter(req[item.Key + "_st"], _tempFilter, new startsWith());
             }
             long start = 0;
             long numOfRows = 25;
             {
-                var limit = HttpContext.Value.GetRequestParam("_limit");
+                var limit = req["_limit"];
                 if (!string.IsNullOrEmpty(limit))
                     numOfRows = Number.Parse(limit);
                 if (Number.IsNullOrZero(numOfRows))
@@ -144,7 +144,7 @@ namespace ENV.Web
             }
             if (numOfRows > 0)
             {
-                var page = HttpContext.Value.GetRequestParam("_page");
+                var page = req["_page"];
                 if (!string.IsNullOrEmpty(page))
                 {
 
@@ -154,12 +154,12 @@ namespace ENV.Web
                 }
             }
             var ob = _bp.OrderBy;
-            var sort = HttpContext.Value.GetRequestParam("_sort");
+            var sort = req["_sort"];
             if (!string.IsNullOrEmpty(sort))
             {
                 var orderBy = new Sort();
                 var s = sort.Split(',');
-                var ord = HttpContext.Value.GetRequestParam("_order") ?? "";
+                var ord = req["_order"] ?? "";
                 var o = ord.Split(',');
                 for (int i = 0; i < s.Length; i++)
                 {
@@ -859,7 +859,7 @@ namespace ENV.Web
             return di.ToJson();
         }
 
-        internal void ApplyNotFound(HttpResponse response)
+        internal void ApplyNotFound(WebResponse response)
         {
             response.StatusCode = 404;
             AddError("Not found");

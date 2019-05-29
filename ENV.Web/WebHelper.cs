@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Firefly.Box;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,9 @@ namespace ENV.Web
 {
     public class WebHelper
     {
-        public static System.Web.HttpResponse Response { get { return System.Web.HttpContext.Current.Response; } }
+        internal static ContextStatic<IMyHttpContext> HttpContext = new ContextStatic<IMyHttpContext>(() => new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current));
+        public static bool PostOnly { get; set; }
+        public static string UseUrlBasedMethodParamName { get; set; }
         public static void ReturnJson(ISerializedObject item)
         {
             using (var sw = new StringWriter())
@@ -26,40 +29,29 @@ namespace ENV.Web
         }
         public static DataItem DataItemFromJsonBody()
         {
-            var Request = System.Web.HttpContext.Current.Request;
-            Request.InputStream.Position = 0;
-            using (var sr = new System.IO.StreamReader(Request.InputStream))
-            {
-                return DataItem.FromJson(sr.ReadToEnd());
-            }
+            return DataItem.FromJson(HttpContext.Value.Request.GetRequestInputString());
         }
         public static objectType ObjectFromJsonBody<objectType>()
         {
-            var Request = System.Web.HttpContext.Current.Request;
-            Request.InputStream.Position = 0;
-            using (var sr = new System.IO.StreamReader(Request.InputStream))
-            {
-                return JsonConvert.DeserializeObject<objectType>(sr.ReadToEnd());
-            }
+
+            return JsonConvert.DeserializeObject<objectType>(HttpContext.Value.Request.GetRequestInputString());
+
         }
         public static dynamic DynamicFromJsonBody()
         {
-            var Request = System.Web.HttpContext.Current.Request;
-            Request.InputStream.Position = 0;
-            using (var sr = new System.IO.StreamReader(Request.InputStream))
-            {
-                return JObject.Parse(sr.ReadToEnd());
-            }
+          
+                return JObject.Parse(HttpContext.Value.Request.GetRequestInputString());
+            
         }
         private static void WriteJsonString(string s)
         {
             ENV.IO.WebWriter.ThereWasAnOutput();
-            Response.ContentType = "application/json";
-            Response.Write(s);
+            HttpContext.Value.Response.ContentType = "application/json";
+            HttpContext.Value.Response.Write(s);
         }
         public static void ReturnJson(object o)
         {
-            WriteJsonString( JsonConvert.SerializeObject(o));
+            WriteJsonString(JsonConvert.SerializeObject(o));
 
         }
     }

@@ -12,6 +12,8 @@ namespace WebDemo.Controllers
         static DataApi _dataApi = new DataApi();
         static DataApiController()
         {
+            WebHelper.PostOnly = true;
+            WebHelper.UseUrlBasedMethodParamName = "method";
             _dataApi.Register(typeof(Northwind.Models.Categories), true);
 
         }

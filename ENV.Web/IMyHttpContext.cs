@@ -33,6 +33,8 @@ namespace ENV.Web
         {
             _current = current;
             Request = new WebReqestBridgeToRequest(current.Request);
+            if (WebHelper.PostOnly)
+                Request = new PostOnlyWebRequest(Request);
             Response = new WebResponseBridgeToResponse(current.Response);
         }
 
@@ -47,7 +49,7 @@ namespace ENV.Web
     }
     internal class WebReqestBridgeToRequest : WebRequest
     {
-        System.Web. HttpRequest _request;
+        System.Web.HttpRequest _request;
 
         public WebReqestBridgeToRequest(System.Web.HttpRequest request)
         {
@@ -63,7 +65,15 @@ namespace ENV.Web
 
         }
 
-        public string HttpMethod => _request.HttpMethod;
+        public string HttpMethod
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(WebHelper.UseUrlBasedMethodParamName))
+                    return this[WebHelper.UseUrlBasedMethodParamName];
+                return _request.HttpMethod;
+            }
+        }
 
         public string RawUrl => _request.RawUrl;
 
@@ -93,8 +103,29 @@ namespace ENV.Web
             _response.Write(what);
         }
 
-     
+
     }
-   
+    class PostOnlyWebRequest : WebRequest
+    {
+        WebRequest _request;
+        public PostOnlyWebRequest(WebRequest request)
+        {
+            _request = request;
+        }
+
+        public string this[string key] => _request[key];
+
+        public string HttpMethod => _request.HttpMethod;
+
+        public string RawUrl => _request.RawUrl;
+
+        public string Path => _request.Path;
+
+        public string GetRequestInputString()
+        {
+            return _request["body"];
+        }
+    }
+
 
 }

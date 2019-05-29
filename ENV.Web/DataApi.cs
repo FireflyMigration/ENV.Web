@@ -12,14 +12,14 @@ namespace ENV.Web
 {
     public class DataApi
     {
-         static ContextStatic<IMyHttpContext> HttpContext = new ContextStatic<IMyHttpContext>(() => new HttpContextBridgeToIHttpContext(System.Web.HttpContext.Current));
+         
         Dictionary<string, ApiItem> _controllers = new Dictionary<string, ApiItem>();
         public void Register(string key, Func<ViewModel> controller)
         {
             _controllers.Add(key.ToLower(), new ApiItem(key, controller));
         }
         bool PrgnameTypeRequest { get; set; }
-        public string UseUrlBasedMethodParamName { get; set; }
+        
         class ApiItem
         {
 
@@ -84,7 +84,7 @@ namespace ENV.Web
         }
         public void ProcessRequest(string name, string id = null)
         {
-            ProcessRequest(name, id,HttpContext.Value);
+            ProcessRequest(name, id,WebHelper.HttpContext.Value);
         }
         void ProcessRequest(string name, string id ,IMyHttpContext context)
         {
@@ -95,7 +95,7 @@ namespace ENV.Web
                 Firefly.Box.Context.Current.SetNonUIThread();
                 var responseType = (System.Web.HttpContext.Current.Request.Params["_response"] ?? "J").ToUpper();
 
-                if (!PrgnameTypeRequest)
+                if (!PrgnameTypeRequest&&!WebHelper.PostOnly)
                 {//fix id stuff
                     var url = Request.RawUrl;
                     var z = url.IndexOf('?');
@@ -117,12 +117,7 @@ namespace ENV.Web
 
                             Response.ContentType = "application/json";
                             var method = Request.HttpMethod.ToLower();
-                            if (!string.IsNullOrEmpty(UseUrlBasedMethodParamName))
-                            {
-                                var url = Request[UseUrlBasedMethodParamName];
-                                if (!string.IsNullOrEmpty(url))
-                                    method = url;
-                            }
+                            
                             switch (method)
                             {
                                 case "get":
@@ -283,7 +278,7 @@ namespace ENV.Web
                                 i.Set("HTTP Method", action);
                                 i.Set("URL", url +
                                     (dontNeedId ? "" : (this.PrgnameTypeRequest ? "&" + IdParameterName + "={id}" : "/{id}")) +
-                                    (!string.IsNullOrEmpty(UseUrlBasedMethodParamName) ? "&" + UseUrlBasedMethodParamName + "=" + action : ""));
+                                    (!string.IsNullOrEmpty(WebHelper. UseUrlBasedMethodParamName) ? "&" + WebHelper. UseUrlBasedMethodParamName + "=" + action : ""));
 
                             }
                             addLine("GET", true);

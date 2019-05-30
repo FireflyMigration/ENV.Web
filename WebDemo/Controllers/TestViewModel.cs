@@ -12,6 +12,7 @@ namespace WebDemo.Controllers
         public TestViewModel()
         {
             From = Products;
+            AllowRead = false;
             Relations.Add(Categories, Categories.CategoryID.IsEqualTo(Products.CategoryID));
             AllowUpdate = true;
             MapColumn(Products.ProductID,

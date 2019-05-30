@@ -12,14 +12,15 @@ namespace ENV.Web
 {
     public class DataApi
     {
-         
+
         Dictionary<string, ApiItem> _controllers = new Dictionary<string, ApiItem>();
         public void Register(string key, Func<ViewModel> controller)
         {
             _controllers.Add(key.ToLower(), new ApiItem(key, controller));
         }
         bool PrgnameTypeRequest { get; set; }
-        
+        public bool DisableDocumentation { get; set; }
+
         class ApiItem
         {
 
@@ -86,9 +87,9 @@ namespace ENV.Web
         }
         public void ProcessRequest(string name, string id = null)
         {
-            ProcessRequest(name, id,new HttpContextBridgeToIHttpContext(HttpContext.Current, PostOnly,HttpMethodParamName));
+            ProcessRequest(name, id, new HttpContextBridgeToIHttpContext(HttpContext.Current, PostOnly, HttpMethodParamName));
         }
-        void ProcessRequest(string name, string id ,IMyHttpContext context)
+        void ProcessRequest(string name, string id, IMyHttpContext context)
         {
             var Request = context.Request;
             var Response = context.Response;
@@ -97,7 +98,7 @@ namespace ENV.Web
                 Firefly.Box.Context.Current.SetNonUIThread();
                 var responseType = (System.Web.HttpContext.Current.Request.Params["_response"] ?? "J").ToUpper();
 
-                if (!PrgnameTypeRequest&&!PostOnly)
+                if (!PrgnameTypeRequest && !PostOnly)
                 {//fix id stuff
                     var url = Request.RawUrl;
                     var z = url.IndexOf('?');
@@ -119,10 +120,15 @@ namespace ENV.Web
 
                             Response.ContentType = "application/json";
                             var method = Request.HttpMethod.ToLower();
-                            
+
                             switch (method)
                             {
                                 case "get":
+                                    if (!vmc.AllowRead)
+                                    {
+                                        MethodNotAllowed(Response, vmc, method);
+                                        return;
+                                    }
                                     using (var sw = new System.IO.StringWriter())
                                     {
 
@@ -224,6 +230,8 @@ namespace ENV.Web
                 }
                 else
                 {
+                    if (DisableDocumentation)
+                        return;
                     ResponseIsHtml(Response);
                     Response.Write(HTMLISerializedObjectWriter.HTMLPageHeader);
                     Response.Write("<div class=\"container\">");
@@ -283,10 +291,12 @@ namespace ENV.Web
                                     (!string.IsNullOrEmpty(HttpMethodParamName) ? "&" + HttpMethodParamName + "=" + action : ""));
 
                             }
-                            addLine("GET", true);
+                            if (c.AllowRead)
+                                addLine("GET", true);
                             if (c.AllowInsert)
                                 addLine("POST", true);
-                            addLine("GET");
+                            if (c.AllowRead)
+                                addLine("GET");
                             if (c.AllowUpdate)
                                 addLine("PUT");
                             if (c.AllowDelete)
@@ -358,9 +368,9 @@ namespace ENV.Web
             PerformInsertOrUpdateOrDelete(Response, vmc, allowed, name, () =>
             {
                 DataItem r;
-                    r = action(DataItem.FromJson(Request.GetRequestInputString()));
-                    if (r == null && vmc.ModelState.IsValid)
-                        vmc.ModelState.Message = "The request in invalid";
+                r = action(DataItem.FromJson(Request.GetRequestInputString()));
+                if (r == null && vmc.ModelState.IsValid)
+                    vmc.ModelState.Message = "The request in invalid";
 
                 return r;
 
@@ -409,7 +419,7 @@ namespace ENV.Web
         }
         private static void MethodNotAllowed(WebResponse Response, ViewModel vmc, string name)
         {
-            vmc.ModelState.AddError($"The requested resource does not support http method '{name}'.");
+            vmc.ModelState.AddError($"The requested resource does not support method '{name}'.");
             Response.Write(vmc.ModelState.ToJson());
             Response.StatusCode = 405;
             return;
@@ -447,6 +457,6 @@ namespace ENV.Web
     class NotFoundException : Exception
     { }
 
-   
+
 
 }

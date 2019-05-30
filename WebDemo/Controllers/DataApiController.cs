@@ -9,7 +9,7 @@ namespace WebDemo.Controllers
 {
     public class DataApiController : Controller
     {
-        static DataApi _dataApi = new DataApi();
+        static DataApi _dataApi = new DataApi() { DisableDocumentation = false };
         static DataApiController()
         {
             

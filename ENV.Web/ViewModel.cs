@@ -90,6 +90,7 @@ namespace ENV.Web
         protected FilterCollection Where { get { return _bp.Where; } }
         protected Sort OrderBy { get { return _bp.OrderBy; } set { _bp.OrderBy = value; } }
         protected internal ColumnCollection Columns => _bp.Columns;
+        protected internal bool AllowRead { get; set; } = true;
         protected internal bool AllowUpdate { get; set; }
         protected internal bool AllowDelete { get; set; }
         protected internal bool AllowInsert { get; set; }

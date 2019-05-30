@@ -132,6 +132,7 @@ namespace ENV.Web.Tests
             var vmh = new TestVMH();
             var t = new MockTable();
             t.c.Caption = "מזהה";
+            t.c.Name = "";
             vmh.From = t;
             vmh.MapColumn(t.c);
             vmh.AssertColumnKey(t.c, "mzaa");
@@ -196,6 +197,78 @@ namespace ENV.Web.Tests
             vmh.MapColumn(t.a);
             vmh.MapColumn(t.c);
             vmh.AssertColumnKey(t.c, "theOrder");
+
+        }
+        [TestMethod]
+        public void Test_Issue_11()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            
+            vmh.From = t;
+            
+            vmh.MapColumn(t.c,"theOrder");
+            vmh.AssertColumnKey(t.c, "theOrder");
+
+        }
+        [TestMethod]
+        public void Test_Issue_12()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            vmh.From = t;
+            t.c.Caption = "נועם";
+            t.c.Name = "";
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "noam");
+
+        }
+        [TestMethod]
+        public void Test_Issue_13()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            vmh.From = t;
+            t.c.Caption = "נועם";
+            t.c.Name = "a_cool_name";
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "aCoolName");
+
+        }
+        [TestMethod]
+        public void Test_Issue_14()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            vmh.From = t;
+            t.c.Caption = "נועם";
+            t.c.Name = "A_COOL_NAME";
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "aCoolName");
+
+        }
+        [TestMethod]
+        public void Test_Issue_15()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            vmh.From = t;
+            t.c.Caption = "נועם";
+            t.c.Name = "aCoolName";
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "aCoolName");
+
+        }
+        [TestMethod]
+        public void Test_Issue_16()
+        {
+            var vmh = new TestVMH();
+            var t = new MockTable();
+            vmh.From = t;
+            t.c.Caption = "נועם";
+            t.c.Name = "a_CoolName";
+            vmh.MapColumn(t.c);
+            vmh.AssertColumnKey(t.c, "aCoolName");
 
         }
         [TestMethod]

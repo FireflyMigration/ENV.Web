@@ -107,7 +107,7 @@ namespace ENV.Web
             {
                 if (_bp.Columns.Count == 0)
                     _bp.AddAllColumns();
-                MapColumns(_bp.Columns);
+                MapColumns(_bp.Columns.ToArray());
             }
             if (!_colMap.ContainsKey(_idColumn))
             {
@@ -116,7 +116,7 @@ namespace ENV.Web
             _bp.Where.Add(_tempFilter);
 
         }
-        
+
         internal DataList GetRows(WebRequest req)
         {
             init();
@@ -193,7 +193,7 @@ namespace ENV.Web
                 _tempFilter.Clear();
             }
         }
-        public void Describe(TextWriter tw, string name)
+        internal  void Describe(TextWriter tw, string name)
         {
             tw.WriteLine("export class " + name + " extends entity {");
             init();
@@ -207,7 +207,7 @@ namespace ENV.Web
     }");
             tw.WriteLine("}");
         }
-        public void CreateTypeScriptClass(TextWriter tw, string name, string url)
+        internal void CreateTypeScriptClass(TextWriter tw, string name, string url)
         {
             init();
 
@@ -236,7 +236,7 @@ namespace ENV.Web
 
 
         }
-        public void CreateTypeScriptInterface(TextWriter tw, string name, string url)
+        internal void CreateTypeScriptInterface(TextWriter tw, string name, string url)
         {
 
 
@@ -251,7 +251,7 @@ namespace ENV.Web
             }
             tw.WriteLine("}");
         }
-        public void ColumnKeys(TextWriter tw)
+        internal void ColumnKeys(TextWriter tw)
         {
             init();
             tw.WriteLine("columnKeys:[");
@@ -268,7 +268,7 @@ namespace ENV.Web
             tw.WriteLine();
             tw.WriteLine("]");
         }
-        public void FullColumnList(TextWriter tw)
+        internal void FullColumnList(TextWriter tw)
         {
             init();
             tw.WriteLine("columnSettings:[");
@@ -357,7 +357,7 @@ namespace ENV.Web
             }
         }
 
-        public DataItem GetRow(string id)
+        internal DataItem GetRow(string id)
         {
             DataItem result = null;
             forId(id, () =>
@@ -370,14 +370,14 @@ namespace ENV.Web
             });
             return result;
         }
-        public void Delete(string id)
+        internal void Delete(string id)
         {
             forId(id, () =>
             {
                 _bp.ForFirstRow(() => { });
             }, Activities.Delete);
         }
-        public DataItem Update(string id, DataItem item)
+        internal DataItem Update(string id, DataItem item)
         {
             DataItem result = null;
             forId(id, () =>
@@ -413,7 +413,7 @@ namespace ENV.Web
 
         }
 
-        public DataItem Insert(DataItem item)
+        internal DataItem Insert(DataItem item)
         {
             init();
             DataItem result = null;
@@ -582,6 +582,13 @@ namespace ENV.Web
         }
         void MapColumns(IEnumerable<ColumnBase> columns)
         {
+            foreach (var column in columns)
+            {
+                MapColumn(column);
+            }
+        }
+        internal protected void MapColumn(ColumnBase column, string name = null)
+        {
 
             if (!_handledIdentity)
             {
@@ -616,27 +623,74 @@ namespace ENV.Web
                 }
 
             }
-            foreach (var column in columns)
+            if (name == null)
             {
-                string name = column.Caption;
-                if (column == _idColumn)
-                    name = "id";
-                name = NameFixer.fixName(name);
-                var orgName = name;
-                int i = 1;
-                while (_colsPerKey.ContainsKey(name.ToUpper()))
+                name = column.Caption;
+                if (NameFixer.HasHebrewInIt(name) && !string.IsNullOrEmpty(column.Name))
                 {
-                    name = orgName + (i++).ToString();
+                    
+                    name = column.Name;
                 }
-                var cv = new ColumnInViewModel(name, () => column.Value, v =>
-                {
-                    Caster.Cast(column, v, new setValueForColumn());
-                }, column);
-                _colMap.Add(column, cv);
-                _colsPerKey.Add(name.ToUpper(), cv);
-                _columns.Add(cv);
-                Columns.Add(column);
+                name = SeparateWordsAndCasing(name);
             }
+            
+            if (column == _idColumn)
+                name = "id";
+
+            name = NameFixer.fixName(name);
+            var orgName = name;
+            int i = 1;
+            while (_colsPerKey.ContainsKey(name.ToUpper()))
+            {
+                name = orgName + (i++).ToString();
+            }
+            var cv = new ColumnInViewModel(name, () => column.Value, v =>
+            {
+                Caster.Cast(column, v, new setValueForColumn());
+            }, column);
+            _colMap.Add(column, cv);
+            _colsPerKey.Add(name.ToUpper(), cv);
+            _columns.Add(cv);
+            Columns.Add(column);
+
+        }
+        static string SeparateWordsAndCasing(string name)
+        {
+            if (name == null)
+                return name;
+
+            name = name.Replace("_", " ");
+
+            var sb = new StringBuilder();
+
+            int i = -1, start = 0; ;
+            Func<string, string> processItem = item =>
+            {
+                if (item.Length <= 1)
+                    return item;
+
+
+                if (item.ToUpper() == item)
+                    item = item[0] + item.Substring(1).ToLower();
+                else
+                    item = item[0].ToString().ToUpper() + item.Substring(1);
+                return item;
+
+            };
+            while ((i = name.IndexOfAny(new char[] { ' ', '-', '/', '&', ',' }, start)) >= 0)
+            {
+                var item = name.Substring(start, i - start);
+                item = processItem(item);
+                sb.Append(item);
+                sb.Append(name[i]);
+                start = i + 1;
+            }
+            if (i != name.Length)
+            {
+                sb.Append(processItem(name.Substring(start, name.Length - start)));
+            }
+
+            return sb.ToString();
         }
 
 

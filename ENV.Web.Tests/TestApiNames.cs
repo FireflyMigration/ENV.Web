@@ -23,6 +23,7 @@ namespace ENV.Web.Tests
             d.TestApinameExists("MyTable", true);
             d.TestApinameExists("myTable", true);
         }
+        
     }
 
     class MyTable : Entity

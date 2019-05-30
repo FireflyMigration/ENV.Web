@@ -176,6 +176,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PostDataApiController.cs" />
     <Compile Include="Controllers\ProfilerController.cs" />
+    <Compile Include="Controllers\TestViewModel.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

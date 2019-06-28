@@ -181,7 +181,8 @@ namespace ENV.Web
         public Text Text
         {
             get
-            {if (_o == null)
+            {
+                if (_o == null)
                     return null;
                 return _o.ToString();
             }
@@ -486,14 +487,14 @@ namespace ENV.Web
 <html lang=""en"">
 <head>
      <meta name=""viewport"" content=""width=device-width, initial-scale=1"">
-<style>"+StoredStuff.BootstrapCss+@"
+<style>" + StoredStuff.BootstrapCss + @"
 </style>
      
 </head>
 <body>";
 
         TextWriter _writer;
-        public HTMLISerializedObjectWriter(TextWriter writer,string title=null, bool root = true)
+        public HTMLISerializedObjectWriter(TextWriter writer, string title = null, bool root = true)
         {
 
             _writer = writer;
@@ -583,8 +584,8 @@ namespace ENV.Web
             if (!string.IsNullOrEmpty(BodyAddition))
                 _writer.WriteLine(BodyAddition);
             _writer.WriteLine(@"</body>
-    <script >"+StoredStuff.JQuery+@"</script>
-    <script >"+StoredStuff.BootstrapJs+@"</script>
+    <script >" + StoredStuff.JQuery + @"</script>
+    <script >" + StoredStuff.BootstrapJs + @"</script>
 </html>");
         }
     }
@@ -666,7 +667,7 @@ namespace ENV.Web
 
             using (var sw = new StringWriter())
             {
-                
+
                 ToWriter(new HTMLISerializedObjectWriter(sw));
                 sw.WriteLine("</body></html>");
                 return sw.ToString();
@@ -822,8 +823,8 @@ namespace ENV.Web
                         break;
                     default:
 
-                        setState(new ReadValueThatMayOrMayNotBeQuoted(_next, new char[] { ',', '}' }, s => _done(_name, 
-                            s.Replace("\\n","\n")
+                        setState(new ReadValueThatMayOrMayNotBeQuoted(_next, new char[] { ',', '}' }, s => _done(_name,
+                            s.Replace("\\n", "\n")
                             .Replace("\\r", "\r")
                             .Replace("\\t", "\t"))), true);
                         break;
@@ -846,13 +847,7 @@ namespace ENV.Web.DataListHelpers
         public static DataList ToDataList(this ENV.Data.Entity entity, FilterBase where = null, Sort orderBy = null, params ColumnBase[] columns)
         {
             var result = new DataList();
-            int pageSize = 100;
-            int pageNum = 0;
-            {
-                var s = System.Web.HttpContext.Current.Request["PageNum"];
-                if (!string.IsNullOrEmpty(s))
-                    pageNum = int.Parse(s);
-            }
+
 
             var bp = new BusinessProcess { From = entity };
             if (where != null)
@@ -861,16 +856,12 @@ namespace ENV.Web.DataListHelpers
                 bp.OrderBy = orderBy;
             bp.ForEachRow(() =>
             {
-                int currentPage = ((int)bp.Counter - 1) / pageSize;
-                if (currentPage == pageNum)
-                {
-                    if (columns != null)
-                        result.AddItem(columns);
-                    else
-                        result.AddItem(entity);
-                }
-                else if (currentPage > pageNum)
-                    bp.Exit();
+
+                if (columns != null&&columns.Length>0)
+                    result.AddItem(columns);
+                else
+                    result.AddItem(entity);
+
             });
             return result;
         }

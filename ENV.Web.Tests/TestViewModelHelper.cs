@@ -9,6 +9,60 @@ namespace ENV.Web.Tests
     [TestClass]
     public class TestViewModelHelper
     {
+        [TestMethod]
+        public void TestInsertOneRow()
+        {
+            var mt = new MockTable();
+            mt.Truncate();
+            mt.InsertRow(1, 1, "Noam");
+            mt.InsertRow(2, 2, "Yael");
+            mt.InsertRow(3, 3, "Yoni");
+            var vmh = new ViewModel { From = mt };
+            var d = vmh.ExportRows();
+            mt.Truncate();
+            mt.CountRows().ShouldBe(0);
+            vmh.Insert(d[0]);
+            mt.CountRows().ShouldBe(1);
+        }
+        [TestMethod]
+        public void TestHandlingOfDuplicateRows()
+        {
+            var mt = new MockTable();
+            mt.Truncate();
+            mt.InsertRow(1, 1, "Noam");
+            mt.InsertRow(2, 2, "Yael");
+            mt.InsertRow(3, 3, "Yoni");
+            var vmh = new ViewModel { From = mt };
+            var d = vmh.ExportRows();
+            mt.Delete(mt.a.IsDifferentFrom(2));
+            mt.CountRows().ShouldBe(1);
+            vmh.ImportRows(d, ignoreDuplicate: true);
+            mt.CountRows().ShouldBe(3);
+        }
+        [TestMethod]
+        public void TestVMHExportImport()
+        {
+            var mt = new MockTable();
+            mt.Truncate();
+            mt.InsertRow(1, 1, "Noam");
+            mt.InsertRow(2, 2, "Yael");
+
+            var vmh = new ViewModel() { From = mt };
+            var dl = vmh.ExportRows();
+            mt.Truncate();
+            mt.CountRows().ShouldBe(0);
+            vmh = new ViewModel() { From = mt };
+            vmh.ImportRows(dl);
+            var i = 0;
+            mt.ForEachRow(null, new Sort(mt.a), () =>
+            {
+                mt.a.ShouldBe(new Number[] { 1, 2 }[i]);
+                mt.b.ShouldBe(new Number[] { 1, 2 }[i]);
+                mt.c.ShouldBe(new string[] { "Noam", "Yael" }[i]);
+                i++;
+            }).ShouldBe(2);
+        }
+
         internal class TestVMHWithMoreThanOneMemoberInThePrimaryKey : ViewModel
         {
             public MockTable mt = new MockTable();
@@ -19,10 +73,10 @@ namespace ENV.Web.Tests
             }
             protected override void OnSavingRow()
             {
-                if (Activity== Activities.Insert)
+                if (Activity == Activities.Insert)
                     mt.a.Value = mt.Max(mt.a) + 1;
             }
-            
+
 
 
         }
@@ -55,7 +109,7 @@ namespace ENV.Web.Tests
             }
             protected override void OnSavingRow()
             {
-                if (Activity== Activities.Insert)
+                if (Activity == Activities.Insert)
                     mt.a.Value = mt.Max(mt.a) + 1;
             }
 
@@ -204,10 +258,10 @@ namespace ENV.Web.Tests
         {
             var vmh = new TestVMH();
             var t = new MockTable();
-            
+
             vmh.From = t;
-            
-            vmh.MapColumn(t.c,"theOrder");
+
+            vmh.MapColumn(t.c, "theOrder");
             vmh.AssertColumnKey(t.c, "theOrder");
 
         }
@@ -284,7 +338,7 @@ namespace ENV.Web.Tests
 
             }
         }
-    
+
     }
 
 

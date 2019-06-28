@@ -19,7 +19,7 @@ namespace ENV.Web
     public class ViewModel
     {
 
-        protected readonly ENV.UserMethods u;
+        public readonly ENV.UserMethods u;
         public ViewModel()
         {
             u = UserMethods.Instance;
@@ -36,7 +36,45 @@ namespace ENV.Web
             };
             ModelState._translateColumn = c => _colMap[c].Key;
         }
-        protected internal Activities Activity { get { return _bp.Activity; } }
+
+        internal void ImportRows(DataList dl, Action forEachNewRow = null, bool ignoreDuplicate = false)
+        {
+            init();
+            Firefly.Box.Data.DataProvider.DatabaseErrorEventHandler errorHandler=null;
+            if (ignoreDuplicate)
+            {
+                errorHandler = e =>
+                {
+                    if (e.ErrorType == Firefly.Box.Data.DataProvider.DatabaseErrorType.DuplicateIndex)
+                        e.HandlingStrategy = Firefly.Box.Data.DataProvider.DatabaseErrorHandlingStrategy.Ignore;
+                };
+                _bp.DatabaseErrorOccurred += errorHandler;
+            }
+            try
+            {
+                _bp.Activity = Activities.Insert;
+                _bp.TransactionScope = TransactionScopes.Task;
+                var en = dl.GetEnumerator();
+                _bp.Exit(ExitTiming.BeforeRow, () => !en.MoveNext());
+
+                _bp.ForEachRow(() =>
+                {
+                    UpdateColumnsBasedIn(en.Current);
+                    if (forEachNewRow != null)
+                        forEachNewRow();
+                });
+
+            }
+            finally
+            {
+                if (errorHandler != null)
+                    _bp.DatabaseErrorOccurred -= errorHandler;
+                _bp.Exit(ExitTiming.BeforeRow, () => false);
+                _bp.Activity = Activities.Update;
+            }
+        }
+
+        public Activities Activity { get { return _bp.Activity; } }
         protected virtual void OnLoad() { }
         public ViewModel(Firefly.Box.Data.Entity e, bool allowInsertUpdateDelete = false) : this()
         {
@@ -51,7 +89,7 @@ namespace ENV.Web
         {
             _colMap[c].AssertKey(key);
         }
-        protected void MapExperssion(string name, Func<Text> exp)
+        public void MapExperssion(string name, Func<Text> exp)
         {
             AddExpressionColumn(Columns.Add(new TextColumn(name)).BindValue(exp));
 
@@ -61,17 +99,17 @@ namespace ENV.Web
             DenyUpdate(col);
             MapColumn(col);
         }
-        protected void MapExperssion(string name, Func<Bool> exp)
+        public void MapExperssion(string name, Func<Bool> exp)
         {
             AddExpressionColumn(Columns.Add(new BoolColumn(name)).BindValue(exp));
 
         }
-        protected void MapExperssion(string name, Func<Number> exp)
+        public void MapExperssion(string name, Func<Number> exp)
         {
             AddExpressionColumn(Columns.Add(new NumberColumn(name)).BindValue(exp));
 
         }
-        protected void AddAllColumns()
+        public void AddAllColumns()
         {
             _bp.AddAllColumns();
         }
@@ -86,15 +124,15 @@ namespace ENV.Web
 
         bool _init = false;
         FilterCollection _tempFilter = new FilterCollection();
-        protected RelationCollection Relations { get { return _bp.Relations; } }
-        protected FilterCollection Where { get { return _bp.Where; } }
-        protected Sort OrderBy { get { return _bp.OrderBy; } set { _bp.OrderBy = value; } }
-        protected internal ColumnCollection Columns => _bp.Columns;
+        public RelationCollection Relations { get { return _bp.Relations; } }
+        public FilterCollection Where { get { return _bp.Where; } }
+        public Sort OrderBy { get { return _bp.OrderBy; } set { _bp.OrderBy = value; } }
+        public ColumnCollection Columns => _bp.Columns;
         protected internal bool AllowRead { get; set; } = true;
         protected internal bool AllowUpdate { get; set; }
         protected internal bool AllowDelete { get; set; }
         protected internal bool AllowInsert { get; set; }
-        protected internal Firefly.Box.Data.Entity From { get { return _bp.From; } set { _bp.From = value; } }
+        public Firefly.Box.Data.Entity From { get { return _bp.From; } set { _bp.From = value; } }
 
         protected virtual void OnSavingRow()
         {
@@ -121,7 +159,7 @@ namespace ENV.Web
         internal DataList GetRows(WebRequest req)
         {
             init();
-            var dl = new DataList();
+
 
             foreach (var item in _colsPerKey)
             {
@@ -178,15 +216,7 @@ namespace ENV.Web
             }
             try
             {
-                _bp.ForEachRow(() =>
-                {
-                    if (_bp.Counter > start)
-                        dl.AddItem(GetItem());
-                    if (_bp.Counter == start + numOfRows)
-                        _bp.Exit();
-
-                });
-                return dl;
+                return GetRows(start, numOfRows);
             }
             finally
             {
@@ -194,7 +224,27 @@ namespace ENV.Web
                 _tempFilter.Clear();
             }
         }
-        internal  void Describe(TextWriter tw, string name)
+        public DataList ExportRows()
+        {
+            init();
+            return GetRows(0, int.MaxValue);
+        }
+
+        private DataList GetRows(long start, long numOfRows)
+        {
+            var dl = new DataList();
+            _bp.ForEachRow(() =>
+            {
+                if (_bp.Counter > start)
+                    dl.AddItem(GetItem());
+                if (_bp.Counter == start + numOfRows)
+                    _bp.Exit();
+
+            });
+            return dl;
+        }
+
+        internal void Describe(TextWriter tw, string name)
         {
             tw.WriteLine("export class " + name + " extends entity {");
             init();
@@ -553,28 +603,28 @@ namespace ENV.Web
         Dictionary<string, ColumnInViewModel> _colsPerKey = new Dictionary<string, ColumnInViewModel>();
         bool _handledIdentity = false;
         ColumnBase _idColumn;
-        internal protected void MapColumn(params ColumnBase[] columns)
+        public void MapColumn(params ColumnBase[] columns)
         {
             MapColumns(columns);
         }
         HashSet<ColumnBase> _denyUpdateColumns = new HashSet<ColumnBase>(),
             _onlyAllowUpdateOf = new HashSet<ColumnBase>(),
             _ignoreUpdateOf = new HashSet<ColumnBase>();
-        internal protected void DenyUpdate(params ColumnBase[] columns)
+        public void DenyUpdate(params ColumnBase[] columns)
         {
             foreach (var item in columns)
             {
                 _denyUpdateColumns.Add(item);
             }
         }
-        internal protected void IgnoreUpdateOf(params ColumnBase[] columns)
+        public void IgnoreUpdateOf(params ColumnBase[] columns)
         {
             foreach (var item in columns)
             {
                 _ignoreUpdateOf.Add(item);
             }
         }
-        internal protected void OnlyAllowUpdateOf(params ColumnBase[] columns)
+        public void OnlyAllowUpdateOf(params ColumnBase[] columns)
         {
             foreach (var item in columns)
             {
@@ -588,7 +638,7 @@ namespace ENV.Web
                 MapColumn(column);
             }
         }
-        internal protected void MapColumn(ColumnBase column, string name = null)
+        public void MapColumn(ColumnBase column, string name = null)
         {
 
             if (!_handledIdentity)
@@ -629,12 +679,12 @@ namespace ENV.Web
                 name = column.Caption;
                 if (NameFixer.HasHebrewInIt(name) && !string.IsNullOrEmpty(column.Name))
                 {
-                    
+
                     name = column.Name;
                 }
                 name = SeparateWordsAndCasing(name);
             }
-            
+
             if (column == _idColumn)
                 name = "id";
 

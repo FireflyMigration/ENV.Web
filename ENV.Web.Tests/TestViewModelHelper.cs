@@ -36,7 +36,7 @@ namespace ENV.Web.Tests
             var d = vmh.ExportRows();
             mt.Delete(mt.a.IsDifferentFrom(2));
             mt.CountRows().ShouldBe(1);
-            vmh.ImportRows(d, ignoreDuplicate: true);
+            vmh.ImportRows(d, ignoreDuplicateRows: true);
             mt.CountRows().ShouldBe(3);
         }
         [TestMethod]

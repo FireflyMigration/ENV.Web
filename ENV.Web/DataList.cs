@@ -844,26 +844,24 @@ namespace ENV.Web.DataListHelpers
 {
     public static class EntityHelper
     {
-        public static DataList ToDataList(this ENV.Data.Entity entity, FilterBase where = null, Sort orderBy = null, params ColumnBase[] columns)
+        public static string ExportToJson(this ENV.Data.Entity entity, FilterBase where = null, Sort orderBy = null, params ColumnBase[] columns)
         {
-            var result = new DataList();
-
-
-            var bp = new BusinessProcess { From = entity };
-            if (where != null)
-                bp.Where.Add(where);
-            if (orderBy != null)
-                bp.OrderBy = orderBy;
-            bp.ForEachRow(() =>
+            var vmc = new ViewModel
             {
+                From = entity
+            };
+            if (where != null)
+                vmc.Where.Add(where);
+            if (orderBy != null)
+                vmc.OrderBy = orderBy;
+            return vmc.ExportRows().ToJson();
+        }
+        public static void ImportFromJson(this ENV.Data.Entity entity, string json, bool ignoreDuplicateRows = false)
+        {
+            var vmc = new ViewModel { From = entity };
+            var dl = DataList.FromJson(json);
+            vmc.ImportRows(dl, ignoreDuplicateRows: ignoreDuplicateRows);
 
-                if (columns != null&&columns.Length>0)
-                    result.AddItem(columns);
-                else
-                    result.AddItem(entity);
-
-            });
-            return result;
         }
     }
 }

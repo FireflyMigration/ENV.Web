@@ -37,11 +37,11 @@ namespace ENV.Web
             ModelState._translateColumn = c => _colMap[c].Key;
         }
 
-        internal void ImportRows(DataList dl, Action forEachNewRow = null, bool ignoreDuplicate = false)
+        internal void ImportRows(DataList dl, Action forEachNewRow = null, bool ignoreDuplicateRows = false)
         {
             init();
             Firefly.Box.Data.DataProvider.DatabaseErrorEventHandler errorHandler=null;
-            if (ignoreDuplicate)
+            if (ignoreDuplicateRows)
             {
                 errorHandler = e =>
                 {

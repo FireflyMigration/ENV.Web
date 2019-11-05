@@ -15,7 +15,7 @@ namespace ENV.Web.Tests
         [PrimaryKey]
         public readonly NumberColumn a = new NumberColumn("c1","5");
         public readonly NumberColumn b = new NumberColumn("c2","5");
-        public readonly TextColumn c = new TextColumn("c3","30");
+        public readonly TextColumn C = new TextColumn("c3","30");
         public MockTable() : base("t1", db) { }
 
         internal void InsertRow(int a, int b, string c)
@@ -23,7 +23,7 @@ namespace ENV.Web.Tests
             Insert(() => {
                 this.a.Value = a;
                 this.b.Value = b;
-                this.c.Value = c;
+                this.C.Value = c;
             });
         }
     }

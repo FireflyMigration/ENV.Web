@@ -13,6 +13,7 @@ using System.Xml;
 using Firefly.Box.Testing;
 using System.Web;
 using ENV.Data;
+using System.Reflection;
 
 namespace ENV.Web
 {
@@ -36,11 +37,16 @@ namespace ENV.Web
             };
             ModelState._translateColumn = c => _colMap[c].Key;
         }
+        public static bool DefaultUseClassMemberName = false,
+            DefaultUseNameInsteadOfCaptionForHebrew = true;
+
+        public bool UseClassMemberName = DefaultUseClassMemberName;
+        public bool UseNameInsteadOfCaptionForHebrew = DefaultUseNameInsteadOfCaptionForHebrew;
 
         internal void ImportRows(DataList dl, Action forEachNewRow = null, bool ignoreDuplicateRows = false)
         {
             init();
-            Firefly.Box.Data.DataProvider.DatabaseErrorEventHandler errorHandler=null;
+            Firefly.Box.Data.DataProvider.DatabaseErrorEventHandler errorHandler = null;
             if (ignoreDuplicateRows)
             {
                 errorHandler = e =>
@@ -676,13 +682,62 @@ namespace ENV.Web
             }
             if (name == null)
             {
-                name = column.Caption;
-                if (NameFixer.HasHebrewInIt(name) && !string.IsNullOrEmpty(column.Name))
+                if (UseClassMemberName)
                 {
+                    if (column.Entity != null)
+                    {
+                        foreach (var item in column.Entity.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                        {
+                            if (item.GetValue(column.Entity) == column)
+                            {
+                                name = item.Name;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var item in this.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                        {
+                            if (item.GetValue(this) == column)
+                            {
+                                name = item.Name;
+                            }
+                        }
+                    }
+                    if (name != null)
+                    {
+                        if (name.Length > 1)
+                        {
+                            name = name[0].ToString().ToLower() + name.Substring(1);
+                        }
+                        if (name.Length == 1)
+                        {
+                            name = name.ToLower();
+                        }
+                    }
+                    if (column.Entity != null && column.Entity != From)
+                    {
+                        foreach (var item in this.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                        {
+                            if (item.GetValue(this) == column.Entity)
+                            {
+                                name = item.Name + "_" + name;
+                                name = name[0].ToString().ToLower() + name.Substring(1);
+                            }
+                        }
+                    }
 
-                    name = column.Name;
                 }
-                name = SeparateWordsAndCasing(name);
+                if (name == null)
+                {
+                    name = column.Caption;
+                    if (NameFixer.HasHebrewInIt(name) && !string.IsNullOrEmpty(column.Name) && UseNameInsteadOfCaptionForHebrew)
+                    {
+
+                        name = column.Name;
+                    }
+                    name = SeparateWordsAndCasing(name);
+                }
             }
 
             if (column == _idColumn)

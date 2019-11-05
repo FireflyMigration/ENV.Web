@@ -15,6 +15,8 @@ namespace ENV.Web
             if (name.Length >= 2)
 
                 return name[0].ToString().ToLower() + name.Substring(1);
+            else if (name.Length == 1)
+                name = name.ToLower();
             return name;
         }
         public static string HebrewTranslateCsStyle(string source)

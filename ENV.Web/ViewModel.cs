@@ -250,21 +250,8 @@ namespace ENV.Web
             return dl;
         }
 
-        internal void Describe(TextWriter tw, string name)
-        {
-            tw.WriteLine("export class " + name + " extends entity {");
-            init();
-            foreach (var item in _columns)
-            {
-                tw.WriteLine("    " + item.Key + " = new stringColumn('" + item.Caption + "');");
-            }
-            tw.WriteLine(@"    constructor(ds?: dataSource) {
-        super(ds ? ds : shared.server, '" + name + @"');
-        this.initColumns(this.id);
-    }");
-            tw.WriteLine("}");
-        }
-        internal void CreateTypeScriptClass(TextWriter tw, string name, string url)
+
+        internal void CreateTypeScriptRemultClass(TextWriter tw, string name)
         {
             init();
 
@@ -273,19 +260,20 @@ namespace ENV.Web
             string idColumnType = "string";
             if (_idColumn is NumberColumn)
                 idColumnType = "number";
-
-            tw.WriteLine($@"export class {name} extends radweb.Entity<{idColumnType}> {{");
+            tw.WriteLine("import { EntityClass, Entity, NumberColumn, StringColumn, DateColumn, BoolColumn } from '@remult/core';");
+            tw.WriteLine("");
+            tw.WriteLine("@EntityClass");
+            tw.WriteLine($@"export class {name} extends Entity<{idColumnType}> {{");
             foreach (var item in _columns)
             {
                 var args = "";
                 if (item.Caption.ToLowerInvariant() != item.Key.ToLowerInvariant())
                     args = "'" + item.Caption + "'";
-                tw.WriteLine($"    {item.Key} = new radweb.{item.getColumnType()}({args});");
+                tw.WriteLine($"    {item.Key} = new {item.getColumnType()}({args});");
             }
             tw.WriteLine($@"
     constructor() {{
-        super(() => new {name}(), environment.dataSource, '{name}');
-        this.initColumns();
+        super('{name}');
     }}
 }}");
 

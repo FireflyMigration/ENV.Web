@@ -153,13 +153,18 @@ namespace ENV.Web
                                             };
 
                                         }
-                                        if (responseType.StartsWith("D"))
+
+                                        if (responseType.StartsWith("D")||responseType.ToLower().StartsWith("remult"))
                                         {
                                             Response.ContentType = "text/plain";
                                             sw.WriteLine("// /" + name + "?_responseType=" + responseType);
                                             sw.WriteLine();
-                                            if (responseType.StartsWith("DE"))
-                                                vmc.Describe(sw, name);
+                                            if (responseType.ToLower().StartsWith("remult"))
+                                            {
+                                                vmc.CreateTypeScriptRemultClass(sw, name);
+                                                Response.ContentType = "application/text";
+                                                Response.AddHeader("Content-Disposition", "attachment;filename="+name+".ts");
+                                            }
                                             else if (responseType.StartsWith("DCF"))
                                                 vmc.FullColumnList(sw);
                                             else if (responseType.StartsWith("DC"))
@@ -327,7 +332,7 @@ namespace ENV.Web
     <li role=""presentation"" class=""active""><a href=""#{item.Name}_api"" aria-controls=""api"" role=""tab"" data-toggle=""tab"">API</a></li>
     <li role=""presentation""><a href=""#{item.Name}_parameters"" aria-controls=""profile"" role=""tab"" data-toggle=""tab"">Body Parameters</a></li>
     <li role=""presentation""><a href=""#{item.Name}_settings"" aria-controls=""messages"" role=""tab"" data-toggle=""tab"">Typescript Interface</a></li>
-    <li role=""presentation""><a href=""#{item.Name}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript Radweb</a></li>
+    <li role=""presentation""><a href=""#{item.Name}_interface"" aria-controls=""settings"" role=""tab"" data-toggle=""tab"">Typescript remult</a></li>
     <li role=""presentation""><a href=""#{item.Name}_keys"" aria-controls=""keys"" role=""tab"" data-toggle=""tab"">Typescript Column Keys</a></li>
   </ul>
 
@@ -335,7 +340,7 @@ namespace ENV.Web
   <div class=""tab-content"">
     <div role=""tabpanel"" class=""tab-pane active"" id=""{item.Name}_api"">{ api}</div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_parameters"">{bodyParameters}</div>
-    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptClass(tw, item.Name, url))}</pre></div>
+    <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_interface""><pre>{getCodeSnippet(tw => c.CreateTypeScriptRemultClass(tw, item.Name))}</pre><a href=""{url+ "?_response=remult"}"">download</a></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_settings""><pre>{getCodeSnippet(tw => c.CreateTypeScriptInterface(tw, item.Name, url))}</pre></div>
     <div role=""tabpanel"" class=""tab-pane"" id=""{item.Name}_keys""><pre>{getCodeSnippet(c.ColumnKeys)}</pre></div>
   </div>

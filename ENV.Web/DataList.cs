@@ -214,7 +214,7 @@ namespace ENV.Web
                 Bool r;
                 if (Bool.TryCast(_o, out r))
                     return r;
-                return _o.ToString() == "true";
+                return _o.ToString().ToLower() == "true";
             }
         }
         public DataList DataList

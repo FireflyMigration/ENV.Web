@@ -12,9 +12,10 @@ namespace WebDemo.Controllers
         static DataApi _dataApi = new DataApi() { DisableDocumentation = false };
         static DataApiController()
         {
-            
+            _dataApi.Register(typeof(Northwind.Test.EntityThatSupportsNull), true);
             _dataApi.Register(typeof(Northwind.Models.Categories), true);
             _dataApi.Register(typeof(TestViewModel));
+            
 
         }
         // GET: DataApi

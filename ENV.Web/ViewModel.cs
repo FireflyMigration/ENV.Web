@@ -177,6 +177,8 @@ namespace ENV.Web
                 item.Value.addFilter(req[item.Key + "_ne"], _tempFilter, new different());
                 item.Value.addFilter(req[item.Key + "_contains"], _tempFilter, new contains());
                 item.Value.addFilter(req[item.Key + "_st"], _tempFilter, new startsWith());
+                item.Value.addNullFilter(req[item.Key + "_null"],_tempFilter);
+
             }
             long start = 0;
             long numOfRows = 25;
@@ -509,6 +511,36 @@ namespace ENV.Web
                     tempFilter.Add(f.result);
                 }
             }
+            internal void addNullFilter(string dataItemValue, FilterCollection tempFilter)
+            {
+                var equalNull = dataItemValue;
+                if (equalNull != null)
+                {
+                    equalNull = equalNull.ToString().Trim().ToLower();
+                    switch (equalNull)
+                    {
+                        case "true":
+                        case "y":
+                        case "yes":
+                            {
+                                var en = new equalToNull();
+                                Caster.Cast(_col, new DataItemValue(null), en);
+                                if (en.result != null)
+                                    tempFilter.Add(en.result);
+                                break;
+                            }
+                        default:
+                            {
+                                var en = new isDifferentFromNull();
+                                Caster.Cast(_col, new DataItemValue(null), en);
+                                if (en.result != null)
+                                    tempFilter.Add(en.result);
+                                break;
+                            }
+                    }
+                }
+                
+            }
 
 
             internal void AddSort(Sort orderBy, SortDirection so)
@@ -588,7 +620,6 @@ namespace ENV.Web
                     return "time";
                 return "text";
             }
-
 
 
         }
@@ -826,6 +857,21 @@ namespace ENV.Web
             result = col.IsEqualTo(val);
         }
     }
+    class equalToNull : filterAbstract
+    {
+        public override void What<T>(TypedColumnBase<T> col, T val)
+        {
+            result = col.IsEqualTo(default(T));
+        }
+    }
+    class isDifferentFromNull : filterAbstract
+    {
+        public override void What<T>(TypedColumnBase<T> col, T val)
+        {
+            result = col.IsDifferentFrom(default(T));
+        }
+    }
+
     class greater : filterAbstract
     {
         public override void What<T>(TypedColumnBase<T> col, T val)
@@ -870,6 +916,7 @@ namespace ENV.Web
                 result = tcol.StartsWith(val.ToString());
         }
     }
+
     class contains : filterAbstract
     {
         public override void What<T>(TypedColumnBase<T> col, T val)

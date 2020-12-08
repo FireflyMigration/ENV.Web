@@ -53,6 +53,8 @@ namespace ENV.Web
 
         internal static object FixValueTypes(object value)
         {
+            if (value == null)
+                return null;
             Text txt;
             Number n;
             Date d;
@@ -108,7 +110,7 @@ namespace ENV.Web
                 object value = pair.Value.ToObject<object>();
                 if (value is JArray)
                     value = DataList.FromJson(value.ToString());
-                else
+                else if (value != null)
                     value = value.ToString();
                 di.Set(pair.Key, value);
             }
@@ -365,8 +367,8 @@ namespace ENV.Web
         public void WriteValue(object value)
         {
             if (value == null)
-                value = "";
-            if (value is int || value is long)
+                _writer.Write("null");
+            else if (value is int || value is long)
 
                 _writer.Write(value.ToString());
             else if (value is double)

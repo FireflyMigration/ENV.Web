@@ -270,7 +270,7 @@ namespace ENV.Web
             {
                 var args = "";
                 if (item.Caption.ToLowerInvariant() != item.Key.ToLowerInvariant())
-                    args = "'" + item.Caption + "'";
+                    args = "{caption:'" + item.Caption + "'}";
                 tw.WriteLine($"    {item.Key} = new {item.getColumnType()}({args});");
             }
             tw.WriteLine($@"

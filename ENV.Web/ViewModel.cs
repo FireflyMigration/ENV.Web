@@ -177,7 +177,7 @@ namespace ENV.Web
                 item.Value.addFilter(req[item.Key + "_ne"], _tempFilter, new different());
                 item.Value.addFilter(req[item.Key + "_contains"], _tempFilter, new contains());
                 item.Value.addFilter(req[item.Key + "_st"], _tempFilter, new startsWith());
-                item.Value.addNullFilter(req[item.Key + "_null"],_tempFilter);
+                item.Value.addNullFilter(req[item.Key + "_null"], _tempFilter);
 
             }
             long start = 0;
@@ -259,25 +259,32 @@ namespace ENV.Web
 
             name = name[0].ToString().ToUpper() + name.Substring(1);
 
-            string idColumnType = "string";
-            if (_idColumn is NumberColumn)
-                idColumnType = "number";
-            tw.WriteLine("import { EntityClass, Entity, NumberColumn, StringColumn, DateColumn, BoolColumn } from '@remult/core';");
+            
+            tw.WriteLine("import { Column, DateOnlyValueConverter, Entity, EntityBase } from '@remult/core';");
             tw.WriteLine("");
-            tw.WriteLine("@EntityClass");
-            tw.WriteLine($@"export class {name} extends Entity<{idColumnType}> {{");
+            tw.WriteLine("@Entity({ key: '" + name + "' })");
+            tw.WriteLine($@"export class {name} extends EntityBase {{");
             foreach (var item in _columns)
             {
                 var args = "";
                 if (item.Caption.ToLowerInvariant() != item.Key.ToLowerInvariant())
-                    args = "{caption:'" + item.Caption + "'}";
-                tw.WriteLine($"    {item.Key} = new {item.getColumnType()}({args});");
+                    args = "caption:'" + item.Caption + "'";
+                var type = item.getColumnType();
+                if (type == "Date")
+                {
+                    if (args.Length > 0)
+                        args += ", ";
+                    args += "valueConverter: () => DateOnlyValueConverter";
+                }
+                if (args.Length > 0) {
+                    args = "{ " + args + " }";
+                }
+                tw.WriteLine($"    @Column({args})");
+                tw.WriteLine($"    {item.Key}: {item.getColumnType()};");
+                
             }
-            tw.WriteLine($@"
-    constructor() {{
-        super('{name}');
-    }}
-}}");
+            tw.WriteLine("}");
+            
 
 
 
@@ -539,7 +546,7 @@ namespace ENV.Web
                             }
                     }
                 }
-                
+
             }
 
 
@@ -556,17 +563,15 @@ namespace ENV.Web
             public string Caption => _col.Caption;
 
 
-            internal object getColumnType()
+            internal string getColumnType()
             {
                 if (_col is BoolColumn)
-                    return "BoolColumn";
+                    return "boolean";
                 else if (_col is NumberColumn)
-                    return "NumberColumn";
+                    return "number";
                 else if (_col is DateColumn)
-                    return "DateColumn";
-                else if (_col is TimeColumn)
-                    return "TimeColumn";
-                return "StringColumn";
+                    return "Date";
+                return "string";
             }
 
             internal void SaveTo(DataItem x)

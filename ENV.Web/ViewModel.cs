@@ -260,7 +260,7 @@ namespace ENV.Web
             name = name[0].ToString().ToUpper() + name.Substring(1);
 
             
-            tw.WriteLine("import { Column, DateOnlyValueConverter, Entity, EntityBase } from '@remult/core';");
+            tw.WriteLine("import { Field, DateOnlyValueConverter, Entity, EntityBase } from '@remult/core';");
             tw.WriteLine("");
             tw.WriteLine("@Entity({ key: '" + name + "' })");
             tw.WriteLine($@"export class {name} extends EntityBase {{");
@@ -279,7 +279,7 @@ namespace ENV.Web
                 if (args.Length > 0) {
                     args = "{ " + args + " }";
                 }
-                tw.WriteLine($"    @Column({args})");
+                tw.WriteLine($"    @Field({args})");
                 tw.WriteLine($"    {item.Key}: {item.getColumnType()};");
                 
             }

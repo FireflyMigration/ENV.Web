@@ -22,6 +22,10 @@ namespace ENV.Web
         {
             Set((IEnumerable<ColumnBase>)cols);
         }
+        public bool ContainsKey(string key)
+        {
+            return _vals.ContainsKey(key);
+        }
         public string[] Keys { get { return _vals.Keys.ToArray<string>(); } }
         public void Set(IEnumerable<ColumnBase> cols)
         {
@@ -206,6 +210,8 @@ namespace ENV.Web
                 Time r;
                 if (Time.TryCast(_o, out r))
                     return r;
+                if (_o == null)
+                    return null;
                 return Time.Parse(_o.ToString(), ("HH:MM:SS"));
             }
         }

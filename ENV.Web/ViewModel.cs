@@ -581,7 +581,8 @@ namespace ENV.Web
             {
                 if ((_col.Entity == null || _col.Entity == updatebleEntity) && !ignoreUpdateOf.Contains(_col))
                 {
-                    _setValueBasedOnDataItem(item[_key]);
+                    if (item.ContainsKey(_key))
+                        _setValueBasedOnDataItem(item[_key]);
 
                     if (!Comparer.Equal(_col.OriginalValue, _col.Value))
                     {
@@ -830,7 +831,14 @@ namespace ENV.Web
 
 
 
-
+        protected static T Create<T>()
+        {
+            return AbstractFactory.Create<T>();
+        }
+        protected static T Cached<T>()
+        {
+            return AbstractFactory.Create<T>();
+        }
 
 
     }

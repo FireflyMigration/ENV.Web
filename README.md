@@ -1,3 +1,6 @@
+# this project is no longer maintained, it was moved to ENV.Web.Demo
+https://github.com/FireflyMigration/ENV.Web.demo/
+
 # Introducing ENV.Web
 
 ENV.Web is a project we use to demo fast web application development with migrated .NET code reused on the server side.
